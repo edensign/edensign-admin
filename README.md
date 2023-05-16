@@ -1,2 +1,2 @@
-# edensign-web
-Eden Sign Web in React + Vite
+# edensign-website
+Eden Sign Website in React + Vite
