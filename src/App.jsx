@@ -2,13 +2,13 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { Routes, Route } from "react-router-dom";
 
 import { ColorModeContext, useMode } from "./theme";
-import Topbar from "./scenes/global/Topbar.jsx";
-import Sidebar from "./scenes/global/Sidebar.jsx";
-import Dashboard from "./scenes/dashboard";
-import Form from "./scenes/form";
-import Employees from "./scenes/team/Employees";
-import Contacts from "./scenes/contacts";
-// import Calendar from "./scenes/calendar/calendar";
+import Topbar from "./components/common/Topbar.jsx";
+import Sidebar from "./components/common/Sidebar.jsx";
+import Dashboard from "./components/dashboard/Dashboard.jsx";
+import EmployeeUpdateComponent from "./components/users/Employee Update Component.jsx";
+import EmployeeListingComponent from "./components/users/Employee Listing Component.jsx";
+import Login from "./components/login/Login.jsx";
+// import Calendar from "./calendar/calendar";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -22,10 +22,10 @@ function App() {
           <main className="content">
             <Topbar />
             <Routes>
+              <Route exact path="/login" element={<Login /> } />
               <Route exact path="/" element={<Dashboard />} />
-              <Route exact path="/form" element={<Form />} />
-              <Route exact path="/employees" element={<Employees />} />
-              <Route exact path="/contacts" element={<Contacts />} />
+              <Route exact path="/employee-update" element={<EmployeeUpdateComponent />} />
+              <Route exact path="/employee-listing" element={<EmployeeListingComponent /> } />
               {/* <Route exact path="/calendar" element={<Calendar />} /> */}
             </Routes>
           </main>
