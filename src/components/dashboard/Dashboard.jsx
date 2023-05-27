@@ -1,3 +1,11 @@
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+*/
+
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import EmailIcon from "@mui/icons-material/Email";
@@ -5,8 +13,8 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
 
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
+import { tokens } from "../../theme.jsx";
+import Header from "../../components/Header.jsx";
 // import { mockTransactions } from "../../data/mockData";
 // import LineChart from "../../components/LineChart";
 // import GeographyChart from "../../components/GeographyChart";

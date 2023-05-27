@@ -45,12 +45,12 @@ const center = {
   left: "30%",
 };
 
-export default function Register() {
+export default function ResetPassword() {
   const [open, setOpen] = useState(false);
   const [remember, setRemember] = useState(false);
   const vertical = "top";
   const horizontal = "right";
-  const navigate = useNavigate();
+  const navigateTo = useNavigate();
 
   const handleSubmit = async (event) => {
     setOpen(true);
@@ -79,7 +79,7 @@ export default function Register() {
         anchorOrigin={{ vertical, horizontal }}
       >
         <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
-          Failed! Enter correct username and password.
+          Failed! Enter correct email
         </Alert>
       </Snackbar>
       <div
@@ -124,7 +124,7 @@ export default function Register() {
                         <LockOutlinedIcon />
                       </Avatar>
                       <Typography component="h1" variant="h4">
-                        Create Account
+                        Reset Password
                       </Typography>
                     </Box>
                     <Box
@@ -139,31 +139,9 @@ export default function Register() {
                             required
                             fullWidth
                             id="email"
-                            label="Username"
+                            label="Email"
                             name="email"
                             autoComplete="email"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <TextField
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="new-password"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
-                          <TextField
-                            required
-                            fullWidth
-                            name="confirmpassword"
-                            label="Confirm Password"
-                            type="password"
-                            id="confirmpassword"
-                            autoComplete="new-password"
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ ml: "5em", mr: "5em" }}>
@@ -181,7 +159,7 @@ export default function Register() {
                               backgroundColor: "#FF9A01",
                             }}
                           >
-                            Register
+                            Send Reset Link
                           </Button>
                         </Grid>
                         <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
@@ -191,14 +169,14 @@ export default function Register() {
                               component="span"
                               style={{ marginTop: "10px" }}
                             >
-                              Already have an Account?{" "}
+                              Login to your Account.
                               <span
                                 style={{ color: "#beb4fb", cursor: "pointer" }}
                                 onClick={() => {
-                                    navigate("/");
-                                  }}
+                                  navigateTo("/login");
+                                }}
                               >
-                                Sign In
+                                {" "}Sign In
                               </span>
                             </Typography>
                           </Stack>

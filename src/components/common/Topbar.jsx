@@ -1,17 +1,23 @@
-import { Box, useTheme } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import InputBase from "@mui/material/InputBase";
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+*/
+
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { Box, useTheme, IconButton, InputBase } from "@mui/material";
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { ColorModeContext, tokens } from "../../theme";
-
+import { ColorModeContext, tokens } from "../../theme.jsx";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -49,7 +55,7 @@ const Topbar = () => {
           <SettingsOutlinedIcon />
         </IconButton>
         <IconButton
-          // onClick={() => navigateTo("/login")}
+          onClick={() => navigateTo("/login")}
         >
           <PersonOutlinedIcon />
         </IconButton>

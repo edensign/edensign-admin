@@ -4,12 +4,19 @@
  * This software is the confidential information of Eden Sign Inc., and is licensed as
  * restricted rights software. The use,reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
-*/
+ */
 
-import { createStore } from "redux";
+import "./index.css";
 
-import reducers from "./reducers";
+const Loader = () => {
 
-const store = createStore(reducers, {});
+    return (
+        // <div className="loader-container">
+            <div className="lds-ring">
+                <div></div><div></div><div></div><div></div>
+            </div>
+        // </div>
+    )
+}
 
-export default store;
+export default Loader;

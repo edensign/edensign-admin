@@ -9,25 +9,14 @@
 import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
-    users: [],
+    selected: "Dashboard",
 };
 
-export const setUserReducer = (state = initialState, action) => {
+export const menuItemReducer = (state = initialState, action) => {
     switch (action.type) {
-        case ActionTypes.SET_USERS:
+        case ActionTypes.MENU_ITEM:
             return {
-                ...state, users: action.payload
-            };
-        default:
-            return state;
-    };
-};
-
-export const registerUserReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case ActionTypes.REGISTER_USER:
-            return {
-                ...state, users: action.payload
+                ...state, selected: action.payload
             };
         default:
             return state;

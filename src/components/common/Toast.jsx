@@ -1,4 +1,13 @@
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+ */
+
 import * as React from 'react';
+
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
@@ -12,7 +21,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function Toast(props) {
     const [state, setState] = React.useState({
         open: props.alerting,
-        Transition: Slide,
+        Transition: Slide
     });
 
     const handleClose = (reason) => {
@@ -38,17 +47,19 @@ export default function Toast(props) {
 
     return (
         <div>
-            {props.alerting && <Snackbar
-                open={props.alerting}
-                onClose={handleClose}
-                autoHideDuration={2000}
-                TransitionComponent={state.Transition}
-                key={state.Transition.name}
-            >
-                <Alert severity={props.severity} sx={{ width: '100%' }} onClose={handleClose}>
-                    {props.message}
-                </Alert>
-            </Snackbar>
+            {
+                props.alerting && <Snackbar
+                    anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                    open={props.alerting}
+                    onClose={handleClose}
+                    autoHideDuration={2000}
+                    TransitionComponent={state.Transition}
+                    key={state.Transition.name}
+                >
+                    <Alert severity={props.severity} sx={{ width: '100%' }} onClose={handleClose}>
+                        {props.message}
+                    </Alert>
+                </Snackbar>
             }
         </div>
     );
