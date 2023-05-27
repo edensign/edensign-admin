@@ -1,31 +1,42 @@
+import { useEffect } from "react";
 import { Box, Typography, Button, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-// import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-// import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-// import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import { useSelector, useDispatch } from "react-redux";
 
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
-import getUsersAPI from "../../getUsersAPI";
+import Header from "../Header.jsx";
+import { UserAPI } from "../../apis/UserAPI.jsx";
+import { tokens } from "../../theme.jsx";
+import { getUsers } from "../../redux/actions/UserActions.jsx";
 
-const Team = () => {
+const EmployeeListingComponent = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        UserAPI.getAll()
+            .then(users => {
+                dispatch(getUsers(users));
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }, [])
+
+    const users = useSelector(state => state);
+
+    const navigateTo = useNavigate();
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+
     const columns = [
-        { field: "id", headerName: "ID" },
+        { field: "id", headerName: "ID", flex: 0.5 },
+        { field: "created_by", headerName: "Created By" },
         {
             field: "username",
             headerName: "Username",
             flex: 1,
             cellClassName: "name-column--cell",
-        },
-        {
-            field: "age",
-            headerName: "Age",
-            type: "number",
-            headerAlign: "left",
-            align: "left",
         },
         {
             field: "contact_no",
@@ -58,8 +69,6 @@ const Team = () => {
                         }
                         borderRadius="4px"
                     >
-                        {/* {status === "active" && <SecurityOutlinedIcon />}
-                        {status === "inactive" && <LockOpenOutlinedIcon />} */}
                         <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
                             {status}
                         </Typography>
@@ -69,19 +78,16 @@ const Team = () => {
         },
     ];
 
-    const [ usersData ] = getUsersAPI();
-    const navigateTo = useNavigate();
-
     return (
         <Box m="20px">
             <Header title="USERS" />
             <Button
-                type="submit" 
+                type="submit"
                 color="success"
-                variant="contained" 
-                sx={{ position: "absolute", right: "15px", top: "90px"}}
-                onClick={() => { navigateTo("/form") }}
-                >
+                variant="contained"
+                sx={{ position: "absolute", right: "15px", top: "90px" }}
+                onClick={() => { navigateTo("/employee-update") }}
+            >
                 Create New User
             </Button>
             <Box
@@ -111,13 +117,20 @@ const Team = () => {
                     "& .MuiCheckbox-root": {
                         color: `${colors.greenAccent[200]} !important`,
                     },
+                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                        color: `${colors.grey[100]} !important`,
+                    }
                 }}
             >
-                <DataGrid checkboxSelection rows={usersData} columns={columns} />
+                <DataGrid
+                    checkboxSelection
+                    rows={users.allUsers.users}
+                    columns={columns}
+                    components={{ Toolbar: GridToolbar }}
+                />
             </Box>
         </Box>
-    )
-
+    );
 };
 
-export default Team;
+export default EmployeeListingComponent;

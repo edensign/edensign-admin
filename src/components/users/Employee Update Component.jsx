@@ -1,16 +1,70 @@
 import { Box, Button, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
-import * as yup from "yup";
+import EmployeeValidation from "./Employee Validation.jsx";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-import Header from "../../components/Header";
+import Header from "../Header.jsx";
+import Toast from "../common/Toast.jsx";
+import { UserAPI } from "../../apis/UserAPI.jsx";
 
-const Form = () => {
+const EmployeeUpdateComponent = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    const navigateTo = useNavigate();
 
-    const handleFormSubmit = (values) => {
-        console.log(values);
+    const [userData, setUserData] = useState(null);
+    const [toastAlert, setToastAlert] = useState(false);
+    const [toastSeverity, setToastSeverity] = useState("");
+    const [toastMessage, setToastMessage] = useState("");
+
+    const handleFormSubmit = values => {
+        setUserData(values);
+        setToastAlert(true);
+        setToastSeverity("success");
+        setToastMessage("Success");
+
+        setTimeout(() => {
+            setToastAlert(false);
+        }, 2000);
     };
+
+    const handleFormReset = values => {
+        if (window.confirm("Do You Want To Reset?")) {
+            values = {};
+        };
+        setToastAlert(true);
+        setToastSeverity("warning");
+        setToastMessage("Resetted");
+
+        setTimeout(() => {
+            setToastAlert(false);
+        }, 2000);
+    };
+
+    const handleFormCancel = () => {
+        setToastAlert(true);
+        setToastSeverity("error");
+        setToastMessage("Cancelled");
+
+        setTimeout(() => {
+            setToastAlert(false);
+            navigateTo("/employee-listing");
+        }, 2000);
+    };
+
+    useEffect(() => {
+        if (userData) {
+            console.log("Inside useEffect");
+            UserAPI.register(userData)
+                .then(user => {
+                    navigateTo("/employee-listing");
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
+    }, [userData]);
 
     return (
         <Box m="20px">
@@ -19,7 +73,8 @@ const Form = () => {
             <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={initialValues}
-                validationSchema={checkoutSchema}
+                validationSchema={EmployeeValidation}
+                onReset={handleFormReset}
             >
                 {({
                     values,
@@ -28,8 +83,9 @@ const Form = () => {
                     handleBlur,
                     handleChange,
                     handleSubmit,
+                    handleReset
                 }) => (
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} onReset={handleReset}>
                         <Box
                             display="grid"
                             gap="30px"
@@ -84,10 +140,10 @@ const Form = () => {
                                 label="Contact Number"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
-                                value={values.contact}
-                                name="contact"
-                                error={!!touched.contact && !!errors.contact}
-                                helperText={touched.contact && errors.contact}
+                                value={values.contact_no}
+                                name="contact_no"
+                                error={!!touched.contact_no && !!errors.contact_no}
+                                helperText={touched.contact_no && errors.contact_no}
                                 sx={{ gridColumn: "span 2" }}
                             />
                             <TextField
@@ -121,12 +177,13 @@ const Form = () => {
                             <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}>
                                 Reset
                             </Button>
-                            <Button color="error" variant="contained" sx={{ mr: 3 }}>
+                            <Button color="error" variant="contained" sx={{ mr: 3 }} onClick={handleFormCancel} >
                                 Cancel
                             </Button>
                             <Button type="submit" color="success" variant="contained">
                                 Create New User
                             </Button>
+                            <Toast alerting={toastAlert} severity={toastSeverity} message={toastMessage} />
                         </Box>
                     </form>
                 )}
@@ -135,27 +192,27 @@ const Form = () => {
     );
 };
 
-const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+// const phoneRegExp = /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
-const checkoutSchema = yup.object().shape({
-    username: yup.string().required("required"),
-    password: yup.string().required("required"),
-    email: yup.string().email("invalid email").required("required"),
-    contact: yup
-        .string()
-        .matches(phoneRegExp, "Phone number is not valid")
-        .required("required"),
-    type: yup.string().required("required"),
-    //   address2: yup.string().required("required"),
-});
+// const checkoutSchema = yup.object().shape({
+//     username: yup.string().required("required"),
+//     password: yup.string().required("required"),
+//     email: yup.string().email("invalid email").required("required"),
+//     contact_no: yup
+//         .string()
+//         .matches(phoneRegExp, "Phone number is not valid")
+//         .required("required"),
+//     type: yup.string().required("required"),
+//     //   address2: yup.string().required("required"),
+// });
 
 const initialValues = {
     username: "",
     password: "",
     email: "",
-    contact: "",
+    contact_no: "",
     type: "",
     //   address2: "",
 };
 
-export default Form;
+export default EmployeeUpdateComponent;
