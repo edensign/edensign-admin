@@ -1,50 +1,34 @@
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+ */
+
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar/dist";
 import "react-pro-sidebar/dist/css/styles.css";
+
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
-import { tokens } from "../../theme";
+import { tokens } from "../../theme.jsx";
+import { SidebarItem } from "./SidebarItem.jsx";
 import DummyImg from "./Faraz.png";
-
-
-const Item = ({ title, to, icon, selected, setSelected }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
-  return (
-    <MenuItem
-      active={selected === title}
-      style={{
-        color: colors.grey[100],
-      }}
-      onClick={() => setSelected(title)}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-      <Link to={to} />
-    </MenuItem>
-  );
-};
-
 
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
+
+  const selected = useSelector(state => state.menuItems.selected);
 
   return (
     <Box
@@ -123,12 +107,11 @@ const Sidebar = () => {
 
           {/* MENU ITEMS */}
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
+            <SidebarItem
               title="Dashboard"
               to="/"
               icon={<HomeOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
             />
 
             <Typography
@@ -138,41 +121,24 @@ const Sidebar = () => {
             >
               Users
             </Typography>
-            <Item
-              title="Employee Listing"
-              to="/employee-listing"
+            <SidebarItem
+              title="Employee"
+              to="/user-listing"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
             />
-            <Item
-              title="Employee Update"
-              to="/employee-update"
-              icon={<ContactsOutlinedIcon />}
+            <SidebarItem
+              title="Salon"
+              to="/user-listing"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
-            />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Salons
-            </Typography>
-            <Item
-              title="Salon Listing"
-              to="/employee-listing"
+            />
+            <SidebarItem
+              title="Freelancer"
+              to="/user-listing"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Salon Update"
-              to="/employee-update"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
 
             <Typography
@@ -182,41 +148,17 @@ const Sidebar = () => {
             >
               Products
             </Typography>
-            <Item
+            <SidebarItem
               title="Product Listing"
               to="/employee-listing"
-              icon={<PeopleOutlinedIcon />}
+              icon={<ReceiptOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
             />
-            <Item
+            <SidebarItem
               title="Product Update"
               to="/employee-update"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Freelancers
-            </Typography>
-            <Item
-              title="Freelancer Listing"
-              to="/employee-listing"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Freelancer Update"
-              to="/employee-update"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
 
             <Typography
@@ -226,56 +168,12 @@ const Sidebar = () => {
             >
               Pages
             </Typography>
-            <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
+            <SidebarItem
               title="FAQ Page"
               to="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
-              setSelected={setSelected}
             />
-
-            {/* <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
           </Box>
         </Menu>
       </ProSidebar>

@@ -1,22 +1,16 @@
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import bg from "./bg/signin.svg";
-import bgimg from "./bg/backimg.jpg";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
+import { useState, forwardRef } from "react";
+import { Box, Grid, Button, TextField, Typography, Container, Avatar, Checkbox } from "@mui/material";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import { useState, forwardRef } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import MuiAlert from "@mui/material/Alert";
 import Slide from "@mui/material/Slide";
 import { useNavigate } from "react-router-dom";
+
+import bg from "./bg/signin.svg";
+import bgimg from "./bg/backimg.jpg";
 
 const Alert = forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -45,12 +39,12 @@ const center = {
   left: "30%",
 };
 
-export default function ForgotPassword() {
+export default function Signup() {
   const [open, setOpen] = useState(false);
   const [remember, setRemember] = useState(false);
   const vertical = "top";
   const horizontal = "right";
-  const navigate = useNavigate();
+  const navigateTo = useNavigate();
 
   const handleSubmit = async (event) => {
     setOpen(true);
@@ -124,7 +118,7 @@ export default function ForgotPassword() {
                         <LockOutlinedIcon />
                       </Avatar>
                       <Typography component="h1" variant="h4">
-                        Reset Password
+                        Create Account
                       </Typography>
                     </Box>
                     <Box
@@ -139,9 +133,31 @@ export default function ForgotPassword() {
                             required
                             fullWidth
                             id="email"
-                            label="Email"
+                            label="Username"
                             name="email"
                             autoComplete="email"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            autoComplete="new-password"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
+                          <TextField
+                            required
+                            fullWidth
+                            name="confirmpassword"
+                            label="Confirm Password"
+                            type="password"
+                            id="confirmpassword"
+                            autoComplete="new-password"
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ ml: "5em", mr: "5em" }}>
@@ -159,7 +175,7 @@ export default function ForgotPassword() {
                               backgroundColor: "#FF9A01",
                             }}
                           >
-                            Send Reset Link
+                            Register
                           </Button>
                         </Grid>
                         <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
@@ -169,14 +185,14 @@ export default function ForgotPassword() {
                               component="span"
                               style={{ marginTop: "10px" }}
                             >
-                              Login to your Account.
+                              Already have an Account?{" "}
                               <span
                                 style={{ color: "#beb4fb", cursor: "pointer" }}
                                 onClick={() => {
-                                  navigate("/");
-                                }}
+                                    navigateTo("/login");
+                                  }}
                               >
-                                {" "}Sign In
+                                Sign In
                               </span>
                             </Typography>
                           </Stack>
