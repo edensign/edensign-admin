@@ -29,9 +29,9 @@ export const menuItem = (item) => {
     };
 };
 
-export const setAuthToken = (token) => {
+export const setAuthInfo = (payload) => {
     return {
-        type: ActionTypes.AUTH_TOKEN,
-        payload: token
+        type: ActionTypes.AUTH_INFO,
+        payload: payload
     };
 };

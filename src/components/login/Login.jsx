@@ -11,7 +11,7 @@ import { Formik } from "formik";
 import Toast from "../common/Toast";
 import SignInLoader from "../common/SignInLoader";
 import { UserAPI } from "../../apis/UserAPI";
-import { setAuthToken } from "../../redux/actions/UserActions";
+import { setAuthInfo } from "../../redux/actions/UserActions";
 import { themeSettings } from "../../theme";
 
 import bgImg from "../assets/backimg.jpg";
@@ -67,7 +67,7 @@ export default function Login() {
         .then(({ data: response }) => {
           setLoading(false);
           if (response.status === 'Success' && response.data !== "Username and Password do not match") {
-            dispatch(setAuthToken({ token: response.data.token }));
+            dispatch(setAuthInfo({ token: response.data.token, username: response.data.username }));
           } else if (response.status === 'Success' && response.data === "Username and Password do not match") {
             setToastAlert(true);
             setToastSeverity("info");

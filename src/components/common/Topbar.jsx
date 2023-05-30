@@ -10,7 +10,7 @@ import { useContext, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Avatar, Box, useTheme, IconButton, InputBase, Tooltip, MenuItem } from "@mui/material";
-import { Menu, Divider, ListItemIcon } from "@mui/material";
+import { Menu, ListItemIcon } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
@@ -20,13 +20,14 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import Logout from '@mui/icons-material/Logout';
 
 import { ColorModeContext, tokens } from "../../theme";
-import { setAuthToken } from "../../redux/actions/UserActions";
-import { UserAPI } from "../../apis/UserAPI";
+import { setAuthInfo } from "../../redux/actions/UserActions";
+import { Utility } from "../utility";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+  const { getInitials } = Utility();
 
   const dispatch = useDispatch();
   const authInfo = useSelector(state => state.auth);
@@ -41,19 +42,11 @@ const Topbar = () => {
     setAnchorEl(null);
   };
 
-  const handleProfile = () => {
-    console.log("Token=>", authInfo.auth.token);
-    if (authInfo.auth.token) {
-      UserAPI.profile(authInfo.auth.token)
-        .then(profile => console.log(profile))
-        .catch(err => console.log(err))
-    };
-  };
-
   const handleSignOut = () => {
     console.log("Token=>", authInfo.auth.token);
     if (authInfo.auth.token) {
-      dispatch(setAuthToken({}));
+      dispatch(setAuthInfo({}));
+      location.reload();
     };
   };
 
@@ -75,19 +68,27 @@ const Topbar = () => {
       <Box display="flex" textAlign="center">
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
+            <Tooltip title="Dark Mode">
+              <DarkModeOutlinedIcon />
+            </Tooltip>
           ) : (
-            <LightModeOutlinedIcon />
+            <Tooltip title="Light Mode">
+              <LightModeOutlinedIcon />
+            </Tooltip>
           )}
         </IconButton>
-        <IconButton>
-          <NotificationsOutlinedIcon />
-        </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
+        <Tooltip title="Notifications">
+          <IconButton>
+            <NotificationsOutlinedIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Settings">
+          <IconButton>
+            <SettingsOutlinedIcon />
+          </IconButton>
+        </Tooltip>
         {/* <PersonOutlinedIcon /> */}
-        <Tooltip title="Account settings">
+        <Tooltip title="Account">
           <IconButton
             onClick={handleClick}
             size="small"
@@ -96,8 +97,9 @@ const Topbar = () => {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ width: 28, height: 28, bgcolor: colors.grey[100] }}>FH</Avatar>
-            {/* essentials of the user who is signed in */}
+            <Avatar sx={{ width: 28, height: 28, bgcolor: colors.grey[100] }}> {
+              getInitials()
+            } </Avatar>
           </IconButton>
         </Tooltip>
       </Box>
@@ -136,10 +138,6 @@ const Topbar = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleProfile}>
-          <Avatar /> Profile
-        </MenuItem>
-        <Divider />
         <MenuItem onClick={handleSignOut}>
           <ListItemIcon >
             <Logout fontSize="small" />

@@ -73,15 +73,11 @@ const FormComponent = () => {
 
     //Create/Update user
     useEffect(() => {
-        console.log("inside create/update useEffect", userData)
-
         if (userData && userData.id) {
-            console.log("Inside update")
             setLoading(true);
             if (pwField.disabled || !userData.password) {
                 delete userData.password;
             }
-            console.log("delete password", userData)
             UserAPI.update(userData)
                 .then(user => {
                     setLoading(false);
@@ -106,7 +102,6 @@ const FormComponent = () => {
                     }, 2000);
                 });
         } else if (userData && !userData.id) {
-            console.log("Inside Create User");
             setLoading(true);
             UserAPI.register(userData)
                 .then(user => {

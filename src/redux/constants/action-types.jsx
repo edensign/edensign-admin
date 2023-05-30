@@ -11,5 +11,5 @@ export const ActionTypes = {
     REGISTER_USER: "REGISTER_USER",
     SELECTED_USER: "SELECTED_USER",
     MENU_ITEM: "MENU_ITEM",
-    AUTH_TOKEN: "AUTH_TOKEN"
+    AUTH_INFO: "AUTH_INFO"
 };
