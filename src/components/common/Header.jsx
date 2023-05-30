@@ -8,7 +8,7 @@
 
 import { Typography, Box, useTheme } from "@mui/material";
 
-import { tokens } from "../theme.jsx";
+import { tokens } from "../../theme.jsx";
 
 const Header = ({ title }) => {
     const theme = useTheme();

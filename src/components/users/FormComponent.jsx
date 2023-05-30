@@ -11,19 +11,19 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { Box, Button, InputLabel, TextField, Select, MenuItem, InputAdornment, IconButton, FormControl } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { Formik } from "formik";
 
-import UserValidation from "./UserValidation.jsx";
-import Header from "../Header.jsx";
-import Toast from "../common/Toast.jsx";
-import Loader from "../common/Loader.jsx";
-import { UserAPI } from "../../apis/UserAPI.jsx";
-import { CommonAPI } from "../../apis/CommonAPI.jsx";
+import UserValidation from "./UserValidation";
+import Header from "../common/Header";
+import Toast from "../common/Toast";
+import Loader from "../common/Loader";
+import { UserAPI } from "../../apis/UserAPI";
+import { CommonAPI } from "../../apis/CommonAPI";
 
-const UserFormComponent = () => {
+const FormComponent = () => {
     const navigateTo = useNavigate();
     const { state } = useLocation();
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -153,11 +153,6 @@ const UserFormComponent = () => {
         }
     }, []);
 
-    // const handleFormSubmit = values => {
-    //     console.log("Inside Form submit", values);
-    //     setUserData(values);
-    // };
-
     const handleUpdatePassword = () => {
         pwField.removeAttribute("disabled");
         pwField.style.backgroundColor = "rgba(255, 255, 255, 0.09)";
@@ -167,22 +162,6 @@ const UserFormComponent = () => {
 
     const handleClickShowPassword = () => setShowPassword(!showPassword);
     const handleMouseDownPassword = () => setShowPassword(!showPassword);
-
-    // const handleFormReset = (resetForm) => {
-    //     const confirmation = window.confirm("Do You Want To Reset?");
-    //     console.log("Outside reset=>", confirmation);
-    //     console.log(userData);
-    //     if (confirmation == true) {
-    //         resetForm();
-    //         setToastAlert(true);
-    //         setToastSeverity("warning");
-    //         setToastMessage("Resetted");
-
-    //         setTimeout(() => {
-    //             setToastAlert(false);
-    //         }, 2000);
-    //     };
-    // };
 
     const handleFormCancel = () => {
         setToastAlert(true);
@@ -366,4 +345,4 @@ const UserFormComponent = () => {
     );
 };
 
-export default UserFormComponent;
+export default FormComponent;

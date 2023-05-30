@@ -11,6 +11,27 @@ import { defineCancelApiObject } from "./config/axiosUtils";
 
 export const UserAPI = {
   /** */
+  login: async (loginInfo, cancel = false) => {
+    return await api.request({
+      url: `/login`,
+      method: "POST",
+      data: loginInfo,
+      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+    });
+  },
+  /** */
+  profile: async (token, cancel = false) => {
+    return await api.request({
+      url: `/profile`,
+      headers: {
+        "x-access-token": token
+      },
+      method: "GET",
+      data: token,
+      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+    });
+  },
+  /** */
   getAll: async (conditionObj, cancel = false) => {
     const queryParam = conditionObj ? `?${conditionObj.key}=${conditionObj.value}` : null;
     const { data: response } = await api.request({
@@ -37,7 +58,7 @@ export const UserAPI = {
       data: fields,
       signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
     });
-  },
+  }
 };
 
 // defining the cancel API object for UserAPI

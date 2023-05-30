@@ -19,8 +19,9 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 
-import { tokens } from "../../theme.jsx";
-import { SidebarItem } from "./SidebarItem.jsx";
+import { tokens } from "../../theme";
+import { SidebarItem } from "./SidebarItem";
+
 import DummyImg from "./Faraz.png";
 
 const Sidebar = () => {

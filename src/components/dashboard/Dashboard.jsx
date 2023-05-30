@@ -13,8 +13,8 @@ import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
 
-import { tokens } from "../../theme.jsx";
-import Header from "../../components/Header.jsx";
+import { tokens } from "../../theme";
+import Header from "../common/Header";
 // import { mockTransactions } from "../../data/mockData";
 // import LineChart from "../../components/LineChart";
 // import GeographyChart from "../../components/GeographyChart";

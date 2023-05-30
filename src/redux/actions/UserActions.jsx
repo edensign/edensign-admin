@@ -28,3 +28,10 @@ export const menuItem = (item) => {
         payload: item
     };
 };
+
+export const setAuthToken = (token) => {
+    return {
+        type: ActionTypes.AUTH_TOKEN,
+        payload: token
+    };
+};
