@@ -6,11 +6,11 @@
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-export const ActionTypes = {
-    AUTH_INFO: "AUTH_INFO",
-    DISPLAY_TOAST: "DISPLAY_TOAST",
-    MENU_ITEM: "MENU_ITEM",
-    SET_USERS: "SET_USERS",
-    SELECTED_USER: "SELECTED_USER",
-    REGISTER_USER: "REGISTER_USER"
+import { ActionTypes } from "../constants/action-types";
+
+export const displayToast = (obj) => {
+    return {
+        type: ActionTypes.DISPLAY_TOAST,
+        payload: obj
+    };
 };

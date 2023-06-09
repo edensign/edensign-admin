@@ -7,54 +7,64 @@
 */
 
 import { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { useIdleTimer } from 'react-idle-timer';
 
 import { ColorModeContext, useMode } from "./theme";
-// const AccountMenu = lazy(() => import("./components/common/AccountMenu"));
 import Login from "./components/login/Login";
 import Topbar from "./components/common/Topbar";
 import Sidebar from "./components/common/Sidebar";
 import Loader from "./components/common/Loader";
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
 const FormComponent = lazy(() => import("./components/users/FormComponent"));
-const ListingComponent = lazy(() => import("./components/users/ListingComponent"));
+const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+import { Utility } from "./components/utility";
 // import Calendar from "./calendar/calendar";
 
 function App() {
   const [theme, colorMode] = useMode();
-  const authInfo = useSelector(state => state.auth);
+  const { pathname } = useLocation();
+  const { getLocalStorage } = Utility();
 
-  if (!authInfo.auth.token) {
-    console.log("Not logged in")
-    return (
-      <ThemeProvider theme={theme}>
-        <Login />
-      </ThemeProvider>
-    );
+  const onIdle = () => {
+    localStorage.clear();
+    location.reload();
   }
 
-  console.log("Logged in=>", authInfo.auth.token)
+  useIdleTimer({    //Automatically SignOut when a user is inactive
+    onIdle,
+    timeout: parseInt(import.meta.env.VITE_LOGOUT_TIMER)    //10 minute idle timeout stored in environment variable file
+  })
+
+  if (!getLocalStorage("auth")?.token && pathname !== '/login') {
+    return <Navigate to="/login" replace />
+  }
+
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          <Suspense fallback={<Loader />}>
-            <Sidebar />
-            <main className="content">
-              <Topbar />
-              <Routes>
-                <Route exact path="/" element={<Dashboard />} />
-                <Route exact path="/user-form" element={<FormComponent />} />
-                <Route exact path="/user-listing" element={<ListingComponent />} />
-                {/* <Route exact path="/account" element={<AccountMenu /> } /> */}
-                {/* <Route exact path="/calendar" element={<Calendar />} /> */}
-              </Routes>
-            </main>
-          </Suspense>
+          {getLocalStorage("auth")?.token &&
+            <Suspense fallback={<Loader />}>
+              <Sidebar />
+              <main className="content">
+                <Topbar />
+                <Routes>
+                  <Route exact path="/" element={<Dashboard />} />
+                  <Route exact path="/user/create" element={<FormComponent />} />
+                  <Route exact path="/user/update" element={<FormComponent />} />
+                  <Route exact path="/user/listing" element={<UserListingComponent />} />
+                  {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                </Routes>
+              </main>
+            </Suspense>
+          }
+          <Routes>
+            <Route exact path="/login" element={<Login />} />
+          </Routes>
         </div>
       </ThemeProvider>
     </ColorModeContext.Provider>

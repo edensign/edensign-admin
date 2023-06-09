@@ -7,33 +7,33 @@
 */
 
 import { useContext, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
-import { Avatar, Box, useTheme, IconButton, InputBase, Tooltip, MenuItem } from "@mui/material";
-import { Menu, ListItemIcon } from "@mui/material";
+import { Avatar, Box, Divider, useTheme, IconButton, Tooltip, MenuItem } from "@mui/material";
+import { Menu, ListItemIcon, Typography } from "@mui/material";
 
-import SearchIcon from "@mui/icons-material/Search";
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+// import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+// import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+// import PersonAdd from '@mui/icons-material/PersonAdd';
 import Logout from '@mui/icons-material/Logout';
 
+
 import { ColorModeContext, tokens } from "../../theme";
-import { setAuthInfo } from "../../redux/actions/UserActions";
 import { Utility } from "../utility";
 
 const Topbar = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const { getInitials } = Utility();
+  const { getInitials, getNameAndType } = Utility();
+  const { username, type } = getNameAndType();
 
-  const dispatch = useDispatch();
-  const authInfo = useSelector(state => state.auth);
-  const [anchorEl, setAnchorEl] = useState(null);
 
-  const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -43,29 +43,14 @@ const Topbar = () => {
   };
 
   const handleSignOut = () => {
-    console.log("Token=>", authInfo.auth.token);
-    if (authInfo.auth.token) {
-      dispatch(setAuthInfo({}));
-      location.reload();
-    };
+    localStorage.clear();
+    location.reload();
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" p={2}>
-      {/* SEARCH BAR */}
-      <Box
-        display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="4px"
-      >
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-        <IconButton sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
-      </Box>
-
+    <>
       {/* ICONS */}
-      <Box display="flex" textAlign="center">
+      <Box display="flex" textAlign="center" justifyContent="flex-end" p={2}>
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <Tooltip title="Dark Mode">
@@ -82,12 +67,12 @@ const Topbar = () => {
             <NotificationsOutlinedIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title="Settings">
+        {/* <Tooltip title="Settings">
           <IconButton>
             <SettingsOutlinedIcon />
           </IconButton>
         </Tooltip>
-        {/* <PersonOutlinedIcon /> */}
+        <PersonOutlinedIcon /> */}
         <Tooltip title="Account">
           <IconButton
             onClick={handleClick}
@@ -97,9 +82,9 @@ const Topbar = () => {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ width: 28, height: 28, bgcolor: colors.grey[100] }}> {
-              getInitials()
-            } </Avatar>
+            <Avatar sx={{ padding:"2px", width: 36, height: 33, bgcolor: colors.grey[100] }}>
+              {getInitials()}
+            </Avatar>
           </IconButton>
         </Tooltip>
       </Box>
@@ -138,14 +123,29 @@ const Topbar = () => {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleSignOut}>
+        <MenuItem onClick={handleClose}>
+          <Box textAlign="center">
+            <Typography
+              variant="h3"
+              color={colors.blueAccent[600]}
+              fontWeight="bold"
+              sx={{ m: "10px 0 4px 0" }}
+            >
+              {username}
+            </Typography>
+            <Typography variant="h5" color={colors.greenAccent[500]}> {type} </Typography>
+          </Box>
+
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleSignOut} sx={{ color: colors.blueAccent[600], justifyContent: "center" }}>
           <ListItemIcon >
-            <Logout fontSize="small" />
+            <Logout fontSize="medium" sx={{ color: colors.blueAccent[600] }} />
           </ListItemIcon>
-          Logout
+          <Typography variant="h5"> Logout </Typography>
         </MenuItem>
       </Menu>
-    </Box>
+    </>
   );
 };
 
