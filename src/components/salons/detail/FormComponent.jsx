@@ -12,31 +12,34 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Typography, useTheme } from "@mui/material";
 
-import API from "../../apis";
-import AddressFormComponent from "../address/AddressFormComponent";
-import Loader from "../common/Loader";
-import Toast from "../common/Toast";
-import UserFormComponent from "./UserFormComponent";
+import API from "../../../apis";
+import AddressFormComponent from "../../address/AddressFormComponent";
+import ImagePicker from "../../image/ImagePicker";
+import Loader from "../../common/Loader";
+import SalonFormComponent from "./SalonFormComponent";
+import Toast from "../../common/Toast";
 
-import { setMenuItem } from "../../redux/actions/NavigationAction";
-import { tokens, themeSettings } from "../../theme";
-import { useUser } from "../hooks/users";
-import { Utility } from "../utility";
+import { setMenuItem } from "../../../redux/actions/NavigationAction";
+import { Utility } from "../../utility";
+import { uploadImageToAzure, downloadImageFromAzure } from "../../image/AzureStorageConnection";
+import { tokens, themeSettings } from "../../../theme";
 
 const FormComponent = () => {
     const [title, setTitle] = useState("Create");
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        userData: { values: null, validated: false },
+        salonData: { values: null, validated: false },
         addressData: { values: null, validated: false },
+        imageData: { values: null, validated: true }
     });
     const [updatedValues, setUpdatedValues] = useState(null);
     const [dirty, setDirty] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [reset, setReset] = useState(false);
 
-    const userFormRef = useRef();
+    const salonFormRef = useRef();
     const addressFormRef = useRef();
+    const imageFormRef = useRef();
 
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
@@ -47,7 +50,6 @@ const FormComponent = () => {
     const selected = useSelector(state => state.menuItems.selected);
     const toastInfo = useSelector(state => state.toastInfo);
     const { state } = useLocation();
-    const { getQueryParam } = useUser();
 
     const { toastModal, getLocalStorage } = Utility();
     let id = state?.id;
@@ -57,17 +59,15 @@ const FormComponent = () => {
         dispatch(setMenuItem(selectedMenu.selected));
     }, []);
 
-    const updateUserAndAddress = useCallback(formData => {
+    const updateSalonAndAddress = useCallback((formData) => {
         const dataFields = [
-            { ...formData.userData.values },
-            { ...formData.addressData.values }
+            { ...formData.salonData.values },
+            { ...formData.addressData.values },
+            { ...formData.imageData.values }
         ];
-        const paths = ["/update-user", "/update-address"];
+        const paths = ["/update-salon", "/update-address", "/update-image"];
         setLoading(true);
 
-        if (!formData.userData.password) {
-            delete formData.userData.password;
-        };
         API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
             .then(responses => {
                 let status = true;
@@ -78,7 +78,7 @@ const FormComponent = () => {
                 });
                 if (status) {
                     setLoading(false);
-                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/user/listing");
+                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/salon/listing");
                 };
                 setLoading(false);
             })
@@ -89,15 +89,18 @@ const FormComponent = () => {
             });
     }, [formData]);
 
-    const populateUserData = (id) => {
-        const paths = [`/get-by-pk/users/${id}`, `/get-address/user/${id}`];
+    const populateSalonData = (id) => {
+        const paths = [`/get-by-pk/salon/${id}`, `/get-address/salon/${id}`, `/get-image/salon/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
                 const dataObj = {
                     userData: responses[0].data.data,
-                    addressData: responses[1]?.data?.data
+                    addressData: responses[1]?.data?.data,
+                    imageData: responses[2]?.data?.data
                 };
                 setUpdatedValues(dataObj);
+                console.log("Image Data=>", dataObj.imageData);
+                dataObj.imageData.map(image => downloadImageFromAzure("image-storage", image))
             })
             .catch(err => {
                 toastModal(dispatch, true, "error", err?.response?.data?.msg);
@@ -105,24 +108,41 @@ const FormComponent = () => {
             });
     };
 
-    const registerUser = () => {
+    const createSalon = () => {
+        let promises;
         setLoading(true);
-        const userType = getQueryParam();
-        API.UserAPI.register({ ...formData.userData.values, type: userType })
-            .then(({ data: user }) => {
-                if (user?.status === 'Success') {
+        API.SalonAPI.createSalon({ ...formData.salonData.values })
+            .then(({ data: salon }) => {
+                if (salon?.status === 'Success') {
                     API.AddressAPI.createAddress({
                         ...formData.addressData.values,
-                        parent_id: user.data.id,
-                        parent: 'user',
+                        parent_id: salon.data.id,
+                        parent: 'salon',
                     })
-                        .then(address => {
-                            setLoading(false);
-                            toastModal(dispatch, true, "success", "Success", navigateTo, "/user/listing");
+                        .then(async (address) => {
+                            promises = Array.from(formData.imageData.values.file).map(async (image) => {
+                                let name = await uploadImageToAzure("image-storage", image);
+                                API.ImageAPI.createImage({
+                                    image_src: name,
+                                    parent_id: salon.data.id,
+                                    parent: 'salon',
+                                })
+                            });
+                            return Promise.all(promises)
+                                .then(image => {
+                                    setLoading(false);
+                                    toastModal(dispatch, true, "success", "Success", navigateTo, "/salon/listing");
+                                })
+                                .catch(err => {
+                                    setLoading(false);
+                                    console.log("INSIDE PROMISES CATCH");
+                                    toastModal(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
+                                    throw err;
+                                });
                         })
                         .catch(err => {
                             setLoading(false);
-                            toastModal(dispatch, true, err ? err : "An Error Occurred");
+                            toastModal(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
                             throw err;
                         });
                 };
@@ -134,26 +154,32 @@ const FormComponent = () => {
             });
     };
 
-    //Create/Update/Populate user
+    //Create/Update/Populate salon
     useEffect(() => {
         if (id && !submitted) {
             setTitle("Update");
-            populateUserData(id);
+            populateSalonData(id);
         }
-        if (formData.userData.validated && formData.addressData.validated) {
-            formData.userData.values?.id ? updateUserAndAddress(formData) : registerUser();
-        };
+        if (formData.salonData.validated && formData.addressData.validated) {
+            formData.salonData.values?.id ? updateSalonAndAddress(formData) : createSalon();
+        }
     }, [id, submitted]);
 
     const handleSubmit = async () => {
-        await userFormRef.current.Submit();
+        await salonFormRef.current.Submit();
         await addressFormRef.current.Submit();
+        await imageFormRef.current.Submit();
         setSubmitted(true);
     };
 
     const handleFormChange = (data, form) => {
-        form === 'user' ? setFormData({ ...formData, userData: data }) :
+        if (form === 'salon') {
+            setFormData({ ...formData, salonData: data });
+        } else if (form === 'address') {
             setFormData({ ...formData, addressData: data });
+        } else {
+            setFormData({ ...formData, imageData: data })
+        };
     };
 
     return (
@@ -168,11 +194,11 @@ const FormComponent = () => {
             >
                 {`${title} ${selected}`}
             </Typography>
-            <UserFormComponent
+            <SalonFormComponent
                 onChange={(data) => {
-                    handleFormChange(data, 'user');
+                    handleFormChange(data, 'salon');
                 }}
-                refId={userFormRef}
+                refId={salonFormRef}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
@@ -190,6 +216,18 @@ const FormComponent = () => {
                 setReset={setReset}
                 updatedValues={updatedValues?.addressData}
             />
+            <ImagePicker
+                onChange={(data) => {
+                    handleFormChange(data, 'image');
+                }}
+                refId={imageFormRef}
+                dirty={dirty}
+                setDirty={setDirty}
+                reset={reset}
+                setReset={setReset}
+                // userId={id}
+                updatedValues={updatedValues?.imageData}
+            />
 
             <Box display="flex" justifyContent="end" mt="20px">
                 {   //hide reset button on user update
@@ -206,7 +244,7 @@ const FormComponent = () => {
                         </Button>
                 }
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
-                    onClick={() => navigateTo('/user/listing')}>
+                    onClick={() => navigateTo('/salon/listing')}>
                     Cancel
                 </Button>
                 <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}

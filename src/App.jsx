@@ -18,8 +18,10 @@ import Topbar from "./components/common/Topbar";
 import Sidebar from "./components/common/Sidebar";
 import Loader from "./components/common/Loader";
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
-const FormComponent = lazy(() => import("./components/users/FormComponent"));
+const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
+const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
 import { Utility } from "./components/utility";
 // import Calendar from "./calendar/calendar";
 
@@ -31,16 +33,16 @@ function App() {
   const onIdle = () => {
     localStorage.clear();
     location.reload();
-  }
+  };
 
-  useIdleTimer({    //Automatically SignOut when a user is inactive
+  useIdleTimer({    //Automatically SignOut when a user is inactive for 30 minutes
     onIdle,
-    timeout: parseInt(import.meta.env.VITE_LOGOUT_TIMER)    //10 minute idle timeout stored in environment variable file
-  })
+    timeout: parseInt(import.meta.env.VITE_LOGOUT_TIMER)    //30 minute idle timeout stored in environment variable file
+  });
 
   if (!getLocalStorage("auth")?.token && pathname !== '/login') {
     return <Navigate to="/login" replace />
-  }
+  };
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -54,9 +56,12 @@ function App() {
                 <Topbar />
                 <Routes>
                   <Route exact path="/" element={<Dashboard />} />
-                  <Route exact path="/user/create" element={<FormComponent />} />
-                  <Route exact path="/user/update" element={<FormComponent />} />
+                  <Route exact path="/user/create" element={<UserFormComponent />} />
+                  <Route exact path="/user/update" element={<UserFormComponent />} />
                   <Route exact path="/user/listing" element={<UserListingComponent />} />
+                  <Route exact path="/salon/create" element={<SalonFormComponent />} />
+                  <Route exact path="/salon/update" element={<SalonFormComponent />} />
+                  <Route exact path="/salon/listing" element={<SalonListingComponent />} />
                   {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                 </Routes>
               </main>

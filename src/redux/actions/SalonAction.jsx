@@ -8,19 +8,9 @@
 
 import { ActionTypes } from "../constants/action-types";
 
-const initialState = {
-    listData: [],
-    loading: false
-};
-
-export const setUserReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case ActionTypes.SET_USERS:
-            return {
-                ...state,
-                listData: action.payload.listData
-            };
-        default:
-            return state;
+export const setSalons = (salons) => {
+    return {
+        type: ActionTypes.SET_SALONS,
+        payload: salons
     };
 };

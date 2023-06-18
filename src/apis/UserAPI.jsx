@@ -13,16 +13,18 @@ import { Utility } from "../components/utility";
 const { getLocalStorage } = Utility();
 
 export const UserAPI = {
-  /** */
+  /** Login user on the dashboard after verifying login information
+   */
   login: async (loginInfo, cancel = false) => {
     return await api.request({
       url: `/login`,
       method: "POST",
       data: loginInfo,
-      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+      signal: cancel ? cancelApiObject[this.login.name].handleRequestCancellation().signal : undefined,
     });
   },
-  /** */
+  /** Get user profile stored in the database
+   */
   profile: async (cancel = false) => {
     return await api.request({
       url: `/profile`,
@@ -31,10 +33,11 @@ export const UserAPI = {
       },
       method: "GET",
       data: token,
-      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+      signal: cancel ? cancelApiObject[this.profile.name].handleRequestCancellation().signal : undefined,
     });
   },
-  /** */
+  /** Get users from the database that meets the specified query parameters
+   */
   getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false) => {
     const queryParam = conditionObj ? `&${conditionObj.key}=${conditionObj.value}` : '';
     const searchParam = search ? `&search=${search}` : '';
@@ -48,7 +51,8 @@ export const UserAPI = {
     });
     return response;
   },
-  /** */
+  /** Register user in the database
+   */
   register: async (user, cancel = false) => {
     return await api.request({
       url: `/register`,
@@ -57,10 +61,11 @@ export const UserAPI = {
       },
       method: "POST",
       data: user,
-      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+      signal: cancel ? cancelApiObject[this.register.name].handleRequestCancellation().signal : undefined,
     });
   },
-  /** */
+  /** Update user in the database
+   */
   update: async (fields, cancel = false) => {
     return await api.request({
       url: `/update-user`,
@@ -69,7 +74,7 @@ export const UserAPI = {
       },
       method: "PATCH",
       data: fields,
-      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+      signal: cancel ? cancelApiObject[this.update.name].handleRequestCancellation().signal : undefined,
     });
   }
 };

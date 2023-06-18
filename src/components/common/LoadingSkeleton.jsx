@@ -18,9 +18,9 @@ export const multipleSkeletons = () => {
           return <LoadingSkeleton key={index} variant="rounded" animation="wave" width={600} height={20} />
         } else {
           return <LoadingSkeleton key={index} variant="rounded" animation="wave" width={500} height={20} />
-        }
+        };
+      })
       }
-      )}
     </Box>
   );
 };

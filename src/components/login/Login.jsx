@@ -1,20 +1,28 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// import { useDispatch } from "react-redux";
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+ */
 
-import { Box, Grid, Button, TextField, Typography, Container, Avatar, Checkbox } from "@mui/material";
-import { Stack, FormControlLabel, useMediaQuery, InputAdornment, IconButton, useTheme } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+import { Formik } from "formik";
+import { Box, Grid, Button, TextField, Typography, Container, Avatar } from "@mui/material";
+import { InputAdornment, IconButton, useMediaQuery, useTheme } from "@mui/material";
+
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { Formik } from "formik";
 
+import API from "../../apis";
 import Toast from "../common/Toast";
 import SignInLoader from "../common/SignInLoader";
-import { UserAPI } from "../../apis/UserAPI";
 import { themeSettings } from "../../theme";
 import { Utility } from "../utility";
-// import { setAuthInfo } from "../../redux/actions/UserActions";
 
 import bgImg from "../assets/backimg.jpg";
 import bg from "../assets/signin.svg";
@@ -43,74 +51,52 @@ const initialValues = {
   password: ""
 };
 
-export default function Login() {
-  const theme = useTheme();
-  const { typography } = themeSettings(theme.palette.mode);
-  const isNonMobile = useMediaQuery("(min-width:600px)");
-  const navigateTo = useNavigate();
-  const { setLocalStorage } = Utility();
-  // const dispatch = useDispatch();
-
+const Login = () => {
   const [formData, setFormData] = useState(initialValues);
   const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [toastAlert, setToastAlert] = useState(false);
-  const [toastSeverity, setToastSeverity] = useState("");
-  const [toastMessage, setToastMessage] = useState("");
 
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
-  const handleMouseDownPassword = () => setShowPassword(!showPassword);
+  const navigateTo = useNavigate();
+  const theme = useTheme();
+  const dispatch = useDispatch();
+  const toastInfo = useSelector(state => state.toastInfo);
+
+  const isNonMobile = useMediaQuery("(min-width:600px)");
+  const { typography } = themeSettings(theme.palette.mode);
+  const { toastModal, setLocalStorage } = Utility();
 
   //make the POST API call when submit button is clicked
   useEffect(() => {
-    let toastTimeout;
-    let toastTimeout2;
-
     if (formData.email && formData.password) {
       setLoading(true);
-      UserAPI.login(formData)
+      API.UserAPI.login(formData)
         .then(({ data: response }) => {
           setLoading(false);
 
           if (response.status === 'Success' &&
             (response.data === "User does not exist" || response.data === "Username and Password do not match")) {
-            setToastAlert(true);
-            setToastSeverity("info");
-            setToastMessage(response.data);
-
-            toastTimeout = setTimeout(() => {
-              setToastAlert(false);
-            }, 2000);
+            toastModal(dispatch, true, "info", response?.data);
           }
           else {
             const authInfo = { token: response.data.token, username: response.data.username, type: response.data.type };
             setLocalStorage("auth", authInfo);
-            // dispatch(setAuthInfo(authInfo));   cleanup: to be removed if not used
             navigateTo("/");
           }
         })
         .catch(err => {
           setLoading(false);
-          setToastAlert(true);
-          setToastSeverity("error");
-          setToastMessage(err);
-
-          toastTimeout2 = setTimeout(() => {
-            setToastAlert(false);
-          }, 2000);
+          toastModal(dispatch, true, "error", err);
         });
     };
-
-    // return () => {
-    //   clearTimeout(toastTimeout);
-    //   clearTimeout(toastTimeout2);
-    // }
   }, [formData]);
 
   return (
     <>
-      <Toast alerting={toastAlert} severity={toastSeverity} message={toastMessage} />
+      <Toast
+        alerting={toastInfo.toastAlert}
+        severity={toastInfo.toastSeverity}
+        message={toastInfo.toastMessage}
+      />
       <div
         style={{
           backgroundImage: `url(${bgImg})`,
@@ -210,13 +196,13 @@ export default function Login() {
                               value={values.password}
                               error={!!touched.contact_no && !!errors.contact_no}
                               helperText={touched.contact_no && errors.contact_no}
-                              InputProps={{ // <-- This is where the toggle button is added.
+                              InputProps={{ // <-- This is where the toggle button is added
                                 endAdornment: (
                                   <InputAdornment position="end">
                                     <IconButton
                                       aria-label="toggle password visibility"
-                                      onClick={handleClickShowPassword}
-                                      onMouseDown={handleMouseDownPassword}
+                                      onClick={() => setShowPassword(!showPassword)}
+                                      onMouseDown={() => setShowPassword(!showPassword)}
                                     >
                                       {showPassword ? <VisibilityOutlinedIcon /> :
                                         <VisibilityOffOutlinedIcon />}
@@ -226,7 +212,7 @@ export default function Login() {
                               }}
                             />
                           </Grid>
-                          <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
+                          {/* <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
                             <Stack direction="row" spacing={2}>
                               <FormControlLabel
                                 sx={{ width: "60%" }}
@@ -245,7 +231,7 @@ export default function Login() {
                                 Forgot password?
                               </Typography>
                             </Stack>
-                          </Grid>
+                          </Grid> */}
                           <Grid item xs={12} sx={{ ml: "5em", mr: "5em" }}>
                             <Button
                               fullWidth
@@ -278,3 +264,5 @@ export default function Login() {
     </>
   );
 };
+
+export default Login;

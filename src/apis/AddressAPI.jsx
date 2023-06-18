@@ -13,7 +13,21 @@ import { Utility } from "../components/utility";
 const { getLocalStorage } = Utility();
 
 export const AddressAPI = {
-  /** */
+  /** Get the address from the database based on parent information
+   */
+  getAddress: async (parent, parent_id, cancel = false) => {
+    const { data: response } = await api.request({
+      url: `/get-address/${parent}/${parent_id}`,
+      method: "GET",
+      headers: {
+        "x-access-token": getLocalStorage("auth").token
+      },
+      signal: cancel ? cancelApiObject[this.getAddress.name].handleRequestCancellation().signal : undefined,
+    });
+    return response;
+  },
+  /** Create address in the database 
+  */
   createAddress: async (address, cancel = false) => {
     return await api.request({
       url: `/create-address`,
@@ -22,33 +36,23 @@ export const AddressAPI = {
       },
       method: "POST",
       data: address,
-      signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+      signal: cancel ? cancelApiObject[this.createAddress.name].handleRequestCancellation().signal : undefined,
     });
   },
-  getAddress: async (parent, parent_id, cancel = false) => {
-    const { data: response } = await api.request({
-      url: `/get-address/${parent}/${parent_id}`,
-      method: "GET",
+  /** Update address in the database
+   */
+  updateAddress: async (fields, cancel = false) => {
+    return await api.request({
+      url: `/update-address`,
       headers: {
         "x-access-token": getLocalStorage("auth").token
       },
-      signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
+      method: "PATCH",
+      data: fields,
+      signal: cancel ? cancelApiObject[this.updateAddress.name].handleRequestCancellation().signal : undefined,
     });
-    return response;
-  },
-    /** */
-    updateAddress: async (fields, cancel = false) => {
-      return await api.request({
-        url: `/update-address`,
-        headers: {
-          "x-access-token": getLocalStorage("auth").token
-        },
-        method: "PATCH",
-        data: fields,
-        signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
-      });
-    }
-}
+  }
+};
 
 // defining the cancel API object for AddressAPI
 const cancelApiObject = defineCancelApiObject(AddressAPI);

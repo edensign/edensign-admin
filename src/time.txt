@@ -1,0 +1,33 @@
+    //event listener of click on 2nd button element, i.e, set alarm button
+alarmBtn.addEventListener('click', setAlarm);
+
+
+function setAlarm() {
+
+    let dateTimeObject = new Date();       //grabbing date time from system
+        //assigning time value input by user to system date time object using setHours(Hours, Minutes)
+    let userInputTimeValue = dateTimeObject.setHours(timeInput.value[0] + timeInput.value[1], timeInput.value[3] + timeInput.value[4]);
+    let userTimeAsNum = Number(userInputTimeValue);      //userInputTimeValue would be string, so typecoersion
+    // console.log(userTimeAsNum, typeof(userTimeAsNum));
+
+    let systemDateTime = new Date();
+    // console.log(systemDateTime.getTime());      grabbing system date time
+
+    let alarmTime = userTimeAsNum - systemDateTime;     //userTime - systemTime will be the alarm time
+    // console.log(alarmTime);
+
+    if(alarmTime > 0) {           //if the value of alarmTime is greater than 0, call setTimeout(), that will
+        setTimeout(() => {          //create a new Audio object from the link, play audio & set loop to true
+            let audio = new Audio("https://freesound.org/data/previews/316/316847_4939433-lq.mp3");
+            audio.play();
+            audio.loop = true;
+
+            setTimeout(() => {      //setTimeout() inside setTimeout() to set audio.loop property to false 
+                audio.loop = false;         //after 2 minutes, that will stop the audio from playing
+            }, 120000)
+
+        },alarmTime)        //outer setTimeout() will run when alarmTime has reached, that will be after
+                            //some time after systemTime
+    }
+
+}
