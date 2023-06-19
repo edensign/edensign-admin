@@ -13,9 +13,9 @@ const initialState = {
     loading: false
 };
 
-export const setUserReducer = (state = initialState, action) => {
+export const setSalonReducer = (state = initialState, action) => {
     switch (action.type) {
-        case ActionTypes.SET_USERS:
+        case ActionTypes.SET_SALONS:
             return {
                 ...state,
                 listData: action.payload.listData

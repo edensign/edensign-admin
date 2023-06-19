@@ -17,7 +17,9 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import { tokens } from "../../theme";
 import { SidebarItem } from "./SidebarItem";
@@ -69,7 +71,7 @@ const Sidebar = () => {
                 ml="5px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  Eden Sign
+                  {import.meta.env.VITE_COMPANY_NAME}
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -90,18 +92,6 @@ const Sidebar = () => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
-
-              {/* <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
-                >
-                  {username}
-                </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}> {type} </Typography>
-              </Box> */}
             </Box>
           )}
 
@@ -138,6 +128,32 @@ const Sidebar = () => {
               title="Freelancer"
               to="/user/listing"
               icon={<PeopleOutlinedIcon />}
+              selected={selected}
+            />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 10px" }}
+            >
+              Salons
+            </Typography>
+            <SidebarItem
+              title="Salon Detail"
+              to="/salon/listing"
+              icon={<FormatListBulletedIcon />}
+              selected={selected}
+            />
+            <SidebarItem
+              title="Salon Inventory"
+              to="/salon/inventory"
+              icon={<ReceiptLongIcon />}
+              selected={selected}
+            />
+            <SidebarItem
+              title="Salon Cashflow"
+              to="/salon/cashflow"
+              icon={<ReceiptOutlinedIcon />}
               selected={selected}
             />
 

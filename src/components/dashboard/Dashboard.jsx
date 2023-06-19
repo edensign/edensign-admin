@@ -16,7 +16,6 @@ import TrafficIcon from "@mui/icons-material/Traffic";
 import { tokens, themeSettings } from "../../theme";
 import ProgressCircle from "../common/ProgressCircle";
 import StatBox from "../common/StatBox";
-import DependentDropdown from "../common/DependentDropdown";
 // import { mockTransactions } from "../../data/mockData";
 // import LineChart from "../../components/LineChart";
 // import GeographyChart from "../../components/GeographyChart";
@@ -144,7 +143,6 @@ const Dashboard = () => {
           />
         </Box>
       </Box>
-      <DependentDropdown />
     </Box>
   );
 }

@@ -12,22 +12,22 @@ import { useSelector } from "react-redux";
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 
-import { tokens } from "../../theme";
+import { tokens } from "../../../theme";
 
 export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
-    const { listData } = useSelector(state => state.allUsers);
+    const { listData } = useSelector(state => state.allSalons);
 
     const handleActionEdit = (id) => {
-        navigateTo("/user/update", { state: { id: id } });
+        navigateTo("/salon/update", { state: { id: id } });
     };
 
     const columns = [
         {
-            field: "username",
-            headerName: "USERNAME",
+            field: "name",
+            headerName: "NAME",
             headerAlign: "center",
             align: "center",
             flex: 1,
@@ -55,19 +55,19 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "created-column--cell",
-            renderCell: ({ row: { updated_at } }) => {
-                const userData = listData?.rows;
-                let formattedDate = [];
-                if (userData.length) {
-                    userData.map((item) => {
-                        let date = new Date(item.created_at);
-                        formattedDate.push(date.toLocaleDateString());
-                        // console.log(formattedDate)
-                    });
-                }
-                return;
-            }
+            // cellClassName: "created-column--cell",
+            // renderCell: ({ row: { updated_at } }) => {
+            //    const salonData = listData?.rows;
+            //     let formattedDate = [];
+            //     if (salonData.length) {
+            //         salonData.map((item) => {
+            //             let date = new Date(item.created_at);
+            //             formattedDate.push(date.toLocaleDateString());
+            //             // console.log(formattedDate)
+            //         });
+            //     }
+            //     return;
+            // }
         },
         {
             field: "status",
@@ -123,4 +123,4 @@ export const datagridColumns = () => {
         }
     ];
     return columns;
-};
+}

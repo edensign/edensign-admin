@@ -47,20 +47,18 @@ export default function Toast(props) {
 
     return (
         <div>
-            {
-                props.alerting && <Snackbar
-                    anchorOrigin={{ vertical: "top", horizontal: "center" }}
-                    open={props.alerting}
-                    onClose={handleClose}
-                    autoHideDuration={2000}
-                    TransitionComponent={state.Transition}
-                    key={state.Transition.name}
-                >
-                    <Alert severity={props.severity} sx={{ width: '100%' }} onClose={handleClose}>
-                        {props.message}
-                    </Alert>
-                </Snackbar>
-            }
+            {props.alerting && <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                open={props.alerting}
+                onClose={handleClose}
+                autoHideDuration={2000}
+                TransitionComponent={state.Transition}
+                key={state.Transition.name}
+            >
+                <Alert severity={props.severity} sx={{ width: '100%' }} onClose={handleClose}>
+                    {props.message}
+                </Alert>
+            </Snackbar>}
         </div>
     );
 };

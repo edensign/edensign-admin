@@ -1,3 +1,11 @@
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+ */
+
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -9,6 +17,8 @@ import { multipleSkeletons } from "./LoadingSkeleton";
 import { tokens } from "../../theme";
 
 export default function ServerPaginationGrid({
+    action,
+    api,
     getQuery,
     condition = false,
     columns,
@@ -18,7 +28,8 @@ export default function ServerPaginationGrid({
     pageSizeOptions,
     searchFlag,
     setOldPagination,
-    setSearchFlag
+    setSearchFlag,
+    toastModal
 }) {
     const initialState = {
         page: 0,
@@ -30,13 +41,13 @@ export default function ServerPaginationGrid({
     const [paginationModel, setPaginationModel] = useState(initialState);
 
     useEffect(() => {
+        //TO BE REFACTORED
         if (!searchFlag.search && !searchFlag.searching) {
             console.log('Pagination without search');
-            getQuery(paginationModel.page, paginationModel.pageSize, condition);
+            getQuery(paginationModel.page, paginationModel.pageSize, action, api, condition);
             setOldPagination(paginationModel);
         } else if (searchFlag.oldPagination && !searchFlag.searching) {
-            console.log('go back=>', searchFlag.oldPagination);
-            getQuery(searchFlag.oldPagination.page, searchFlag.oldPagination.pageSize, condition);
+            getQuery(searchFlag.oldPagination.page, searchFlag.oldPagination.pageSize, action, api, condition);
             setPaginationModel({
                 page: searchFlag.oldPagination.page,
                 pageSize: searchFlag.oldPagination.pageSize
@@ -59,8 +70,6 @@ export default function ServerPaginationGrid({
     }, [count, setRowCountState]);
 
     console.log('pagina=>', paginationModel);
-
-    const [rowSelectionModel, setRowSelectionModel] = useState([]);
 
     return (
         <Box
@@ -128,7 +137,6 @@ export default function ServerPaginationGrid({
         >
             <DataGrid
                 autoHeight
-                // checkboxSelection
                 disableRowSelectionOnClick
                 rows={rows || []}
                 columns={columns}

@@ -9,20 +9,37 @@
 import * as yup from "yup";
 
 const checkoutSchema = yup.object({
-    parent: yup.string(),
-    // .min(2, 'Username is Too Short!')
-    // .max(50, 'Username is Too Long!')
-    // .required("This Field is Required"),
-    parent_id: yup.number(),
-    // .required("This Field is Required"),
     street: yup.string()
+        .min(4, 'Too Short!')
+        .max(80, 'Too Long!')
+        .matches(/[a-z]/, 'Invalid Street Name Detected')
+        .matches(/[0-9]/, 'Invalid Street Name Detected')
         .required("This Field is Required"),
-    city: yup.number(),
-    // .matches(phoneRegExp, "Phone Number Is Not Valid")
-    // .required("This Field is Required"),
-    state: yup.number(),
-    country: yup.number(),
-    //   address2: yup.string().required("required"),
+    landmark: yup.string()
+        .min(4, 'Too Short!')
+        .max(80, 'Too Long!')
+        .matches(/[a-z]/, 'Invalid Landmark Detected'),
+    zipcode: yup.string()
+        .min(4, 'Too Short!')
+        .max(20, 'Too Long!')
+        .matches(/[0-9]/, 'Invalid Zipcode Detected')
+        .required("This Field is Required"),
+    latitude: yup.string()
+        .min(4, 'Too Short!')
+        .max(40, 'Too Long!')
+        .matches(/[a-z]/, 'Invalid Latitude Detected')
+        .matches(/[0-9]/, 'Invalid Latitude Detected'),
+    longitude: yup.string()
+        .min(4, 'Too Short!')
+        .max(40, 'Too Long!')
+        .matches(/[a-z]/, 'Invalid Longitude Detected')
+        .matches(/[0-9]/, 'Invalid Longitude Detected'),
+    country: yup.number()
+        .required("This Field is Required"),
+    state: yup.number()
+        .required("This Field is Required"),
+    city: yup.number()
+        .required("This Field is Required")
 });
 
 export default checkoutSchema;

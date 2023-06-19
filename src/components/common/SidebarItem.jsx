@@ -18,10 +18,10 @@ import { Utility } from "../utility";
 
 export const SidebarItem = ({ title, to, icon, selected }) => {
     const theme = useTheme();
+    const dispatch = useDispatch();
+
     const colors = tokens(theme.palette.mode);
     const { setLocalStorage } = Utility();
-
-    const dispatch = useDispatch();
 
     return (
         <MenuItem

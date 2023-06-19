@@ -11,12 +11,13 @@ import { defineCancelApiObject } from "./config/axiosUtils";
 import { Utility } from "../components/utility";
 
 export const CommonAPI = {
-    /**  */
+    /** method like GET/POST for network request, true if header and cancel signal is false
+     */
     commonConfig: (method, header, cancel = false) => {
         const { getLocalStorage } = Utility();
         const commonConfig = {
             method: method,
-            signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject[this.commonConfig.name].handleRequestCancellation().signal : undefined,
         }
         if (header) {
             commonConfig.headers = {
@@ -25,9 +26,9 @@ export const CommonAPI = {
         }
         return commonConfig;
     },
-    /** */
+    /** Verify the authenticity of the provided token
+     */
     verifyToken: async (cancel = false) => {
-        //method, true if header, cancel false
         const commonConfig = CommonAPI.commonConfig("GET", true, cancel);
         const { data: response } = await api.request({
             url: `/verify-token`,
@@ -35,7 +36,8 @@ export const CommonAPI = {
         });
         return response;
     },
-    /** */
+    /** Get the user from the specific table -- why it is required as it is made in backend
+    */
     getByPk: async (id, table, cancel = false) => {
         const commonConfig = CommonAPI.commonConfig("GET", false, cancel);
         const { data: response } = await api.request({
@@ -44,8 +46,9 @@ export const CommonAPI = {
         });
         return response;
     },
-    /** provide paths for multiple API calls & this function will make the request object */
-    multipleAPICall: (method, paths, dataFields = [], cancel = false) => {
+    /** provide paths for multiple API calls & this function will make the request object 
+     */
+    multipleAPICall: async (method, paths, dataFields = [], cancel = false) => {
         const commonConfig = CommonAPI.commonConfig(method, true, cancel);
         const promises = dataFields.length ? paths.map((path, index) =>
             api.request({
@@ -60,9 +63,12 @@ export const CommonAPI = {
 
         return Promise.all(promises)
             .then(responses => {
+                console.log('RESPONSES=>', responses);
                 return responses;
             })
-            .catch(err => { throw err });
+            .catch(err => { 
+                console.log('ERROR=>', err);
+                throw err });
     }
 };
 

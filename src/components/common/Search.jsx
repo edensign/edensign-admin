@@ -1,10 +1,26 @@
+/**
+ * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
+ *
+ * This software is the confidential information of Eden Sign Inc., and is licensed as
+ * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restrictions set forth in your license agreement with Eden Sign.
+ */
+
 import { useState } from "react";
 import { Box, IconButton, InputBase, useMediaQuery, useTheme } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 import { tokens } from "../../theme";
 
-const Search = ({ getSearchData, condition, setSearchFlag, oldPagination, reloadBtn }) => {
+const Search = ({
+    getSearchData,
+    condition,
+    setSearchFlag,
+    oldPagination,
+    reloadBtn,
+    action,
+    api
+}) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const isNonMobile = useMediaQuery("(min-width:720px)");
@@ -15,7 +31,7 @@ const Search = ({ getSearchData, condition, setSearchFlag, oldPagination, reload
     };
 
     const handleSearch = () => {
-        getSearchData(0, 5, condition, inputValue);
+        getSearchData(0, 5, action, api, condition, inputValue);
         setInputValue('');
         setSearchFlag({
             search: true,
@@ -24,7 +40,7 @@ const Search = ({ getSearchData, condition, setSearchFlag, oldPagination, reload
         reloadBtn.style.display = "inline-flex";
     };
 
-    //Search data by hitting enter key
+    //Search data by pressing down the enter key
     const handleKeyDown = (event) => {
         if (event.keyCode == 13) {
             handleSearch();

@@ -6,27 +6,36 @@
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
 import { Box, FormControl, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
 
+import API from "../../apis";
 import addressValidation from "./Validation";
-import { useEffect } from "react";
 
 const initialValues = {
     street: "",
     landmark: "",
+    latitude: "",
+    longitude: "",
+    zipcode: "",
     country: "",
     state: "",
     city: ""
 };
 
 const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, updatedValues = null }) => {
-    const isNonMobile = useMediaQuery("(min-width:600px)");
 
     const [initialState, setInitialState] = useState(initialValues);
-    // const [loading, setLoading] = useState(false);
+    const [countries, setCountries] = useState([]);
+    const [countryId, setCountryId] = useState(null);
+    const [states, setStates] = useState([]);
+    const [stateId, setStateId] = useState(null);
+    const [cities, setCities] = useState([]);
+    const [cityId, setCityId] = useState(null);
+
+    const isNonMobile = useMediaQuery("(min-width:600px)");
 
     const formik = useFormik({
         initialValues: initialState,
@@ -71,6 +80,62 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
         }
     }, [updatedValues]);
 
+    useEffect(() => {
+        const getCountry = () => {
+            API.CountryAPI.getCountries()
+                .then(country => {
+                    if (country?.status === 'Success') {
+                        setCountries(country.data.list);
+                    };
+                })
+                .catch(err => {
+                    throw err;
+                });
+        };
+        getCountry();
+    }, []);
+
+    useEffect(() => {
+        const getStates = () => {
+            API.StateAPI.getStates(formik.values.country || countryId)
+                .then(data => {
+                    if (data?.status === 'Success') {
+                        setStates(data.data.list);
+                        setCities([]);
+                    } else {
+                        setStates([]);
+                        setCities([]);
+                        formik.setFieldValue("state", "");
+                        formik.setFieldValue("city", "");
+                    };
+                })
+                .catch(err => {
+                    throw err;
+                });
+        };
+        getStates();
+    }, [formik.values.country]);
+
+    useEffect(() => {
+        const getCities = () => {
+            API.CityAPI.getCities(formik.values.state || stateId)
+                .then(cities => {
+                    if (cities?.status === 'Success') {
+                        setCities(cities.data.list);
+                    } else {
+                        setCities([]);
+                        formik.setFieldValue("city", "");
+                    };
+                })
+                .catch(err => {
+                    setCities([]);
+                    formik.setFieldValue("city", "");
+                    throw err;
+                });
+        };
+        getCities();
+    }, [formik.values.state]);
+
     return (
         <Box m="20px">
             <form ref={refId}>
@@ -110,52 +175,112 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                         helperText={formik.touched.landmark && formik.errors.landmark}
                         sx={{ gridColumn: "span 2" }}
                     />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="latitude"
+                        label="Latitude"
+                        autoComplete="new-latitude"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.latitude}
+                        error={!!formik.touched.latitude && !!formik.errors.latitude}
+                        helperText={formik.touched.latitude && formik.errors.latitude}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="longitude"
+                        label="Longitude"
+                        autoComplete="new-longitude"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.longitude}
+                        error={!!formik.touched.longitude && !!formik.errors.longitude}
+                        helperText={formik.touched.longitude && formik.errors.longitude}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="zipcode"
+                        label="Zipcode"
+                        autoComplete="new-zipcode"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.zipcode}
+                        error={!!formik.touched.zipcode && !!formik.errors.zipcode}
+                        helperText={formik.touched.zipcode && formik.errors.zipcode}
+                        sx={{ gridColumn: "span 2" }}
+                    />
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                        <InputLabel id="countryField">Country</InputLabel>
+                        <InputLabel id="countryField">--Select Country--</InputLabel>
                         <Select
-                            variant="filled"
-                            labelId="countryField"
-                            label="Country"
-                            name="country"
                             autoComplete="new-country"
+                            defaultValue=""
+                            name="country"
+                            variant="filled"
                             value={formik.values.country}
-                            onChange={formik.handleChange}
+                            onChange={event => {
+                                const getCountryId = event.target.value;
+                                setCountryId(getCountryId);
+                                formik.setFieldValue("country", event.target.value);
+                            }}
                             error={!!formik.touched.country && !!formik.errors.country}
                         >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
+                            {countries.map(item => (
+                                <MenuItem value={item.id} name={item.name} key={item.name}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                        <InputLabel id="stateField">State</InputLabel>
+                        <InputLabel id="stateField">--Select State--</InputLabel>
                         <Select
-                            variant="filled"
-                            labelId="stateField"
-                            label="State"
-                            name="state"
                             autoComplete="new-state"
+                            defaultValue=""
+                            name="state"
+                            variant="filled"
                             value={formik.values.state}
-                            onChange={formik.handleChange}
+                            onChange={event => {
+                                const getStateId = event.target.value;
+                                setStateId(getStateId);
+                                formik.setFieldValue("state", event.target.value);
+                            }}
                             error={!!formik.touched.state && !!formik.errors.state}
                         >
-                            <MenuItem value={2}>2</MenuItem>
-                            <MenuItem value={3}>3</MenuItem>
+                            {states.map(item => (
+                                <MenuItem value={item.id} name={item.name} key={item.name}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                        <InputLabel id="cityField">City</InputLabel>
+                        <InputLabel id="cityField">--Select City--</InputLabel>
                         <Select
-                            variant="filled"
-                            labelId="cityField"
-                            label="City"
-                            name="city"
                             autoComplete="new-city"
+                            defaultValue=""
+                            name="city"
+                            variant="filled"
                             value={formik.values.city}
-                            onChange={formik.handleChange}
+                            onChange={event => {
+                                const getCityId = event.target.value;
+                                setCityId(getCityId);
+                                formik.setFieldValue("city", event.target.value);
+                            }}
                             error={!!formik.touched.city && !!formik.errors.city}
                         >
-                            <MenuItem value={1}>1</MenuItem>
-                            <MenuItem value={2}>2</MenuItem>
+                            {cities.map(item => (
+                                <MenuItem value={item.id} key={item.name} name={item.name}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </Box>

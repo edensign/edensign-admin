@@ -22,6 +22,7 @@ const initialValues = {
     password: "",
     email: "",
     contact_no: "",
+    gender: "",
     status: "inactive"
 };
 
@@ -103,7 +104,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                 clicked: true
             });
             formik.values.password = updatePassword.password;
-        }
+        };
     };
 
     return (
@@ -145,7 +146,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         error={!!formik.touched.password && !!formik.errors.password}
                         helperText={formik.touched.password && formik.errors.password}
                         sx={{ gridColumn: "span 2" }}
-                        InputProps={{ // <-- This is where the toggle button is added.
+                        InputProps={{ // <-- This is where the toggle button is added
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton
@@ -188,6 +189,23 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         helperText={formik.touched.contact_no && formik.errors.contact_no}
                         sx={{ gridColumn: "span 2" }}
                     />
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                        <InputLabel id="genderField">Gender</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="genderField"
+                            label="Gender"
+                            name="gender"
+                            autoComplete="new-gender"
+                            value={formik.values.gender}
+                            onChange={formik.handleChange}
+                            error={!!formik.touched.gender && !!formik.errors.gender}
+                        >
+                            <MenuItem value={"male"}>Male</MenuItem>
+                            <MenuItem value={"female"}>Female</MenuItem>
+                            <MenuItem value={"other"}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
                         <InputLabel id="statusField">Status</InputLabel>
                         <Select

@@ -38,6 +38,5 @@ export function defineCancelApiObject(apiObject) {
             },
         };
     });
-
     return cancelApiObject;
 };

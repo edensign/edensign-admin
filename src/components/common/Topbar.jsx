@@ -19,7 +19,6 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 // import PersonAdd from '@mui/icons-material/PersonAdd';
 import Logout from '@mui/icons-material/Logout';
 
-
 import { ColorModeContext, tokens } from "../../theme";
 import { Utility } from "../utility";
 
@@ -82,7 +81,7 @@ const Topbar = () => {
             aria-haspopup="true"
             aria-expanded={open ? "true" : undefined}
           >
-            <Avatar sx={{ padding:"2px", width: 36, height: 33, bgcolor: colors.grey[100] }}>
+            <Avatar sx={{ padding: "2px", width: 36, height: 33, bgcolor: colors.grey[100] }}>
               {getInitials()}
             </Avatar>
           </IconButton>

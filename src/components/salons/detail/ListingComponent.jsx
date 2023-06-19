@@ -13,16 +13,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
 
-import API from "../../apis";
-import Search from "../common/Search";
-import ServerPaginationGrid from '../common/Datagrid';
-import { datagridColumns } from "./UserConfig";
-import { useCommon } from "../hooks/common";
-import { useUser } from "../hooks/users";
-import { setUsers } from "../../redux/actions/UserActions"
-import { tokens } from "../../theme";
-import { setMenuItem } from "../../redux/actions/NavigationAction";
-import { Utility } from "../utility";
+import API from "../../../apis";
+import Search from "../../common/Search";
+import ServerPaginationGrid from '../../common/Datagrid';
+import { datagridColumns } from "./SalonConfig";
+import { useCommon } from "../../hooks/common";
+import { setSalons } from "../../../redux/actions/SalonAction";
+import { tokens } from "../../../theme";
+import { setMenuItem } from "../../../redux/actions/NavigationAction";
+import { Utility } from "../../utility";
 
 const pageSizeOptions = [5, 10, 20];
 
@@ -33,24 +32,17 @@ const ListingComponent = () => {
     const isNonMobile = useMediaQuery("(min-width:720px)");
 
     const selected = useSelector(state => state.menuItems.selected);
-    const { listData } = useSelector(state => state.allUsers);
-    console.log("Users Data=>", listData)
+    const { listData } = useSelector(state => state.allSalons);
 
     //revisit for pagination
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
     const [oldPagination, setOldPagination] = useState();
 
     const { getPaginatedData } = useCommon();
-    const { getQueryParam } = useUser();
 
     const colors = tokens(theme.palette.mode);
-    const { getLocalStorage, toastModal } = Utility();
+    const { getLocalStorage } = Utility();
     const reloadBtn = document.getElementById("reload-btn");
-
-    let condition = getQueryParam() ? {
-        key: 'type',
-        value: getQueryParam()
-    } : false;
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -90,19 +82,18 @@ const ListingComponent = () => {
                         {selected}
                     </Typography>
                     <Search
-                        action={setUsers}
-                        api={API.UserAPI}
-                        condition={condition}
+                        action={setSalons}
+                        api={API.SalonAPI}
                         getSearchData={getPaginatedData}
+                        setSearchFlag={setSearchFlag}
                         oldPagination={oldPagination}
                         reloadBtn={reloadBtn}
-                        setSearchFlag={setSearchFlag}
                     />
                     <Button
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo("/user/create") }}
+                        onClick={() => { navigateTo("/salon/create") }}
                     >
                         Create New {selected}
                     </Button>
@@ -127,9 +118,8 @@ const ListingComponent = () => {
                 Back
             </Button>
             <ServerPaginationGrid
-                action={setUsers}
-                api={API.UserAPI}
-                condition={condition}
+                action={setSalons}
+                api={API.SalonAPI}
                 getQuery={getPaginatedData}
                 columns={datagridColumns()}
                 rows={listData.rows}
@@ -139,7 +129,6 @@ const ListingComponent = () => {
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}
                 setSearchFlag={setSearchFlag}
-                toastModal={toastModal}
             />
         </Box>
     );

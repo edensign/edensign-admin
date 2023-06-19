@@ -11,6 +11,7 @@ import axios from "axios";
 export const api = axios.create({
   withCredentials: true,
   baseURL: "http://localhost:5000/api/v1",
+  validateStatus: (status) => (status >= 200 && status < 300) || status == 404
 });
 
 // defining a custom error handler for all APIs

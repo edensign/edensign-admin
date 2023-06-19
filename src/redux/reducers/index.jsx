@@ -11,14 +11,15 @@ import { combineReducers } from "redux";
 import { authReducer } from "./AuthReducer";
 import { menuItemReducer } from "./MenuItemReducer";
 import { displayToastReducer } from "./ToastReducer";
-import { setUserReducer, registerUserReducer } from "./UserReducers";
+import { setUserReducer } from "./UserReducers";
+import { setSalonReducer } from "./SalonReducer";
 
 const reducers = combineReducers({
     auth: authReducer,
     allUsers: setUserReducer,
+    allSalons: setSalonReducer,
     toastInfo: displayToastReducer,
     menuItems: menuItemReducer,
-    registeredUser: registerUserReducer,
 });
 
 export default reducers;
