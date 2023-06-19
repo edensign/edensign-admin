@@ -6,8 +6,7 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import Skeleton from '@mui/material/Skeleton';
-import { Box } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 
 export const multipleSkeletons = () => {
   return (

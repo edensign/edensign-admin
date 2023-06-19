@@ -8,10 +8,12 @@
 
 import { combineReducers } from "redux";
 
+import { authReducer } from "./AuthReducer";
 import { setUserReducer, registerUserReducer } from "./UserReducers";
 import { menuItemReducer } from "./MenuItemReducer";
 
 const reducers = combineReducers({
+    auth: authReducer,
     allUsers: setUserReducer,
     registeredUser: registerUserReducer,
     menuItems: menuItemReducer

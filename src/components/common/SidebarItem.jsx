@@ -6,10 +6,11 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import { MenuItem } from "react-pro-sidebar/dist";
-import { Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
+
+import { MenuItem } from "react-pro-sidebar/dist";
+import { Typography, useTheme } from "@mui/material";
 
 import { tokens } from "../../theme";
 import { menuItem } from "../../redux/actions/UserActions";

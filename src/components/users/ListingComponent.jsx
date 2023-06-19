@@ -14,16 +14,16 @@ import { Box, Typography, Button, useTheme } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 
+import Header from "../common/Header";
+import EmptyOverlayGrid from "../common/EmptyOverlayGrid";
+import { CustomPagination } from "../common/Pagination";
+import { multipleSkeletons } from "../common/LoadingSkeleton"
 import { useUtility } from "../hooks";
-import Header from "../Header.jsx";
-import { multipleSkeletons } from "../common/LoadingSkeleton.jsx"
-import EmptyOverlayGrid from "../common/EmptyOverlayGrid.jsx";
-import { CustomPagination } from "../common/Pagination.jsx";
-import { tokens } from "../../theme.jsx";
-import { UserAPI } from "../../apis/UserAPI.jsx";
-import { setUsers } from "../../redux/actions/UserActions.jsx";
+import { tokens } from "../../theme";
+import { UserAPI } from "../../apis/UserAPI";
+import { setUsers } from "../../redux/actions/UserActions";
 
-const UserListingComponent = () => {
+const ListingComponent = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
@@ -212,4 +212,4 @@ const UserListingComponent = () => {
     );
 };
 
-export default UserListingComponent;
+export default ListingComponent;

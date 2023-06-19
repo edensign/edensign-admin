@@ -9,7 +9,7 @@
 import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
-    users: [],
+    users: []
 };
 
 export const setUserReducer = (state = initialState, action) => {

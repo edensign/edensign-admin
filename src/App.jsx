@@ -8,23 +8,35 @@
 
 import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
-import { ColorModeContext, useMode } from "./theme.jsx";
-import Topbar from "./components/common/Topbar.jsx";
-import Sidebar from "./components/common/Sidebar.jsx";
-import Dashboard from "./components/dashboard/Dashboard.jsx";
-
-const FormComponent = lazy( () => import("./components/users/FormComponent.jsx"));
-const ListingComponent = lazy(() => import("./components/users/ListingComponent.jsx"));
-const Login = lazy(() => import("./components/login/Login.jsx"));
-import Loader from "./components/common/Loader.jsx"
+import { ColorModeContext, useMode } from "./theme";
+// const AccountMenu = lazy(() => import("./components/common/AccountMenu"));
+import Login from "./components/login/Login";
+import Topbar from "./components/common/Topbar";
+import Sidebar from "./components/common/Sidebar";
+import Loader from "./components/common/Loader";
+const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
+const FormComponent = lazy(() => import("./components/users/FormComponent"));
+const ListingComponent = lazy(() => import("./components/users/ListingComponent"));
 // import Calendar from "./calendar/calendar";
 
 function App() {
   const [theme, colorMode] = useMode();
+  const authInfo = useSelector(state => state.auth);
 
+  if (!authInfo.auth.token) {
+    console.log("Not logged in")
+    return (
+      <ThemeProvider theme={theme}>
+        <Login />
+      </ThemeProvider>
+    );
+  }
+
+  console.log("Logged in=>", authInfo.auth.token)
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
@@ -35,10 +47,10 @@ function App() {
             <main className="content">
               <Topbar />
               <Routes>
-                <Route exact path="/login" element={<Login />} />
                 <Route exact path="/" element={<Dashboard />} />
                 <Route exact path="/user-form" element={<FormComponent />} />
                 <Route exact path="/user-listing" element={<ListingComponent />} />
+                {/* <Route exact path="/account" element={<AccountMenu /> } /> */}
                 {/* <Route exact path="/calendar" element={<Calendar />} /> */}
               </Routes>
             </main>

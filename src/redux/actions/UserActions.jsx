@@ -28,3 +28,10 @@ export const menuItem = (item) => {
         payload: item
     };
 };
+
+export const setAuthInfo = (payload) => {
+    return {
+        type: ActionTypes.AUTH_INFO,
+        payload: payload
+    };
+};
