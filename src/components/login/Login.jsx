@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import propTypes from 'prop-types';
+// import { useDispatch } from "react-redux";
 
 import { Box, Grid, Button, TextField, Typography, Container, Avatar, Checkbox } from "@mui/material";
-import { Stack, FormControlLabel, useMediaQuery, useTheme } from "@mui/material";
+import { Stack, FormControlLabel, useMediaQuery, InputAdornment, IconButton, useTheme } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { Formik } from "formik";
 
 import Toast from "../common/Toast";
 import SignInLoader from "../common/SignInLoader";
 import { UserAPI } from "../../apis/UserAPI";
-import { setAuthInfo } from "../../redux/actions/UserActions";
 import { themeSettings } from "../../theme";
+import { Utility } from "../utility";
+// import { setAuthInfo } from "../../redux/actions/UserActions";
 
 import bgImg from "../assets/backimg.jpg";
 import bg from "../assets/signin.svg";
@@ -25,7 +27,7 @@ const boxstyle = {
   borderRadius: 6,
   bgcolor: "background.paper",
   width: "62%",
-  height: "60%",
+  height: "62vh",
   transform: "translate(-50%, -50%)",
   padding: "10px"
 };
@@ -46,15 +48,19 @@ export default function Login() {
   const { typography } = themeSettings(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const navigateTo = useNavigate();
-  const dispatch = useDispatch();
+  const { setLocalStorage } = Utility();
+  // const dispatch = useDispatch();
 
   const [formData, setFormData] = useState(initialValues);
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toastAlert, setToastAlert] = useState(false);
   const [toastSeverity, setToastSeverity] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
   //make the POST API call when submit button is clicked
   useEffect(() => {
@@ -66,16 +72,23 @@ export default function Login() {
       UserAPI.login(formData)
         .then(({ data: response }) => {
           setLoading(false);
-          if (response.status === 'Success' && response.data !== "Username and Password do not match") {
-            dispatch(setAuthInfo({ token: response.data.token, username: response.data.username }));
-          } else if (response.status === 'Success' && response.data === "Username and Password do not match") {
+
+          if (response.status === 'Success' &&
+            (response.data === "User does not exist" || response.data === "Username and Password do not match")) {
             setToastAlert(true);
             setToastSeverity("info");
             setToastMessage(response.data);
+
             toastTimeout = setTimeout(() => {
               setToastAlert(false);
             }, 2000);
-          };
+          }
+          else {
+            const authInfo = { token: response.data.token, username: response.data.username, type: response.data.type };
+            setLocalStorage("auth", authInfo);
+            // dispatch(setAuthInfo(authInfo));   cleanup: to be removed if not used
+            navigateTo("/");
+          }
         })
         .catch(err => {
           setLoading(false);
@@ -89,11 +102,10 @@ export default function Login() {
         });
     };
 
-    return () => {
-      clearTimeout(toastTimeout);
-      clearTimeout(toastTimeout2);
-    }
-
+    // return () => {
+    //   clearTimeout(toastTimeout);
+    //   clearTimeout(toastTimeout2);
+    // }
   }, [formData]);
 
   return (
@@ -103,7 +115,8 @@ export default function Login() {
         style={{
           backgroundImage: `url(${bgImg})`,
           backgroundSize: "cover",
-          height: "80vh",
+          height: "99.9vh",
+          width: "100vw",
           color: "#f5f5f5"
         }}
       >
@@ -118,7 +131,7 @@ export default function Login() {
                   marginTop: "40px",
                   marginLeft: "15px",
                   marginRight: "15px",
-                  height: "54vh",
+                  height: "56vh",
                   color: "#f5f5f5",
                 }}
               ></Box>
@@ -126,7 +139,7 @@ export default function Login() {
             <Grid item xs={12} sm={12} lg={6}>
               <Box
                 style={{
-                  height: "100%",
+                  height: "58.5vh",
                   backgroundColor: "#3b33d5",
                   borderRadius: 26
                 }}
@@ -136,12 +149,12 @@ export default function Login() {
                   <Box sx={center}>
                     <Avatar
                       sx={{
-                        ml: "35px", bgcolor: `${theme.palette.mode} === "dark" ? "dark" : "light"`
+                        ml: "35px", bgcolor: `${theme.palette.mode} === dark ? dark : light`
                       }}
                     >
                       <LockOutlinedIcon />
                     </Avatar>
-                    <Typography component="h2" variant="h4" sx={{
+                    <Typography component="h2" sx={{
                       marginLeft: "-18px",
                       fontFamily: typography.fontFamily,
                       fontSize: typography.h2.fontSize
@@ -155,7 +168,6 @@ export default function Login() {
                     }}
                     initialValues={initialValues}
                   // validationSchema={UserValidation}
-                  // enableReinitialize={true}
                   >
                     {({
                       values,
@@ -176,7 +188,7 @@ export default function Login() {
                               label="Username"
                               name="email"
                               type="email"
-                              autoComplete="on"
+                              autoComplete="new-email"
                               onBlur={handleBlur}
                               onChange={handleChange}
                               value={values.email}
@@ -191,13 +203,27 @@ export default function Login() {
                               id="password"
                               label="Password"
                               name="password"
-                              type="password"
+                              type={showPassword ? "text" : "password"} // <-- This is where the pw toggle happens
                               autoComplete="off"
                               onBlur={handleBlur}
                               onChange={handleChange}
                               value={values.password}
                               error={!!touched.contact_no && !!errors.contact_no}
                               helperText={touched.contact_no && errors.contact_no}
+                              InputProps={{ // <-- This is where the toggle button is added.
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    <IconButton
+                                      aria-label="toggle password visibility"
+                                      onClick={handleClickShowPassword}
+                                      onMouseDown={handleMouseDownPassword}
+                                    >
+                                      {showPassword ? <VisibilityOutlinedIcon /> :
+                                        <VisibilityOffOutlinedIcon />}
+                                    </IconButton>
+                                  </InputAdornment>
+                                )
+                              }}
                             />
                           </Grid>
                           <Grid item xs={12} sx={{ ml: "3em", mr: "3em" }}>
@@ -251,8 +277,4 @@ export default function Login() {
       </div >
     </>
   );
-};
-
-Login.propTypes = {
-  setToken: propTypes.func.isRequired
 };

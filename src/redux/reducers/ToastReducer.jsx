@@ -9,26 +9,19 @@
 import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
-    users: [],
-    loading: true
+    toastAlert: false,
+    toastSeverity: "",
+    toastMessage: ""
 };
 
-export const setUserReducer = (state = initialState, action) => {
+export const displayToastReducer = (state = initialState, action) => {
     switch (action.type) {
-        case ActionTypes.SET_USERS:
+        case ActionTypes.DISPLAY_TOAST:
             return {
-                ...state, users: action.payload.users, loading: action.payload.loading
-            };
-        default:
-            return state;
-    };
-};
-
-export const registerUserReducer = (state = initialState, action) => {
-    switch (action.type) {
-        case ActionTypes.REGISTER_USER:
-            return {
-                ...state, users: action.payload
+                ...state, 
+                toastAlert: action.payload.toastAlert, 
+                toastSeverity: action.payload.toastSeverity,
+                toastMessage: action.payload.toastMessage
             };
         default:
             return state;

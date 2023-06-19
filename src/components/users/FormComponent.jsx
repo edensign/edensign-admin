@@ -1,341 +1,204 @@
-/**
- * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
- *
- * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
- * restrictions set forth in your license agreement with Eden Sign.
-*/
+import React, { useCallback, useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 
-import { Box, Button, InputLabel, TextField, Select, MenuItem, InputAdornment, IconButton, FormControl } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
-import { Formik } from "formik";
-
-import UserValidation from "./UserValidation";
-import Header from "../common/Header";
-import Toast from "../common/Toast";
+import AddressFormComponent from "../address/AddressFormComponent";
 import Loader from "../common/Loader";
-import { UserAPI } from "../../apis/UserAPI";
-import { CommonAPI } from "../../apis/CommonAPI";
+import Toast from "../common/Toast";
+import UserFormComponent from "./UserFormComponent";
+import API from "../../apis";
+
+import { Utility } from "../utility";
+import { useUser } from "../hooks";
+import { tokens, themeSettings } from "../../theme";
 
 const FormComponent = () => {
-    const navigateTo = useNavigate();
-    const { state } = useLocation();
-    const isNonMobile = useMediaQuery("(min-width:600px)");
-    const selected = useSelector(state => state.menuItems.selected);
-
-    let initialValues = {};
-    let styleObj = {};
-    if (selected === "Employee") {
-        initialValues = {
-            username: "",
-            password: "",
-            email: "",
-            contact_no: "",
-            status: "inactive"
-        };
-        styleObj = {
-            display: "none",
-            gridColumn: "span 2"
-        }
-    } else {
-        initialValues = {
-            username: "",
-            password: "",
-            email: "",
-            contact_no: "",
-            status: "inactive",
-            type: ""
-        };
-        styleObj = {
-            display: "block",
-            gridColumn: "span 2"
-        }
-    };
-
-    // const [focusOn, setFocusOn] = useState(false);
-    const [initialState, setInitialState] = useState(initialValues);
-    const [showPassword, setShowPassword] = useState(false);
     const [title, setTitle] = useState("Create");
     const [loading, setLoading] = useState(false);
-    const [userData, setUserData] = useState(null);
-    const [toastAlert, setToastAlert] = useState(false);
-    const [toastSeverity, setToastSeverity] = useState("");
-    const [toastMessage, setToastMessage] = useState("");
+    const [formData, setFormData] = useState({
+        userData: { values: null, validated: false },
+        addressData: { values: null, validated: false },
+    });
+    const [updatedValues, setUpdatedValues] = useState(null);
+    const [dirty, setDirty] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [reset, setReset] = useState(false);
 
+    const userFormRef = useRef();
+    const addressFormRef = useRef();
 
-    const pwField = document.getElementById("pwField");
+    const navigateTo = useNavigate();
+    const dispatch = useDispatch();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const { typography } = themeSettings(theme.palette.mode);
 
-    //Create/Update user
-    useEffect(() => {
-        if (userData && userData.id) {
-            setLoading(true);
-            if (pwField.disabled || !userData.password) {
-                delete userData.password;
-            }
-            UserAPI.update(userData)
-                .then(user => {
-                    setLoading(false);
-                    setToastAlert(true);
-                    setToastSeverity("info");
-                    setToastMessage("Updated");
+    const selected = useSelector(state => state.menuItems.selected);
+    const toastInfo = useSelector(state => state.toastInfo);
+    const { state } = useLocation();
+    const { getQueryParam } = useUser();
 
-                    setTimeout(() => {
-                        setToastAlert(false);
-                        navigateTo("/user-listing");
-                    }, 2000);
-                })
-                .catch(err => {
-                    setLoading(false);
-                    setToastAlert(true);
-                    setToastSeverity("error");
-                    setToastMessage(err.response.data.msg);
+    const { toastModal } = Utility();
+    let id = state?.id;
 
-                    setTimeout(() => {
-                        setToastAlert(false);
-                        navigateTo("/user-listing");
-                    }, 2000);
-                });
-        } else if (userData && !userData.id) {
-            setLoading(true);
-            UserAPI.register(userData)
-                .then(user => {
-                    setLoading(false);
-                    setToastAlert(true);
-                    setToastSeverity("success");
-                    setToastMessage("Success");
-
-                    setTimeout(() => {
-                        setToastAlert(false);
-                        navigateTo("/user-listing");
-                    }, 2000);
-                })
-                .catch(err => {
-                    setLoading(false);
-                    setToastAlert(true);
-                    setToastSeverity("error");
-                    setToastMessage(err.response.data.msg);
-
-                    setTimeout(() => {
-                        setToastAlert(false);
-                        navigateTo("/user-listing");
-                    }, 2000);
-                });
+    const updateUserAndAddress = useCallback((formData) => {
+        const dataFields = [
+            { ...formData.userData.values },
+            { ...formData.addressData.values }
+        ];
+        if (!formData.userData.password) {
+            delete formData.userData.password;
         }
-    }, [userData]);
+        console.log("Inside update user=>", formData)
+        const paths = ["/update-user", "/update-address"];
+        API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
+            .then(responses => {
+                let status = true;
+                responses.forEach(response => {
+                    if (response.data.status !== "Success") {
+                        status = false;
+                    }
+                });
+                if (status) {
+                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/user/listing");
+                }
+            })
+            .catch(err => {
+                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                throw err
+            });
+    }, [formData]);
 
-    //populate data in form when update button is clicked from listing component
+    const populateUserData = (id) => {
+        const paths = [`/get-by-pk/users/${id}`, `/get-address/user/${id}`];
+        API.CommonAPI.multipleAPICall("GET", paths)
+            .then(responses => {
+                const dataObj = {
+                    userData: responses[0].data.data,
+                    addressData: responses[1].data.data
+                }
+                setUpdatedValues(dataObj);
+            })
+            .catch(err => { throw err });
+    };
+
+    const registerUser = () => {
+        setLoading(true);
+        const userType = getQueryParam();
+        API.UserAPI.register({ ...formData.userData.values, type: userType })
+            .then(({ data: user }) => {
+                if (user?.status === 'Success') {
+                    API.AddressAPI.createAddress({
+                        ...formData.addressData.values,
+                        parent_id: user.data.id,
+                        parent: 'user',
+                    })
+                        .then(address => {
+                            setLoading(false);
+                            toastModal(dispatch, true, "success", "Success", navigateTo, "/user/listing");
+                        })
+                        .catch(err => {
+                            setLoading(false);
+                            toastModal(dispatch, true, err ? err : "An Error Occurred");
+                            throw err;
+                        });
+                }
+            })
+            .catch(err => {
+                setLoading(false);
+                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                throw err;
+            });
+    }
+
+    //Create/Update/Populate user
     useEffect(() => {
-        if (state) {
-            const { id } = state;
-            const pwField = document.getElementById("pwField");
+        if (id && !submitted) {
             setTitle("Update");
-
-            CommonAPI.getByPk(id, "users")
-                .then(({ data: response }) => {
-                    setInitialState({ ...response });
-                    pwField.setAttribute("disabled", true);
-                    pwField.style.backgroundColor = "#777";
-                })
-                .catch(err => {
-                    console.log(err);
-                })
+            populateUserData(id);
         }
-    }, []);
+        if (formData.userData.validated && formData.addressData.validated) {
+            formData.userData.values?.id ? updateUserAndAddress(formData) : registerUser();
+        }
+    }, [id, submitted]);
 
-    const handleUpdatePassword = () => {
-        pwField.removeAttribute("disabled");
-        pwField.style.backgroundColor = "rgba(255, 255, 255, 0.09)";
-        pwField.focus();
-        // pwField.setAttribute("onfocus", "this.value=''");
+    const handleSubmit = async () => {
+        await userFormRef.current.Submit();
+        await addressFormRef.current.Submit();
+        setSubmitted(true);
     };
 
-    const handleClickShowPassword = () => setShowPassword(!showPassword);
-    const handleMouseDownPassword = () => setShowPassword(!showPassword);
-
-    const handleFormCancel = () => {
-        setToastAlert(true);
-        setToastSeverity("error");
-        setToastMessage("Cancelled");
-
-        setTimeout(() => {
-            setToastAlert(false);
-            navigateTo("/user-listing");
-        }, 2000);
-    };
+    const handleFormChange = (data, form) => {
+        form === 'user' ? setFormData({ ...formData, userData: data }) :
+            setFormData({ ...formData, addressData: data });
+    }
 
     return (
-        <Box m="20px">
-            <Header title={`${title} ${selected}`} />
-
-            <Formik
-                onSubmit={values => {
-                    setUserData(values);
-                }}
-                initialValues={initialState}
-                validationSchema={UserValidation}
-                enableReinitialize={true}
+        <Box m="10px">
+            <Typography
+                fontFamily={typography.fontFamily}
+                fontSize={typography.h2.fontSize}
+                color={colors.grey[100]}
+                fontWeight="bold"
+                display="inline-block"
+                marginLeft="20px"
             >
-                {({
-                    values,
-                    errors,
-                    touched,
-                    dirty,
-                    resetForm,
-                    handleBlur,
-                    handleChange,
-                    handleSubmit
-                }) => (
-                    <form onSubmit={handleSubmit}>
-                        <Box
-                            display="grid"
-                            gap="30px"
-                            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-                            sx={{
-                                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                {`${title} ${selected}`}
+            </Typography>
+            <UserFormComponent
+                onChange={(data) => {
+                    handleFormChange(data, 'user');
+                }}
+                refId={userFormRef}
+                setDirty={setDirty}
+                reset={reset}
+                setReset={setReset}
+                userId={id}
+                updatedValues={updatedValues?.userData}
+            />
+            <AddressFormComponent
+                onChange={(data) => {
+                    handleFormChange(data, 'address');
+                }}
+                refId={addressFormRef}
+                dirty={dirty}
+                setDirty={setDirty}
+                reset={reset}
+                setReset={setReset}
+                updatedValues={updatedValues?.addressData}
+            />
+
+            <Box display="flex" justifyContent="end" mt="20px">
+                {   //hide reset button on user update
+                    title === "Update" ? null :
+                        <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}
+                            disabled={!dirty}
+                            onClick={() => {
+                                if (window.confirm("Do You Really Want To Reset?")) {
+                                    setReset(true);
+                                };
                             }}
                         >
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                name="username"
-                                label="Username"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.username}
-                                error={!!touched.username && !!errors.username}
-                                helperText={touched.username && errors.username}
-                                sx={{ gridColumn: "span 2" }}
-                            />
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                id="pwField"
-                                label="Password"
-                                name="password"
-                                type={showPassword ? "text" : "password"} // <-- This is where the pw toggle happens
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.password}
-                                error={!!touched.password && !!errors.password}
-                                helperText={touched.password && errors.password}
-                                sx={{ gridColumn: "span 2" }}
-                                InputProps={{ // <-- This is where the toggle button is added.
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={handleClickShowPassword}
-                                                onMouseDown={handleMouseDownPassword}
-                                            >
-                                                {showPassword ? <VisibilityOutlinedIcon /> :
-                                                    <VisibilityOffOutlinedIcon />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Email"
-                                name="email"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.email}
-                                error={!!touched.email && !!errors.email}
-                                helperText={touched.email && errors.email}
-                                sx={{ gridColumn: "span 2" }}
-                            />
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Contact Number"
-                                name="contact_no"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.contact_no}
-                                error={!!touched.contact_no && !!errors.contact_no}
-                                helperText={touched.contact_no && errors.contact_no}
-                                sx={{ gridColumn: "span 2" }}
-                            />
-                            <TextField
-                                fullWidth
-                                variant="filled"
-                                type="text"
-                                label="Type"
-                                name="type"
-                                id="typeField"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.type}
-                                error={!!touched.type && !!errors.type}
-                                sx={styleObj}
-                            />
-                            <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                                <InputLabel id="statusField">Status</InputLabel>
-                                <Select
-                                    variant="filled"
-                                    labelId="statusField"
-                                    label="Status"
-                                    name="status"
-                                    value={values.status}
-                                    onChange={handleChange}
-                                    error={!!touched.status && !!errors.status}
-                                >
-                                    <MenuItem value={"active"}>Active</MenuItem>
-                                    <MenuItem value={"inactive"}>Inactive</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Box display="flex" justifyContent="end" mt="20px">
-                            {   //hide reset button on update
-                                title === "Update" ? null :
-                                    <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }} disabled={!dirty}
-                                        onClick={() => {
-                                            if (window.confirm("Do You Really Want To Reset?")) {
-                                                resetForm();
-                                                setToastAlert(true);
-                                                setToastSeverity("warning");
-                                                setToastMessage("Resetted");
-
-                                                setTimeout(() => {
-                                                    setToastAlert(false);
-                                                }, 2000);
-                                            }
-                                        }}
-                                    >
-                                        Reset
-                                    </Button>
-                            }
-                            <Button color="error" variant="contained" sx={{ mr: 3 }} onClick={handleFormCancel} >
-                                Cancel
-                            </Button>
-                            <Button type="submit" color={title === "Update" ? "info" : "success"} variant="contained" disabled={!dirty} >
-                                Submit
-                            </Button>
-                            <Toast alerting={toastAlert} severity={toastSeverity} message={toastMessage} />
-                        </Box>
-                    </form>
-                )}
-            </Formik>
+                            Reset
+                        </Button>
+                }
+                <Button color="error" variant="contained" sx={{ mr: 3 }}
+                    onClick={() => navigateTo('/user/listing')}>
+                    Cancel
+                </Button>
+                <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}
+                    color={title === "Update" ? "info" : "success"} variant="contained"
+                >
+                    Submit
+                </Button>
+                <Toast alerting={toastInfo.toastAlert}
+                    severity={toastInfo.toastSeverity}
+                    message={toastInfo.toastMessage}
+                />
+            </Box>
             {loading === true ? <Loader /> : null}
-            {title === "Update" ? <Button type="button" color="primary" variant="contained"
-                sx={{
-                    position: "absolute",
-                    right: 20,
-                    top: 120
-                }}
-                onClick={handleUpdatePassword}
-            > Update Password </Button> : null}
         </Box>
     );
 };

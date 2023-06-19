@@ -8,6 +8,9 @@
 
 import { api } from "./config/axiosConfig";
 import { defineCancelApiObject } from "./config/axiosUtils";
+import { Utility } from "../components/utility";
+
+const { getLocalStorage } = Utility();
 
 export const UserAPI = {
   /** */
@@ -20,11 +23,11 @@ export const UserAPI = {
     });
   },
   /** */
-  profile: async (token, cancel = false) => {
+  profile: async (cancel = false) => {
     return await api.request({
       url: `/profile`,
       headers: {
-        "x-access-token": token
+        "x-access-token": getLocalStorage("auth").token
       },
       method: "GET",
       data: token,
@@ -32,10 +35,14 @@ export const UserAPI = {
     });
   },
   /** */
-  getAll: async (conditionObj, cancel = false) => {
-    const queryParam = conditionObj ? `?${conditionObj.key}=${conditionObj.value}` : null;
+  getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false) => {
+    const queryParam = conditionObj ? `&${conditionObj.key}=${conditionObj.value}` : '';
+    const searchParam = search ? `&search=${search}` : '';
     const { data: response } = await api.request({
-      url: `/get-users${queryParam}`,
+      url: `/get-users?page=${page}&size=${size}${queryParam}${searchParam}`,
+      headers: {
+        "x-access-token": getLocalStorage("auth")?.token
+      },
       method: "GET",
       signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
     });
@@ -43,8 +50,11 @@ export const UserAPI = {
   },
   /** */
   register: async (user, cancel = false) => {
-    await api.request({
+    return await api.request({
       url: `/register`,
+      headers: {
+        "x-access-token": getLocalStorage("auth").token
+      },
       method: "POST",
       data: user,
       signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
@@ -52,8 +62,11 @@ export const UserAPI = {
   },
   /** */
   update: async (fields, cancel = false) => {
-    await api.request({
+    return await api.request({
       url: `/update-user`,
+      headers: {
+        "x-access-token": getLocalStorage("auth").token
+      },
       method: "PATCH",
       data: fields,
       signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,

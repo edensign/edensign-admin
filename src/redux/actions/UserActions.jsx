@@ -22,13 +22,6 @@ export const registerUser = (user) => {
     };
 };
 
-export const menuItem = (item) => {
-    return {
-        type: ActionTypes.MENU_ITEM,
-        payload: item
-    };
-};
-
 export const setAuthInfo = (payload) => {
     return {
         type: ActionTypes.AUTH_INFO,

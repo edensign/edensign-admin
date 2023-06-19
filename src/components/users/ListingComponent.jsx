@@ -10,204 +10,126 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Box, Typography, Button, useTheme } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
+import ReplayIcon from '@mui/icons-material/Replay';
 
-import Header from "../common/Header";
-import EmptyOverlayGrid from "../common/EmptyOverlayGrid";
-import { CustomPagination } from "../common/Pagination";
-import { multipleSkeletons } from "../common/LoadingSkeleton"
-import { useUtility } from "../hooks";
-import { tokens } from "../../theme";
-import { UserAPI } from "../../apis/UserAPI";
-import { setUsers } from "../../redux/actions/UserActions";
+import Search from "../common/Search";
+import ServerPaginationGrid from '../common/Datagrid';
+import { datagridColumns } from "./UserConfig";
+import { useUser } from "../hooks";
+import { tokens, themeSettings } from "../../theme";
+import { setMenuItem } from "../../redux/actions/NavigationAction";
+import { Utility } from "../utility";
 
 const ListingComponent = () => {
     const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
-
-    const [loading, setLoading] = useState(true);
-    const { getQuery } = useUtility();
     const dispatch = useDispatch();
     const selected = useSelector(state => state.menuItems.selected);
+    const isNonMobile = useMediaQuery("(min-width:720px)");
+    const { getQueryParam, getAllUsers } = useUser();
     const { users } = useSelector(state => state.allUsers);
+    const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
+    const [oldPagination, setOldPagination] = useState();
+
+    const colors = tokens(theme.palette.mode);
+    const pageSizeOptions = [5, 10, 20];
+    const reloadBtn = document.getElementById("reload-btn");
+    const { getLocalStorage } = Utility();
+    const { typography } = themeSettings(theme.palette.mode);
+
+    let condition = getQueryParam() ? {
+        key: 'type',
+        value: getQueryParam()
+    } : false;
 
     useEffect(() => {
-        UserAPI.getAll({
-            key: 'type',
-            value: getQuery()
-        })
-            .then(res => {
-                setLoading(false);
-                if (res.status === 'Success') {
-                    dispatch(setUsers(res.data));
-                }
-            })
-            .catch(err => {
-                setLoading(false);
-                dispatch(setUsers([]));
-                console.log(err);
-            });
-    }, [selected]);
+        const selectedMenu = getLocalStorage("menu");
+        dispatch(setMenuItem(selectedMenu.selected));
+    }, []);
 
-    const handleActionEdit = (id) => {
-        navigateTo("/user-form", { state: { id: id } });
+    const handleReload = () => {
+        // getSearchData(oldPagination.page, oldPagination.pageSize, condition);
+        reloadBtn.style.display = "none";
+        setSearchFlag({
+            search: false,
+            searching: false,
+            oldPagination
+        });
     };
 
-    const columns = [
-        { field: "id", headerName: "ID", flex: 0.5 },
-        {
-            field: "username",
-            headerName: "Username",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-            cellClassName: "name-column--cell",
-        },
-        {
-            field: "contact_no",
-            headerName: "Contact Number",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-        },
-        {
-            field: "email",
-            headerName: "Email",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-        },
-        {
-            field: "status",
-            headerName: "Status",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-            renderCell: ({ row: { status } }) => {
-                return (
-                    <Box
-                        width="60%"
-                        m="0 auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center"
-                        backgroundColor={
-                            status === "active"
-                                ? colors.greenAccent[600]
-                                : status === "inactive"
-                                    ? colors.redAccent[700]
-                                    : colors.redAccent[700]
-                        }
-                        borderRadius="4px"
-                    >
-                        <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-                            {status}
-                        </Typography>
-                    </Box>
-                );
-            },
-        },
-        {
-            field: "actions",
-            headerName: "Actions",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-            renderCell: ({ row: { id } }) => {
-                return (
-                    <Box width="60%"
-                        m="0 auto"
-                        p="5px"
-                        display="flex"
-                        justifyContent="center">
-                        <Button color="info" variant="contained" onClick={() => handleActionEdit(id)} >
-                            <DriveFileRenameOutlineOutlinedIcon />
-                        </Button>
-                    </Box>
-                );
-            },
-        }
-    ];
-
     return (
-        <Box m="20px">
-            <Header title={selected} />
-            <Button
-                type="submit"
-                color="success"
-                variant="contained"
-                sx={{ position: "absolute", right: "20px", top: "90px" }}
-                onClick={() => { navigateTo("/user-form") }}
-            >
-                Create New {selected}
-            </Button>
+        <Box m="10px">
             <Box
-                m="30px 0 0 0"
-                height="70vh"
-                sx={{
-                    "& .MuiDataGrid-root": {
-                        border: "none",
-                        fontSize: "1rem"
-                    },
-                    "& .MuiDataGrid-cell": {
-                        borderBottom: "none"
-                    },
-                    "& .MuiDataGrid-cell:focus-within": {
-                        outline: `1px solid ${colors.greenAccent[600]}`,
-                    },
-                    "& .MuiDataGrid-cell:hover": {
-                        color: colors.greenAccent[300]
-                    },
-                    "& .name-column--cell": {
-                        color: colors.greenAccent[300]
-                    },
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.blueAccent[700],
-                        borderBottom: "none"
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        minHeight: 320
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: colors.blueAccent[700]
-                    },
-                    "& .MuiCheckbox-root": {
-                        color: `${colors.greenAccent[200]} !important`
-                    },
-                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                        color: `${colors.grey[100]} !important`
-                    },
-                }}
+                height={isNonMobile ? "11vh" : "20vh"}
+                borderRadius="4px"
+                padding={isNonMobile ? "2vh" : "1vh"}
+                backgroundColor={colors.blueAccent[700]}
             >
-                <DataGrid
-                    rows={users}
-                    columns={columns}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                    autoHeight
-                    sx={{
-                        minHeight: 440,
-                        boxShadow: 2,
-                        border: 2,
-                        borderColor: 'primary.light',
-                    }}
-                    pagination
-                    components={{
-                        Toolbar: GridToolbar,
-                        LoadingOverlay: multipleSkeletons,
-                        pagination: CustomPagination,
-                        noRowsOverlay: EmptyOverlayGrid
-                    }}
-                    loading={loading}
-                    initialState={{
-                        pagination: { paginationModel: { pageSize: 25 } }
-                    }}
-                />
+                <Box
+                    display="flex"
+                    height={isNonMobile ? "6vh" : "17vh"}
+                    flexDirection={isNonMobile ? "row" : "column"}
+                    justifyContent={"space-between"}
+                >
+                    <Typography
+                        component="h2"
+                        variant="h2"
+                        color={colors.grey[100]}
+                        fontWeight="bold"
+                    >
+                        {selected}
+                    </Typography>
+                    <Search
+                        getSearchData={getAllUsers}
+                        condition={condition}
+                        setSearchFlag={setSearchFlag}
+                        oldPagination={oldPagination}
+                        reloadBtn={reloadBtn}
+                    />
+                    <Button
+                        type="submit"
+                        color="success"
+                        variant="contained"
+                        onClick={() => { navigateTo("/user/create") }}
+                    >
+                        Create New {selected}
+                    </Button>
+                </Box>
             </Box>
+            <Button sx={{
+                display: "none",
+                position: "absolute",
+                top: isNonMobile ? "29.5vh" : "43vh",
+                left: "44.5vw",
+                zIndex: 1,
+                borderRadius: "20%",
+                color: colors.grey[100]
+            }}
+                id="reload-btn"
+                type="submit"
+                onClick={handleReload}
+            >
+                <span style={{ display: "inherit", marginRight: "5px", marginLeft: "-2px" }}>
+                    <ReplayIcon />
+                </span>
+                Back
+            </Button>
+            <ServerPaginationGrid
+                getQuery={getAllUsers}
+                condition={getQueryParam() ? {
+                    key: 'type',
+                    value: getQueryParam()
+                } : false}
+                columns={datagridColumns()}
+                rows={users.rows}
+                count={users.count}
+                selected={selected}
+                pageSizeOptions={pageSizeOptions}
+                setOldPagination={setOldPagination}
+                searchFlag={searchFlag}
+                setSearchFlag={setSearchFlag}
+            />
         </Box>
     );
 };

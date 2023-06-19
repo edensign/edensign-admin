@@ -1,0 +1,158 @@
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+import { Box, useTheme } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+
+import EmptyOverlayGrid from "./EmptyOverlayGrid";
+import { multipleSkeletons } from "./LoadingSkeleton";
+import { tokens } from "../../theme";
+
+export default function ServerPaginationGrid({
+    getQuery,
+    condition = false,
+    columns,
+    rows,
+    count,
+    selected,
+    pageSizeOptions,
+    searchFlag,
+    setOldPagination,
+    setSearchFlag
+}) {
+    const initialState = {
+        page: 0,
+        pageSize: 5 || 10 || 20
+    };
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const loading = useSelector(state => state.allUsers.loading);
+    const [paginationModel, setPaginationModel] = useState(initialState);
+
+    useEffect(() => {
+        if (!searchFlag.search && !searchFlag.searching) {
+            console.log('Pagination without search');
+            getQuery(paginationModel.page, paginationModel.pageSize, condition);
+            setOldPagination(paginationModel);
+        } else if (searchFlag.oldPagination && !searchFlag.searching) {
+            console.log('go back=>', searchFlag.oldPagination);
+            getQuery(searchFlag.oldPagination.page, searchFlag.oldPagination.pageSize, condition);
+            setPaginationModel({
+                page: searchFlag.oldPagination.page,
+                pageSize: searchFlag.oldPagination.pageSize
+            });
+        }
+    }, [selected, paginationModel.page, paginationModel.pageSize, searchFlag.searching]);
+
+    useEffect(() => {
+        setPaginationModel(initialState);
+    }, [selected]);
+
+    // Some API clients return undefined while loading
+    // Following lines are here to prevent `rowCountState` from being undefined during the loading
+    const [rowCountState, setRowCountState] = useState(count || 0);
+
+    useEffect(() => {
+        setRowCountState(() =>
+            count ? count : 0,
+        );
+    }, [count, setRowCountState]);
+
+    console.log('pagina=>', paginationModel);
+
+    const [rowSelectionModel, setRowSelectionModel] = useState([]);
+
+    return (
+        <Box
+            m="30px 0 0 0"
+            height="70vh"
+            // width="79vw"
+            sx={{
+                "& .MuiDataGrid-root": {
+                    border: "none",
+                    fontSize: "1rem"
+                },
+                "& .MuiDataGrid-cell": {
+                    borderBottom: "none"
+                },
+                "& .MuiDataGrid-cellCheckbox": {
+                    borderBottom: "none"
+                },
+                "& .MuiDataGrid-cell:focus-within": {
+                    outline: `1px solid ${colors.greenAccent[600]}`
+                },
+                "& .MuiDataGrid-cell:hover": {
+                    color: colors.greenAccent[300]
+                },
+                "& .name-column--cell": {
+                    color: colors.greenAccent[300],
+                    // minWidth: '170px !important'
+                },
+                "& .contact-column--cell": {
+                    // minWidth: '170px !important'
+                },
+                "& .email-column--cell": {
+                    // minWidth: '180px !important'
+                },
+                "& .created-column--cell": {
+                    // minWidth: '170px !important'
+                },
+                "& .status-column--cell": {
+                    // minWidth: '180px !important'
+                },
+                "& .action-column--cell": {
+                    // minWidth: '160px !important'
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.blueAccent[700],
+                    borderBottom: "none"
+                },
+                "& .MuiDataGrid-columnHeader": {
+                    backgroundColor: colors.blueAccent[700],
+                    // minWidth: `140px !important`
+                },
+                "& .MuiDataGrid-virtualScroller": {
+                    minHeight: 320
+                },
+                "& .MuiDataGrid-footerContainer": {
+                    borderTop: "none",
+                    backgroundColor: colors.blueAccent[700]
+                },
+                "& .MuiCheckbox-root": {
+                    color: `${colors.greenAccent[200]} !important`
+                },
+                "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                    color: `${colors.grey[100]} !important`
+                },
+            }}
+        >
+            <DataGrid
+                autoHeight
+                // checkboxSelection
+                disableRowSelectionOnClick
+                rows={rows || []}
+                columns={columns}
+                // count={count}
+                // page={count + 1}
+                loading={loading}
+                rowCount={rowCountState}
+                components={{
+                    Toolbar: GridToolbar,
+                    LoadingOverlay: multipleSkeletons,
+                    noRowsOverlay: EmptyOverlayGrid
+                }}
+                pagination
+                ServerPaginationGrid
+                paginationMode="server"
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={pageSizeOptions}
+                keepNonExistentRowsSelected
+            // onRowSelectionModelChange={(newRowSelectionModel) => {
+            //     setRowSelectionModel(newRowSelectionModel);
+            //   }}
+            //   rowSelectionModel={rowSelectionModel}
+            />
+        </Box>
+    );
+}

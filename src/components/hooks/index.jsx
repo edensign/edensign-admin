@@ -6,18 +6,25 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import { useSelector } from "react-redux";
+import { useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-export const useUtility = () => {
+import { setUsers } from "../../redux/actions/UserActions";
+import { UserAPI } from "../../apis/UserAPI";
+import { Utility } from "../utility";
+
+export const useUser = () => {
     const selected = useSelector(state => state.menuItems.selected);
+    const dispatch = useDispatch();
+    const { getLocalStorage } = Utility();
 
     /** Get query according to user selection
      */
-    const getQuery = () => {
+    const getQueryParam = () => {
         let query = '';
         switch (selected) {
             case "Employee":
-                query = `admin, subadmin`;
+                query = `admin`;
                 break;
             case "Salon":
                 query = "salon";
@@ -32,8 +39,22 @@ export const useUtility = () => {
         return query;
     };
 
+    const getAllUsers = useCallback((page = 0, size, condition = false, search = false) => {
+        const authInfo = getLocalStorage("auth");
+        UserAPI.getAll(condition, page, size, search, authInfo)
+            .then(res => {
+                if (res.status === 'Success') {
+                    dispatch(setUsers({ users: res.data, loading: false }));
+                }
+            })
+            .catch(err => {
+                dispatch(setUsers({ users: [], loading: false }));
+                console.log(err);
+            });
+    }, [selected]);
+
     return {
-        getQuery
+        getQueryParam,
+        getAllUsers
     };
 };
-

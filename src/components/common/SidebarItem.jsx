@@ -12,12 +12,14 @@ import { useDispatch } from "react-redux";
 import { MenuItem } from "react-pro-sidebar/dist";
 import { Typography, useTheme } from "@mui/material";
 
+import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens } from "../../theme";
-import { menuItem } from "../../redux/actions/UserActions";
+import { Utility } from "../utility";
 
 export const SidebarItem = ({ title, to, icon, selected }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const { setLocalStorage } = Utility();
 
     const dispatch = useDispatch();
 
@@ -27,7 +29,11 @@ export const SidebarItem = ({ title, to, icon, selected }) => {
             style={{
                 color: colors.grey[100],
             }}
-            onClick={() => dispatch(menuItem(title))}
+            onClick={() => {
+                dispatch(setMenuItem(title));
+                setLocalStorage("menu", { selected: title });
+            }
+            }
             icon={icon}
         >
             <Typography>{title}</Typography>
