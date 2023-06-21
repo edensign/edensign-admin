@@ -142,7 +142,9 @@ const FormComponent = () => {
         }
         if (formData.userData.validated && formData.addressData.validated) {
             formData.userData.values?.id ? updateUserAndAddress(formData) : registerUser();
-        };
+        } else {
+            setSubmitted(false);
+        }
     }, [id, submitted]);
 
     const handleSubmit = async () => {

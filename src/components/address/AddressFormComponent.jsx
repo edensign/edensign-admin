@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
+import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
 
 import API from "../../apis";
 import addressValidation from "./Validation";
@@ -135,7 +135,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
         };
         getCities();
     }, [formik.values.state]);
-
+console.log("formik values=>", formik.values);
     return (
         <Box m="20px">
             <form ref={refId}>
@@ -217,7 +217,9 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                         helperText={formik.touched.zipcode && formik.errors.zipcode}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.country && !!formik.errors.country}
+                    >
                         <InputLabel id="countryField">--Select Country--</InputLabel>
                         <Select
                             autoComplete="new-country"
@@ -230,7 +232,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setCountryId(getCountryId);
                                 formik.setFieldValue("country", event.target.value);
                             }}
-                            error={!!formik.touched.country && !!formik.errors.country}
                         >
                             {countries.map(item => (
                                 <MenuItem value={item.id} name={item.name} key={item.name}>
@@ -238,8 +239,11 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.country && formik.errors.country}</FormHelperText>
                     </FormControl>
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.state && !!formik.errors.state}
+                    >
                         <InputLabel id="stateField">--Select State--</InputLabel>
                         <Select
                             autoComplete="new-state"
@@ -252,7 +256,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setStateId(getStateId);
                                 formik.setFieldValue("state", event.target.value);
                             }}
-                            error={!!formik.touched.state && !!formik.errors.state}
                         >
                             {states.map(item => (
                                 <MenuItem value={item.id} name={item.name} key={item.name}>
@@ -260,8 +263,11 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.state && formik.errors.state}</FormHelperText>
                     </FormControl>
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.city && !!formik.errors.city}
+                    >
                         <InputLabel id="cityField">--Select City--</InputLabel>
                         <Select
                             autoComplete="new-city"
@@ -274,7 +280,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setCityId(getCityId);
                                 formik.setFieldValue("city", event.target.value);
                             }}
-                            error={!!formik.touched.city && !!formik.errors.city}
                         >
                             {cities.map(item => (
                                 <MenuItem value={item.id} key={item.name} name={item.name}>
@@ -282,6 +287,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.city && formik.errors.city}</FormHelperText>
                     </FormControl>
                 </Box>
             </form>

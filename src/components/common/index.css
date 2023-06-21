@@ -8,11 +8,12 @@
 
 .lds-ring {
   display: inline-block;
-  position: absolute;
+  position: fixed;
   top: 45%;
   left: 49%;
   width: 80px;
   height: 80px;
+  z-index: 1;
 }
 
 .lds-ring div {

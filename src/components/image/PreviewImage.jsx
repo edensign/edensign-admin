@@ -7,13 +7,12 @@
  */
 
 import { useEffect } from "react";
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
+import { IconButton, ImageList, ImageListItem, Tooltip } from "@mui/material";
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 
 import Loader from "../common/Loader";
 
-const PreviewImage = ({ imageFiles, preview, setPreview }) => {
-    let arrayOfImages = Array.from(imageFiles);
+const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles, preview, setPreview }) => {
     let uploadedImages = [];
 
     const readImageFiles = (file) => {
@@ -29,16 +28,48 @@ const PreviewImage = ({ imageFiles, preview, setPreview }) => {
     };
 
     useEffect(() => {
-        arrayOfImages.forEach(item => readImageFiles(item));
+        if (imageFiles) {
+            let arrayOfImages = Array.from(imageFiles);
+            arrayOfImages.forEach(item => readImageFiles(item));
+        }
     }, [imageFiles]);
 
+    const handleDeleteClick = (item) => {
+        const index = preview.indexOf(item);
+        setDeletedImage([
+            ...deletedImage,
+            updatedValues[index].image_src
+        ]);
+        if (index > -1) {               // only splice 1 item from array when it is found
+            preview.splice(index, 1);
+            updatedValues.splice(index, 1);
+            setPreview([
+                ...preview
+            ]);
+        }
+    };
+
     return (
-        <ImageList sx={{ width: "80%", height: "60%" }} cols={3} rowHeight={220} gap={6}>
+        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit" }} cols={3} rowHeight={220} gap={8}>
             {preview ? preview.map((item, index) => (
                 <ImageListItem key={index}>
+                    <IconButton
+                        sx={{
+                            position: "absolute", left: "87%", top: "-2%"
+                        }}
+                        onClick={() => handleDeleteClick(item)}
+                    >
+                        <Tooltip title="DELETE">
+                            <HighlightOffOutlinedIcon sx={{
+                                "&:hover": {
+                                    color: "red", fontSize: "1.5rem", transition: "all 0.5s ease-in-out"
+                                }
+                            }}
+                            />
+                        </Tooltip>
+                    </IconButton>
                     <img
                         src={item}
-                        // srcSet={`${item.img}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
                         alt="This image cannot be seen"
                         loading="lazy"
                         style={{
@@ -46,7 +77,7 @@ const PreviewImage = ({ imageFiles, preview, setPreview }) => {
                             height: "100%",
                             width: "100%",
                             borderRadius: "12px",
-                            boxShadow: "3px 3px 6px hsl(0, 0%, 50%)"
+                            boxShadow: "2px 2px 4px hsl(0, 0%, 30%)"
                         }}
                     />
                 </ImageListItem>

@@ -30,11 +30,10 @@ const ListingComponent = () => {
     const theme = useTheme();
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
-    const isNonMobile = useMediaQuery("(min-width:720px)");
+    const isMobile = useMediaQuery("(max-width:480px)");
 
     const selected = useSelector(state => state.menuItems.selected);
     const { listData } = useSelector(state => state.allUsers);
-    console.log("Users Data=>", listData)
 
     //revisit for pagination
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
@@ -70,15 +69,15 @@ const ListingComponent = () => {
     return (
         <Box m="10px">
             <Box
-                height={isNonMobile ? "11vh" : "20vh"}
+                height={isMobile ? "19vh" : "11vh"}
                 borderRadius="4px"
-                padding={isNonMobile ? "2vh" : "1vh"}
+                padding={isMobile ? "1vh" : "2vh"}
                 backgroundColor={colors.blueAccent[700]}
             >
                 <Box
                     display="flex"
-                    height={isNonMobile ? "6vh" : "17vh"}
-                    flexDirection={isNonMobile ? "row" : "column"}
+                    height={isMobile ? "16vh" : "7vh"}
+                    flexDirection={isMobile ? "column" : "row"}
                     justifyContent={"space-between"}
                 >
                     <Typography
@@ -111,8 +110,8 @@ const ListingComponent = () => {
             <Button sx={{
                 display: "none",
                 position: "absolute",
-                top: isNonMobile ? "29.5vh" : "43vh",
-                left: "44.5vw",
+                top: isMobile ? "32vh" : "29.5vh",
+                left: "100vw",
                 zIndex: 1,
                 borderRadius: "20%",
                 color: colors.grey[100]

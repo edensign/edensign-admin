@@ -43,7 +43,6 @@ export default function ServerPaginationGrid({
     useEffect(() => {
         //TO BE REFACTORED
         if (!searchFlag.search && !searchFlag.searching) {
-            console.log('Pagination without search');
             getQuery(paginationModel.page, paginationModel.pageSize, action, api, condition);
             setOldPagination(paginationModel);
         } else if (searchFlag.oldPagination && !searchFlag.searching) {
@@ -69,7 +68,7 @@ export default function ServerPaginationGrid({
         );
     }, [count, setRowCountState]);
 
-    console.log('pagina=>', paginationModel);
+    // console.log('pagina=>', paginationModel);
 
     return (
         <Box

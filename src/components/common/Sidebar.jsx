@@ -6,12 +6,12 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar/dist";
 import "react-pro-sidebar/dist/css/styles.css";
 
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
@@ -28,9 +28,14 @@ import DummyImg from "./Faraz.png";
 
 const Sidebar = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const selected = useSelector(state => state.menuItems.selected);
+  const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery("(max-width:480px)");
+
+  useEffect(() => {
+    setIsCollapsed(isMobile);
+  }, [isMobile]);
 
   return (
     <Box
