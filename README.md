@@ -1,2 +1,2 @@
-# edensign-web
-Eden Sign Web in React + Vite
+# edensign-admin
+Eden Sign Admin Dashboard in React + Vite
