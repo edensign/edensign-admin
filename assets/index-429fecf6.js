@@ -1,0 +1,1 @@
+import{o as a}from"./index-99ea5aa6.js";const c=()=>{const{selected:r}=a(e=>e.menuItems);return{getQueryParam:()=>{let e="";switch(r){case"Employee":e="admin";break;case"Salon":e="salon";break;case"Freelancer":e="freelancer";break}return e}}};export{c as u};
