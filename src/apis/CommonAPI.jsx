@@ -66,9 +66,9 @@ export const CommonAPI = {
                 console.log('RESPONSES=>', responses);
                 return responses;
             })
-            .catch(err => { 
-                console.log('ERROR=>', err);
-                throw err });
+            .catch(err => {
+                throw err;
+            });
     }
 };
 

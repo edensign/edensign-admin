@@ -21,7 +21,7 @@ import Toast from "../../common/Toast";
 
 import { setMenuItem } from "../../../redux/actions/NavigationAction";
 import { Utility } from "../../utility";
-import { uploadImageToAzure, downloadImageFromAzure } from "../../image/AzureStorageConnection";
+import { uploadImageToAzure, deleteFileFromAzure } from "../../image/AzureStorageConnection";
 import { tokens, themeSettings } from "../../../theme";
 
 const FormComponent = () => {
@@ -33,9 +33,11 @@ const FormComponent = () => {
         imageData: { values: null, validated: true }
     });
     const [updatedValues, setUpdatedValues] = useState(null);
+    const [deletedImage, setDeletedImage] = useState([]);
     const [dirty, setDirty] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [reset, setReset] = useState(false);
+    const [showTextfields, setShowTextfields] = useState(false);
 
     const salonFormRef = useRef();
     const addressFormRef = useRef();
@@ -49,7 +51,7 @@ const FormComponent = () => {
 
     const selected = useSelector(state => state.menuItems.selected);
     const toastInfo = useSelector(state => state.toastInfo);
-    const { state } = useLocation();
+    const { pathname, state } = useLocation();
 
     const { toastModal, getLocalStorage } = Utility();
     let id = state?.id;
@@ -57,6 +59,11 @@ const FormComponent = () => {
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
         dispatch(setMenuItem(selectedMenu.selected));
+        if (pathname === "/salon/create" || pathname === "/salon/update") {
+            setShowTextfields(true);
+        } else {
+            setShowTextfields(false);
+        }
     }, []);
 
     const updateSalonAndAddress = useCallback((formData) => {
@@ -65,17 +72,49 @@ const FormComponent = () => {
             { ...formData.addressData.values },
             { ...formData.imageData.values }
         ];
-        const paths = ["/update-salon", "/update-address", "/update-image"];
+        const paths = ["/update-salon", "/update-address"];
         setLoading(true);
+
+        if (deletedImage.length) {
+            deletedImage.forEach(image => {
+                deleteFileFromAzure("salon", image);
+            })
+        }
 
         API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
             .then(responses => {
                 let status = true;
-                responses.forEach(response => {
-                    if (response.data.status !== "Success") {
-                        status = false;
-                    };
-                });
+                if (responses) {
+                    API.ImageAPI.deleteImage({
+                        parent: dataFields[2][0].parent,
+                        parent_id: dataFields[2][0].parent_id
+                    })
+                        .then(deleted => {
+                            formData.imageData?.values.map(image => {
+                                API.ImageAPI.createImage({
+                                    image_src: image.image_src,
+                                    parent: image.parent,
+                                    parent_id: image.parent_id
+                                })
+                            });
+                        })
+                        .catch(err => {
+                            setLoading(false);
+                            throw err;
+                        })
+                    if (formData.imageData.values.file) {
+                        Array.from(formData.imageData.values.file).map(async (image) => {
+                            let name = await uploadImageToAzure("salon", image);
+                            API.ImageAPI.createImage({
+                                image_src: name,
+                                parent: 'salon',
+                                parent_id: formData.salonData.values.id
+                            });
+                        });
+                    }
+                } else {
+                    status = false;
+                }
                 if (status) {
                     setLoading(false);
                     toastModal(dispatch, true, "info", "Updated", navigateTo, "/salon/listing");
@@ -90,6 +129,7 @@ const FormComponent = () => {
     }, [formData]);
 
     const populateSalonData = (id) => {
+        setLoading(true);
         const paths = [`/get-by-pk/salon/${id}`, `/get-address/salon/${id}`, `/get-image/salon/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
@@ -98,11 +138,12 @@ const FormComponent = () => {
                     addressData: responses[1]?.data?.data,
                     imageData: responses[2]?.data?.data
                 };
+                console.log("DATA from server=>", dataObj.userData)
                 setUpdatedValues(dataObj);
-                console.log("Image Data=>", dataObj.imageData);
-                dataObj.imageData.map(image => downloadImageFromAzure("image-storage", image))
+                setLoading(false);
             })
             .catch(err => {
+                setLoading(false);
                 toastModal(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
@@ -121,7 +162,7 @@ const FormComponent = () => {
                     })
                         .then(async (address) => {
                             promises = Array.from(formData.imageData.values.file).map(async (image) => {
-                                let name = await uploadImageToAzure("image-storage", image);
+                                let name = await uploadImageToAzure("salon", image);
                                 API.ImageAPI.createImage({
                                     image_src: name,
                                     parent_id: salon.data.id,
@@ -135,7 +176,6 @@ const FormComponent = () => {
                                 })
                                 .catch(err => {
                                     setLoading(false);
-                                    console.log("INSIDE PROMISES CATCH");
                                     toastModal(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
                                     throw err;
                                 });
@@ -215,6 +255,7 @@ const FormComponent = () => {
                 reset={reset}
                 setReset={setReset}
                 updatedValues={updatedValues?.addressData}
+                showTextfields={showTextfields}
             />
             <ImagePicker
                 onChange={(data) => {
@@ -227,9 +268,10 @@ const FormComponent = () => {
                 setReset={setReset}
                 // userId={id}
                 updatedValues={updatedValues?.imageData}
+                deletedImage={deletedImage}
+                setDeletedImage={setDeletedImage}
             />
-
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

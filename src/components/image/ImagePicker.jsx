@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
-import { Box, Button, IconButton, TextField, useMediaQuery } from "@mui/material";
+import { Box, IconButton, TextField, useMediaQuery } from "@mui/material";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 import PreviewImage from "./PreviewImage";
@@ -17,8 +17,17 @@ import PreviewImage from "./PreviewImage";
 const initialValues = {     //clicking on main form reset button does not clears file value
     file: null
 };
+const ENV = import.meta.env;
 
-const ImagePicker = ({ onChange, refId, setDirty, reset, setReset, updatedValues = null }) => {
+const ImagePicker = ({
+    onChange,
+    refId,
+    setDirty,
+    reset,
+    setReset,
+    updatedValues = null,
+    deletedImage,
+    setDeletedImage }) => {
     const [initialState, setInitialState] = useState(initialValues);
     const [preview, setPreview] = useState([]);
 
@@ -50,6 +59,7 @@ const ImagePicker = ({ onChange, refId, setDirty, reset, setReset, updatedValues
     useEffect(() => {
         if (reset) {
             formik.resetForm();
+            setPreview([]);
             setReset(false);
         }
     }, [reset]);
@@ -63,15 +73,15 @@ const ImagePicker = ({ onChange, refId, setDirty, reset, setReset, updatedValues
     useEffect(() => {
         if (updatedValues) {
             setInitialState(updatedValues);
+            const imgSrcArr = [];
+            updatedValues.map(img => {
+                if (img.image_src) {
+                    imgSrcArr.push(`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`)
+                };
+            });
+            setPreview(imgSrcArr);
         }
     }, [updatedValues]);
-
-    const handleResetUpload = () => {
-        console.log("Inside Reset");
-        // setDirty(false);
-        setPreview([]);
-        formik.setFieldValue("file", null);
-    };
 
     return (
         <Box m="10px">
@@ -104,15 +114,9 @@ const ImagePicker = ({ onChange, refId, setDirty, reset, setReset, updatedValues
                     helperText={formik.touched.file && formik.errors.file}
                     sx={{ m: 1, outline: "none", width: "15ch" }}
                 />
-                <Button type="button" color="warning" variant="contained" id="reset-btn"
-                    disabled={!formik.dirty}
-                    onClick={handleResetUpload}
-                    sx={{ marginLeft: "6px" }}
-                >
-                    Reset Upload </Button>
             </form>
-            {formik.values.file ?
-                <PreviewImage imageFiles={formik.values.file} preview={preview} setPreview={setPreview} />
+            {formik.values.file || preview.length ?
+                <PreviewImage deletedImage={deletedImage} setDeletedImage={setDeletedImage} updatedValues={updatedValues} imageFiles={formik.values.file} preview={preview} setPreview={setPreview} />
                 : null}
         </Box>
     );

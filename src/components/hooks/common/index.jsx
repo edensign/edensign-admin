@@ -24,6 +24,8 @@ export const useCommon = () => {
             .then(res => {
                 if (res.status === 'Success') {
                     dispatch(action({ listData: res.data }));
+                } else if (res.status === 'Error') {
+                    dispatch(action({ listData: [] }));
                 }
             })
             .catch(err => {

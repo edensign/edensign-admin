@@ -142,7 +142,9 @@ const FormComponent = () => {
         }
         if (formData.userData.validated && formData.addressData.validated) {
             formData.userData.values?.id ? updateUserAndAddress(formData) : registerUser();
-        };
+        } else {
+            setSubmitted(false);
+        }
     }, [id, submitted]);
 
     const handleSubmit = async () => {
@@ -191,7 +193,7 @@ const FormComponent = () => {
                 updatedValues={updatedValues?.addressData}
             />
 
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

@@ -21,10 +21,11 @@ const Search = ({
     action,
     api
 }) => {
+    const [inputValue, setInputValue] = useState("");
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const isNonMobile = useMediaQuery("(min-width:720px)");
-    const [inputValue, setInputValue] = useState("");
+    const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
 
     const handleChange = (event) => {
         setInputValue(event.target.value);
@@ -51,13 +52,15 @@ const Search = ({
         <Box
             backgroundColor={colors.primary[400]}
             borderRadius="4px"
-            width="42vw"
+            width="44vw"
+            height={isTab ? "4vh" : "auto"}
+            position="relative"
         >
             <InputBase sx={{
                 ml: 2,
                 flex: 1,
-                mt: 1,
-                width: "88%"
+                width: "88%",
+                mt: isMobile ? 0 : 1
             }}
                 placeholder="Search"
                 id="input"
@@ -68,7 +71,8 @@ const Search = ({
             <IconButton sx={{
                 p: 1,
                 position: "absolute",
-                // right: isNonMobile ? "auto" : "2%",
+                top: isTab ? "1vw" : "0",
+                right: isTab ? "1vw" : "0",
                 "&:hover": { backgroundColor: colors.greenAccent[600] }
             }}
                 onClick={handleSearch}

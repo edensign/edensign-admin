@@ -43,7 +43,6 @@ export default function ServerPaginationGrid({
     useEffect(() => {
         //TO BE REFACTORED
         if (!searchFlag.search && !searchFlag.searching) {
-            console.log('Pagination without search');
             getQuery(paginationModel.page, paginationModel.pageSize, action, api, condition);
             setOldPagination(paginationModel);
         } else if (searchFlag.oldPagination && !searchFlag.searching) {
@@ -69,13 +68,12 @@ export default function ServerPaginationGrid({
         );
     }, [count, setRowCountState]);
 
-    console.log('pagina=>', paginationModel);
+    // console.log('pagina=>', paginationModel);
 
     return (
         <Box
             m="30px 0 0 0"
-            height="70vh"
-            // width="79vw"
+            // width="100vw"
             sx={{
                 "& .MuiDataGrid-root": {
                     border: "none",
@@ -95,22 +93,6 @@ export default function ServerPaginationGrid({
                 },
                 "& .name-column--cell": {
                     color: colors.greenAccent[300],
-                    // minWidth: '170px !important'
-                },
-                "& .contact-column--cell": {
-                    // minWidth: '170px !important'
-                },
-                "& .email-column--cell": {
-                    // minWidth: '180px !important'
-                },
-                "& .created-column--cell": {
-                    // minWidth: '170px !important'
-                },
-                "& .status-column--cell": {
-                    // minWidth: '180px !important'
-                },
-                "& .action-column--cell": {
-                    // minWidth: '160px !important'
                 },
                 "& .MuiDataGrid-columnHeaders": {
                     backgroundColor: colors.blueAccent[700],
@@ -118,7 +100,6 @@ export default function ServerPaginationGrid({
                 },
                 "& .MuiDataGrid-columnHeader": {
                     backgroundColor: colors.blueAccent[700],
-                    // minWidth: `140px !important`
                 },
                 "& .MuiDataGrid-virtualScroller": {
                     minHeight: 320

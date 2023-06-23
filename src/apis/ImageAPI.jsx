@@ -13,7 +13,7 @@ import { Utility } from "../components/utility";
 const { getLocalStorage } = Utility();
 
 export const ImageAPI = {
-    /** Get image information from the database based on parent information
+    /** Get image information from the database based on parent
      */
     getImage: async (parent, parent_id, cancel = false) => {
         const { data: response } = await api.request({
@@ -26,7 +26,7 @@ export const ImageAPI = {
         });
         return response;
     },
-    /** Create an image & store it in azure and only image information will go in the database
+    /** Create an image & store it in azure while entering only image information in the database
      */
     createImage: async (image, cancel = false) => {
         return await api.request({
@@ -48,6 +48,18 @@ export const ImageAPI = {
                 "x-access-token": getLocalStorage("auth").token
             },
             method: "PATCH",
+            data: fields,
+            signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+        });
+    },
+    /**  */
+    deleteImage: async (fields, cancel = false) => {
+        return await api.request({
+            url: `/delete-image`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "DELETE",
             data: fields,
             signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
         });

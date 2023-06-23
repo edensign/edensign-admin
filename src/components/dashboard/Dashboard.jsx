@@ -44,7 +44,18 @@ const Dashboard = () => {
         </Typography>
 
         <Box>
-          <Button
+          <Typography
+            sx={{
+              backgroundColor: colors.blueAccent[700],
+              color: colors.grey[100],
+              fontSize: "14px",
+              fontWeight: "bold",
+              padding: "10px 15px",
+              borderRadius: "6px"
+            }}
+          >
+            This Page Is Being Built By Our Team
+            {/* <Button
             sx={{
               backgroundColor: colors.blueAccent[700],
               color: colors.grey[100],
@@ -55,7 +66,8 @@ const Dashboard = () => {
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
-          </Button>
+          </Button> */}
+          </Typography>
         </Box>
       </Box>
       {/* GRID & CHARTS */}

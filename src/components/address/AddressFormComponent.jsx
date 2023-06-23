@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
+import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
 
 import API from "../../apis";
 import addressValidation from "./Validation";
@@ -25,7 +25,7 @@ const initialValues = {
     city: ""
 };
 
-const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, updatedValues = null }) => {
+const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, showTextfields, updatedValues = null }) => {
 
     const [initialState, setInitialState] = useState(initialValues);
     const [countries, setCountries] = useState([]);
@@ -175,34 +175,36 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                         helperText={formik.touched.landmark && formik.errors.landmark}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="latitude"
-                        label="Latitude"
-                        autoComplete="new-latitude"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.latitude}
-                        error={!!formik.touched.latitude && !!formik.errors.latitude}
-                        helperText={formik.touched.latitude && formik.errors.latitude}
-                        sx={{ gridColumn: "span 2" }}
-                    />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="longitude"
-                        label="Longitude"
-                        autoComplete="new-longitude"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.longitude}
-                        error={!!formik.touched.longitude && !!formik.errors.longitude}
-                        helperText={formik.touched.longitude && formik.errors.longitude}
-                        sx={{ gridColumn: "span 2" }}
-                    />
+                    {showTextfields && <>
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="latitude"
+                            label="Latitude"
+                            autoComplete="new-latitude"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.latitude}
+                            error={!!formik.touched.latitude && !!formik.errors.latitude}
+                            helperText={formik.touched.latitude && formik.errors.latitude}
+                            sx={{ gridColumn: "span 2" }}
+                        />
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="longitude"
+                            label="Longitude"
+                            autoComplete="new-longitude"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.longitude}
+                            error={!!formik.touched.longitude && !!formik.errors.longitude}
+                            helperText={formik.touched.longitude && formik.errors.longitude}
+                            sx={{ gridColumn: "span 2" }}
+                        />
+                    </>}
                     <TextField
                         fullWidth
                         variant="filled"
@@ -217,7 +219,9 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                         helperText={formik.touched.zipcode && formik.errors.zipcode}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.country && !!formik.errors.country}
+                    >
                         <InputLabel id="countryField">--Select Country--</InputLabel>
                         <Select
                             autoComplete="new-country"
@@ -230,7 +234,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setCountryId(getCountryId);
                                 formik.setFieldValue("country", event.target.value);
                             }}
-                            error={!!formik.touched.country && !!formik.errors.country}
                         >
                             {countries.map(item => (
                                 <MenuItem value={item.id} name={item.name} key={item.name}>
@@ -238,8 +241,11 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.country && formik.errors.country}</FormHelperText>
                     </FormControl>
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.state && !!formik.errors.state}
+                    >
                         <InputLabel id="stateField">--Select State--</InputLabel>
                         <Select
                             autoComplete="new-state"
@@ -252,7 +258,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setStateId(getStateId);
                                 formik.setFieldValue("state", event.target.value);
                             }}
-                            error={!!formik.touched.state && !!formik.errors.state}
                         >
                             {states.map(item => (
                                 <MenuItem value={item.id} name={item.name} key={item.name}>
@@ -260,8 +265,11 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.state && formik.errors.state}</FormHelperText>
                     </FormControl>
-                    <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.city && !!formik.errors.city}
+                    >
                         <InputLabel id="cityField">--Select City--</InputLabel>
                         <Select
                             autoComplete="new-city"
@@ -274,7 +282,6 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 setCityId(getCityId);
                                 formik.setFieldValue("city", event.target.value);
                             }}
-                            error={!!formik.touched.city && !!formik.errors.city}
                         >
                             {cities.map(item => (
                                 <MenuItem value={item.id} key={item.name} name={item.name}>
@@ -282,6 +289,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
                                 </MenuItem>
                             ))}
                         </Select>
+                        <FormHelperText>{formik.touched.city && formik.errors.city}</FormHelperText>
                     </FormControl>
                 </Box>
             </form>
