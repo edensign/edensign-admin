@@ -33,6 +33,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
         password: null
     });
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    const isMobile = useMediaQuery("(max-width:480px)");
     const pwField = document.getElementById("pwField");
 
     const [initialState, setInitialState] = useState(initialValues);
@@ -106,9 +107,28 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
             formik.values.password = updatePassword.password;
         };
     };
+    // {userId ? <Button type="button" color="primary" variant="contained"
+    //     sx={{
+    //         position: "absolute",
+    //         right: 20,
+    //         top: 100
+    //     }}
+    //     onClick={handleUpdatePassword}
+    // >
+    //     {updatePassword.clicked === true ? "Update" : "Cancel Update"} Password </Button> : null}
 
     return (
         <Box m="20px">
+            {userId ? <Button type="button" color="primary" variant="contained"
+                sx={{
+                    position: isMobile ? "relative" : "absolute",
+                    right: isMobile ? "0" : 30,
+                    top: isMobile ? 98 : 110,
+                    zIndex: isMobile ? 1 : 0
+                }}
+                onClick={handleUpdatePassword}
+            >
+                {updatePassword.clicked === true ? "Update" : "Cancel Update"} Password </Button> : null}
             <form ref={refId}>
                 <Box
                     display="grid"
@@ -130,7 +150,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         value={formik.values.username}
                         error={!!formik.touched.username && !!formik.errors.username}
                         helperText={formik.touched.username && formik.errors.username}
-                        sx={{ gridColumn: "span 2" }}
+                        sx={{ gridColumn: "span 2", marginBottom: "20px" }}
                     />
                     <TextField
                         fullWidth
@@ -224,15 +244,6 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                     </FormControl>
                 </Box>
             </form>
-            {userId ? <Button type="button" color="primary" variant="contained"
-                sx={{
-                    position: "absolute",
-                    right: 20,
-                    top: 100
-                }}
-                onClick={handleUpdatePassword}
-            >
-                {updatePassword.clicked === true ? "Update" : "Cancel Update"} Password </Button> : null}
         </Box>
     );
 }

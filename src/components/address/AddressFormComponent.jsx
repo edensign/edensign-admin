@@ -25,7 +25,7 @@ const initialValues = {
     city: ""
 };
 
-const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, updatedValues = null }) => {
+const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, showTextfields, updatedValues = null }) => {
 
     const [initialState, setInitialState] = useState(initialValues);
     const [countries, setCountries] = useState([]);
@@ -135,7 +135,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, upda
         };
         getCities();
     }, [formik.values.state]);
-console.log("formik values=>", formik.values);
+
     return (
         <Box m="20px">
             <form ref={refId}>
@@ -175,34 +175,36 @@ console.log("formik values=>", formik.values);
                         helperText={formik.touched.landmark && formik.errors.landmark}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="latitude"
-                        label="Latitude"
-                        autoComplete="new-latitude"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.latitude}
-                        error={!!formik.touched.latitude && !!formik.errors.latitude}
-                        helperText={formik.touched.latitude && formik.errors.latitude}
-                        sx={{ gridColumn: "span 2" }}
-                    />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="longitude"
-                        label="Longitude"
-                        autoComplete="new-longitude"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.longitude}
-                        error={!!formik.touched.longitude && !!formik.errors.longitude}
-                        helperText={formik.touched.longitude && formik.errors.longitude}
-                        sx={{ gridColumn: "span 2" }}
-                    />
+                    {showTextfields && <>
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="latitude"
+                            label="Latitude"
+                            autoComplete="new-latitude"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.latitude}
+                            error={!!formik.touched.latitude && !!formik.errors.latitude}
+                            helperText={formik.touched.latitude && formik.errors.latitude}
+                            sx={{ gridColumn: "span 2" }}
+                        />
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="longitude"
+                            label="Longitude"
+                            autoComplete="new-longitude"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.longitude}
+                            error={!!formik.touched.longitude && !!formik.errors.longitude}
+                            helperText={formik.touched.longitude && formik.errors.longitude}
+                            sx={{ gridColumn: "span 2" }}
+                        />
+                    </>}
                     <TextField
                         fullWidth
                         variant="filled"

@@ -31,6 +31,7 @@ const ListingComponent = () => {
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
     const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
     const { listData } = useSelector(state => state.allUsers);
@@ -67,9 +68,9 @@ const ListingComponent = () => {
     };
 
     return (
-        <Box m="10px">
+        <Box m="10px" position="relative">
             <Box
-                height={isMobile ? "19vh" : "11vh"}
+                height={isMobile ? "19vh" : isTab ? "8vh" : "11vh"}
                 borderRadius="4px"
                 padding={isMobile ? "1vh" : "2vh"}
                 backgroundColor={colors.blueAccent[700]}
@@ -79,6 +80,8 @@ const ListingComponent = () => {
                     height={isMobile ? "16vh" : "7vh"}
                     flexDirection={isMobile ? "column" : "row"}
                     justifyContent={"space-between"}
+                    alignItems={isMobile ? "center" : "normal"}
+
                 >
                     <Typography
                         component="h2"
@@ -102,6 +105,7 @@ const ListingComponent = () => {
                         color="success"
                         variant="contained"
                         onClick={() => { navigateTo("/user/create") }}
+                        sx={{ height: isTab ? "4vh" : "auto" }}
                     >
                         Create New {selected}
                     </Button>
@@ -110,14 +114,14 @@ const ListingComponent = () => {
             <Button sx={{
                 display: "none",
                 position: "absolute",
-                top: isMobile ? "32vh" : "29.5vh",
-                left: "100vw",
+                top: isMobile ? "23vh" : isTab ? "10.5vh" : "16.5vh",
+                left: isMobile ? "80vw" : isTab ? "39.5vw" : "26vw",
                 zIndex: 1,
                 borderRadius: "20%",
                 color: colors.grey[100]
             }}
                 id="reload-btn"
-                type="submit"
+                type="button"
                 onClick={handleReload}
             >
                 <span style={{ display: "inherit", marginRight: "5px", marginLeft: "-2px" }}>

@@ -7,12 +7,14 @@
  */
 
 import { useEffect } from "react";
-import { IconButton, ImageList, ImageListItem, Tooltip } from "@mui/material";
+import { IconButton, ImageList, ImageListItem, Tooltip, useMediaQuery } from "@mui/material";
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 
 import Loader from "../common/Loader";
 
 const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles, preview, setPreview }) => {
+    const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
     let uploadedImages = [];
 
     const readImageFiles = (file) => {
@@ -50,12 +52,21 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
     };
 
     return (
-        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit" }} cols={3} rowHeight={220} gap={8}>
+        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit" }}
+            cols={3} rowHeight={isMobile ? 80 : isTab ? 160 : 220} gap={8}>
             {preview ? preview.map((item, index) => (
                 <ImageListItem key={index}>
                     <IconButton
                         sx={{
-                            position: "absolute", left: "87%", top: "-2%"
+                            position: "absolute",
+                            left: "87%",
+                            '@media screen and (max-width: 920px)': {
+                                left: '77%',
+                            },
+                            '@media screen and (max-width: 480px)': {
+                                left: '60%',
+                            },
+                            top: "-2%"
                         }}
                         onClick={() => handleDeleteClick(item)}
                     >
@@ -76,7 +87,7 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
                             objectFit: "cover",
                             height: "100%",
                             width: "100%",
-                            borderRadius: "12px",
+                            borderRadius: isMobile ? "6px" : "12px",
                             boxShadow: "2px 2px 4px hsl(0, 0%, 30%)"
                         }}
                     />

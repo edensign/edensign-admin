@@ -31,15 +31,15 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "name-column--cell"
+            minWidth: 120
         },
         {
             field: "contact_no",
-            headerName: "CONTACT NUMBER",
+            headerName: "CONTACT",
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "contact-column--cell"
+            minWidth: 100
         },
         {
             field: "email",
@@ -47,7 +47,7 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "email-column--cell"
+            minWidth: 200
         },
         {
             field: "updated_at",
@@ -55,19 +55,8 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "created-column--cell",
-            renderCell: ({ row: { updated_at } }) => {
-                const userData = listData?.rows;
-                let formattedDate = [];
-                if (userData.length) {
-                    userData.map((item) => {
-                        let date = new Date(item.created_at);
-                        formattedDate.push(date.toLocaleDateString());
-                        // console.log(formattedDate)
-                    });
-                }
-                return;
-            }
+            minWidth: 100,
+            valueFormatter: params => params?.value.substring(0, 10)
         },
         {
             field: "status",
@@ -75,11 +64,11 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "status-column--cell",
+            minWidth: 120,
             renderCell: ({ row: { status } }) => {
                 return (
                     <Box
-                        width="55%"
+                        width="60%"
                         m="0 auto"
                         p="5px"
                         display="flex"
@@ -106,15 +95,18 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            cellClassName: "action-column--cell",
+            minWidth: 75,
             renderCell: ({ row: { id } }) => {
                 return (
-                    <Box width="40%"
+                    <Box width="30%"
                         m="0 auto"
                         p="5px"
                         display="flex"
                         justifyContent="center">
-                        <Button color="info" variant="contained" onClick={() => handleActionEdit(id)} >
+                        <Button color="info" variant="contained"
+                            onClick={() => handleActionEdit(id)}
+                            sx={{ minWidth: "50px" }}
+                        >
                             <DriveFileRenameOutlineOutlinedIcon />
                         </Button>
                     </Box>

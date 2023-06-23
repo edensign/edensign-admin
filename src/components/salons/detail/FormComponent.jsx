@@ -37,6 +37,7 @@ const FormComponent = () => {
     const [dirty, setDirty] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [reset, setReset] = useState(false);
+    const [showTextfields, setShowTextfields] = useState(false);
 
     const salonFormRef = useRef();
     const addressFormRef = useRef();
@@ -50,7 +51,7 @@ const FormComponent = () => {
 
     const selected = useSelector(state => state.menuItems.selected);
     const toastInfo = useSelector(state => state.toastInfo);
-    const { state } = useLocation();
+    const { pathname, state } = useLocation();
 
     const { toastModal, getLocalStorage } = Utility();
     let id = state?.id;
@@ -58,6 +59,11 @@ const FormComponent = () => {
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
         dispatch(setMenuItem(selectedMenu.selected));
+        if (pathname === "/salon/create" || pathname === "/salon/update") {
+            setShowTextfields(true);
+        } else {
+            setShowTextfields(false);
+        }
     }, []);
 
     const updateSalonAndAddress = useCallback((formData) => {
@@ -132,6 +138,7 @@ const FormComponent = () => {
                     addressData: responses[1]?.data?.data,
                     imageData: responses[2]?.data?.data
                 };
+                console.log("DATA from server=>", dataObj.userData)
                 setUpdatedValues(dataObj);
                 setLoading(false);
             })
@@ -248,6 +255,7 @@ const FormComponent = () => {
                 reset={reset}
                 setReset={setReset}
                 updatedValues={updatedValues?.addressData}
+                showTextfields={showTextfields}
             />
             <ImagePicker
                 onChange={(data) => {
@@ -263,7 +271,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
             />
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

@@ -44,15 +44,16 @@ const initialValues = {
     type: "",
     status: "inactive",
     closed_on: "",
-    opening_time: dayjs("1997-03-16T09:00"),
-    closing_time: dayjs("1997-03-16T21:00"),
-    estd_on: dayjs('01/01/2000')
+    opening_time: dayjs("1997-03-16 09:00").format("h:mm A"),
+    closing_time: dayjs("1997-03-16 21:00"),
+    // estd_on: dayjs('01/01/2000')
 };
 
 const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, updatedValues = null }) => {
     const [initialState, setInitialState] = useState(initialValues);
     const checkboxLabel = { inputProps: { 'aria-label': 'Checkboxes' } };
     const isNonMobile = useMediaQuery("(min-width:600px)");
+    const isMobile = useMediaQuery("(max-width:480px)");
 
     const formik = useFormik({
         initialValues: initialState,
@@ -60,7 +61,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
         enableReinitialize: true,
         onSubmit: () => watchForm()
     });
-
+    console.log("FORMIK VALUES=>", formik.values)
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
             await formik.submitForm();
@@ -319,46 +320,51 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                         sx={{ gridColumn: "span 2" }}
                     />
 
-                    <FormControlLabel label="Is Home" control={
-                        <Checkbox {...checkboxLabel} color="default"
-                            checked={formik.values.is_home ? true : false}
-                            name="is_home"
-                            onChange={() => formik.setFieldValue("is_home", true)}
-                            value={formik.values.is_home}
-                        />
-                    } />
-                    <FormControlLabel label="Is Featured" control={
-                        <Checkbox {...checkboxLabel} color="default"
-                            checked={formik.values?.is_featured}
-                            name="is_featured"
-                            onChange={() => formik.setFieldValue("is_featured", true)}
-                            value={formik.values.is_featured}
-                        />
-                    } />
-                    <FormControlLabel label="Is Franchise" control={
-                        <Checkbox {...checkboxLabel} color="default"
-                            checked={formik.values?.is_franchise}
-                            name="is_franchise"
-                            onChange={() => formik.setFieldValue("is_franchise", true)}
-                            value={formik.values.is_franchise}
-                        />
-                    } />
-                    <FormControlLabel label="Is Self Owned" control={
-                        <Checkbox {...checkboxLabel} color="default"
-                            checked={formik.values?.is_selfowned}
-                            name="is_selfowned"
-                            onChange={() => formik.setFieldValue("is_selfowned", true)}
-                            value={formik.values.is_selfowned}
-                        />
-                    } />
-                    <FormControlLabel label="Is Subscribed" control={
-                        <Checkbox {...checkboxLabel} color="default"
-                            checked={formik.values?.is_subscribed}
-                            name="is_subscribed"
-                            onChange={() => formik.setFieldValue("is_subscribed", true)}
-                            value={formik.values.is_subscribed}
-                        />
-                    } />
+                    <FormControlLabel label="Is Home" sx={{ gridColumn: isMobile ? "span 2" : "" }}
+                        control={
+                            <Checkbox {...checkboxLabel} color="default"
+                                checked={formik.values.is_home ? true : false}
+                                name="is_home"
+                                onChange={() => formik.setFieldValue("is_home", true)}
+                                value={formik.values.is_home}
+                            />
+                        } />
+                    <FormControlLabel label="Is Featured" sx={{ gridColumn: isMobile ? "span 2" : "" }}
+                        control={
+                            <Checkbox {...checkboxLabel} color="default"
+                                checked={formik.values?.is_featured}
+                                name="is_featured"
+                                onChange={() => formik.setFieldValue("is_featured", true)}
+                                value={formik.values.is_featured}
+                            />
+                        } />
+                    <FormControlLabel label="Is Franchise" sx={{ gridColumn: isMobile ? "span 2" : "" }}
+                        control={
+                            <Checkbox {...checkboxLabel} color="default"
+                                checked={formik.values?.is_franchise}
+                                name="is_franchise"
+                                onChange={() => formik.setFieldValue("is_franchise", true)}
+                                value={formik.values.is_franchise}
+                            />
+                        } />
+                    <FormControlLabel label="Is Self Owned" sx={{ gridColumn: isMobile ? "span 2" : "" }}
+                        control={
+                            <Checkbox {...checkboxLabel} color="default"
+                                checked={formik.values?.is_selfowned}
+                                name="is_selfowned"
+                                onChange={() => formik.setFieldValue("is_selfowned", true)}
+                                value={formik.values.is_selfowned}
+                            />
+                        } />
+                    <FormControlLabel label="Is Subscribed" sx={{ gridColumn: isMobile ? "span 2" : "" }}
+                        control={
+                            <Checkbox {...checkboxLabel} color="default"
+                                checked={formik.values?.is_subscribed}
+                                name="is_subscribed"
+                                onChange={() => formik.setFieldValue("is_subscribed", true)}
+                                value={formik.values.is_subscribed}
+                            />
+                        } />
 
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
                         <InputLabel id="typeField">Type</InputLabel>
@@ -417,24 +423,30 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <TimePicker
-                            onChange={time => {
-                                console.log("TIME=>", dayjs(time));
-                                formik.setFieldValue("opening_time", time, true)
+                            onChange={event => {
+                                console.log("TIME=>", dayjs(event.toDate()).format("h:mm A"));
+                                formik.setFieldValue("opening_time", dayjs(event.toDate()).format("h:mm"))
                             }}
                             value={formik.values.opening_time}
+                            format="h:mm A"
+                            views={['hours', "minutes"]}
                             label="Opening Time"
                             name="Opening Time"
-                            slotProps={{
-                                textField: {
-                                    variant: "outlined",
-                                    error: formik.touched.opening_time && Boolean(formik.errors.opening_time),
-                                    helperText: formik.touched.opening_time && formik.errors.opening_time
-                                }
+                            // valueFormatter={params => params?.value.substring(0, 10)}
+                            InputProps={{
+                            //     variant: "outlined",
+                                placeholder: dayjs().format("h:mm"),
+                            //     error: formik.touched.opening_time && Boolean(formik.errors.opening_time),
+                            //     helperText: formik.touched.opening_time && formik.errors.opening_time
                             }}
                         />
                         <TimePicker
-                            onChange={time => formik.setFieldValue("closing_time", time, true)}
+                            onChange={event => {
+                                console.log("TIME=>", dayjs(event.toDate()).format("h:mm A"));
+                                formik.setFieldValue("closing_time", dayjs(event.toDate()).format("h:mm A"))
+                            }}
                             value={formik.values.closing_time}
+                            format="h:mm A"
                             views={['hours', "minutes"]}
                             label="Closing Time"
                             name="Closing Time"

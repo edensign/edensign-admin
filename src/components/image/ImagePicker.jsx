@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from "react";
 
 import { useFormik } from "formik";
-import { Box, Button, IconButton, TextField, useMediaQuery } from "@mui/material";
+import { Box, IconButton, TextField, useMediaQuery } from "@mui/material";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 import PreviewImage from "./PreviewImage";
