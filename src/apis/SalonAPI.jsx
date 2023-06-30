@@ -53,6 +53,19 @@ export const SalonAPI = {
             data: fields,
             signal: cancel ? cancelApiObject[this.updateSalon.name].handleRequestCancellation().signal : undefined,
         });
+    },
+    /** Get salon by user id from the database
+     */
+    getSalonByUserId: async (id, cancel = false) => {
+        return await api.request({
+            url: `/get-by-user-id`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "POST",
+            data: id,
+            signal: cancel ? cancelApiObject[this.getSalonByUserId.name].handleRequestCancellation().signal : undefined,
+        });
     }
 };
 

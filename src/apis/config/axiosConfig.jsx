@@ -8,9 +8,11 @@
 
 import axios from "axios";
 
+const ENV = import.meta.env;
+
 export const api = axios.create({
   withCredentials: true,
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: ENV.VITE_BASE_URL,
   validateStatus: (status) => (status >= 200 && status < 300) || status == 404
 });
 

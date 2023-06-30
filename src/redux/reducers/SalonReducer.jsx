@@ -10,7 +10,7 @@ import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
     listData: [],
-    loading: false
+    loading: true
 };
 
 export const setSalonReducer = (state = initialState, action) => {
@@ -18,7 +18,8 @@ export const setSalonReducer = (state = initialState, action) => {
         case ActionTypes.SET_SALONS:
             return {
                 ...state,
-                listData: action.payload.listData
+                listData: action.payload.listData,
+                loading: action.payload.loading
             };
         default:
             return state;

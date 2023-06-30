@@ -152,7 +152,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                         variant="filled"
                         type="text"
                         name="street"
-                        label="Street"
+                        label="Street*"
                         autoComplete="new-street"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -210,7 +210,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                         variant="filled"
                         type="text"
                         name="zipcode"
-                        label="Zipcode"
+                        label="Zipcode*"
                         autoComplete="new-zipcode"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -222,7 +222,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.country && !!formik.errors.country}
                     >
-                        <InputLabel id="countryField">--Select Country--</InputLabel>
+                        <InputLabel id="countryField">--Select Country*--</InputLabel>
                         <Select
                             autoComplete="new-country"
                             defaultValue=""
@@ -246,7 +246,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.state && !!formik.errors.state}
                     >
-                        <InputLabel id="stateField">--Select State--</InputLabel>
+                        <InputLabel id="stateField">--Select State*--</InputLabel>
                         <Select
                             autoComplete="new-state"
                             defaultValue=""
@@ -270,7 +270,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.city && !!formik.errors.city}
                     >
-                        <InputLabel id="cityField">--Select City--</InputLabel>
+                        <InputLabel id="cityField">--Select City*--</InputLabel>
                         <Select
                             autoComplete="new-city"
                             defaultValue=""

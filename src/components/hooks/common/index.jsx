@@ -23,22 +23,16 @@ export const useCommon = () => {
         api.getAll(condition, page, size, search, authInfo)
             .then(res => {
                 if (res.status === 'Success') {
-                    dispatch(action({ listData: res.data }));
+                    dispatch(action({ listData: res.data, loading: false }));
                 } else if (res.status === 'Error') {
-                    dispatch(action({ listData: [] }));
+                    dispatch(action({ listData: [], loading: false }));
                 }
             })
             .catch(err => {
-                dispatch(action({ listData: [] }));
+                dispatch(action({ listData: [], loading: false }));
                 throw err;
             });
     }, [selected]);
-
-    const formatDate = () => {      //to be continued
-        let datevar = new Date(res.data.rows[0].updated_at);
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        console.log("res=>", datevar.toLocaleDateString("en-US", options));
-    };
 
     return {
         getPaginatedData

@@ -6,8 +6,10 @@
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useIdleTimer } from 'react-idle-timer';
@@ -23,12 +25,40 @@ const UserListingComponent = lazy(() => import("./components/users/ListingCompon
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
 import { Utility } from "./components/utility";
+import API from "./apis";
+import { setMenuItem } from "./redux/actions/NavigationAction";
 // import Calendar from "./calendar/calendar";
 
 function App() {
+  const [role, setRole] = useState();
   const [theme, colorMode] = useMode();
+  const navigateTo = useNavigate();
+  const dispatch = useDispatch();
+
   const { pathname } = useLocation();
-  const { getLocalStorage } = Utility();
+  const { getLocalStorage, getRole, setStorageAndDispatch } = Utility();
+
+  useEffect(() => {
+    const roleType = getRole();
+    switchRole(roleType);
+    setRole(roleType);
+  }, [getLocalStorage("auth")?.type]);
+
+  const switchRole = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+        navigateTo('/');
+        break;
+      case 'salon':
+        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, true);
+        break;
+      case 'freelancer':
+      // navigateTo('/salon/update');
+      // break;
+      default:
+        navigateTo('/login');
+    }
+  };
 
   const onIdle = () => {
     localStorage.clear();
@@ -51,22 +81,31 @@ function App() {
         <div className="app">
           {getLocalStorage("auth")?.token &&
             <Suspense fallback={<Loader />}>
-              <Sidebar />
+              <Sidebar role={role} />
               <main className="content">
                 <Topbar />
                 <Routes>
-                  <Route exact path="/" element={<Dashboard />} />
-                  <Route exact path="/user/create" element={<UserFormComponent />} />
-                  <Route exact path="/user/update" element={<UserFormComponent />} />
-                  <Route exact path="/user/listing" element={<UserListingComponent />} />
-                  <Route exact path="/salon/create" element={<SalonFormComponent />} />
-                  <Route exact path="/salon/update" element={<SalonFormComponent />} />
-                  <Route exact path="/salon/listing" element={<SalonListingComponent />} />
-                  {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                  {role === 'admin' &&
+                    <>
+                      <Route exact path="/" element={<Dashboard />} />
+                      <Route exact path="/user/create" element={<UserFormComponent />} />
+                      <Route exact path="/user/update" element={<UserFormComponent />} />
+                      <Route exact path="/user/listing" element={<UserListingComponent />} />
+                      <Route exact path="/salon/create" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/update" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/listing" element={<SalonListingComponent />} />
+                      {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                    </>}
+                  {role === 'salon' &&
+                    <>
+                      <Route exact path="/salon/create" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/update" element={<SalonFormComponent />} />
+                    </>}
+                  {/* {role === 'freelancer' &&
+                    <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}
                 </Routes>
               </main>
-            </Suspense>
-          }
+            </Suspense>}
           <Routes>
             <Route exact path="/login" element={<Login />} />
           </Routes>

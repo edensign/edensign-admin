@@ -45,9 +45,9 @@ const Login = () => {
   const isMobile = useMediaQuery("(max-width:480px)");
   const isTab = useMediaQuery("(max-width:920px)");
   const { typography } = themeSettings(theme.palette.mode);
-  const { toastModal, setLocalStorage } = Utility();
+  const { toastAndNavigate, setLocalStorage } = Utility();
 
-  const boxstyle = {
+    const boxstyle = {
     position: "absolute",
     top: isMobile ? "35%" : "42%",
     left: "50%",
@@ -70,17 +70,22 @@ const Login = () => {
 
           if (response.status === 'Success' &&
             (response.data === "User does not exist" || response.data === "Username and Password do not match")) {
-            toastModal(dispatch, true, "info", response?.data);
+            toastAndNavigate(dispatch, true, "info", response?.data);
           }
           else {
-            const authInfo = { token: response.data.token, username: response.data.username, type: response.data.type };
+            const authInfo = {
+              id: response.data.id,
+              token: response.data.token,
+              type: response.data.type,
+              username: response.data.username
+            };
             setLocalStorage("auth", authInfo);
             navigateTo("/");
           }
         })
         .catch(err => {
           setLoading(false);
-          toastModal(dispatch, true, "error", err);
+          toastAndNavigate(dispatch, true, "error", err?.message);
         });
     };
   }, [formData]);

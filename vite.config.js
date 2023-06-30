@@ -16,5 +16,19 @@ export default ({ mode }) => {
 
   return defineConfig({
     plugins: [react()],
+    resolve: {
+      alias: [
+        {
+          find: 'web3',
+          replacement: 'web3/dist/web3.min.js',
+        },
+      ],
+    },
   });
 };
+
+
+// export default defineConfig({
+//   ⋮
+
+// })

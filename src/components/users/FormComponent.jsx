@@ -49,7 +49,7 @@ const FormComponent = () => {
     const { state } = useLocation();
     const { getQueryParam } = useUser();
 
-    const { toastModal, getLocalStorage } = Utility();
+    const { toastAndNavigate, getLocalStorage } = Utility();
     let id = state?.id;
 
     useEffect(() => {
@@ -78,13 +78,13 @@ const FormComponent = () => {
                 });
                 if (status) {
                     setLoading(false);
-                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/user/listing");
+                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/user/listing");
                 };
                 setLoading(false);
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     }, [formData]);
@@ -100,7 +100,7 @@ const FormComponent = () => {
                 setUpdatedValues(dataObj);
             })
             .catch(err => {
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };
@@ -118,18 +118,18 @@ const FormComponent = () => {
                     })
                         .then(address => {
                             setLoading(false);
-                            toastModal(dispatch, true, "success", "Success", navigateTo, "/user/listing");
+                            toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/user/listing");
                         })
                         .catch(err => {
                             setLoading(false);
-                            toastModal(dispatch, true, err ? err : "An Error Occurred");
+                            toastAndNavigate(dispatch, true, err ? err : "An Error Occurred");
                             throw err;
                         });
                 };
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };

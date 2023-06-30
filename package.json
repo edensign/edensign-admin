@@ -1,5 +1,6 @@
 {
   "name": "edensign-website",
+  "homepage": "edensign-admin.azurewebsites.net/",
   "private": true,
   "version": "0.0.0",
   "type": "module",

@@ -114,7 +114,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                         variant="filled"
                         type="text"
                         name="name"
-                        label="Name"
+                        label="Name*"
                         autoComplete="new-name"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -127,7 +127,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                         fullWidth
                         variant="filled"
                         type="text"
-                        label="Email"
+                        label="Email*"
                         name="email"
                         autoComplete="new-email"
                         onBlur={formik.handleBlur}
@@ -141,7 +141,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                         fullWidth
                         variant="filled"
                         type="text"
-                        label="Contact Number"
+                        label="Contact Number*"
                         name="contact_no"
                         autoComplete="new-contact"
                         onBlur={formik.handleBlur}

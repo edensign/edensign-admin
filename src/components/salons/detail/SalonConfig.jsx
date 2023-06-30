@@ -18,7 +18,6 @@ export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
-    const { listData } = useSelector(state => state.allSalons);
 
     const handleActionEdit = (id) => {
         navigateTo("/salon/update", { state: { id: id } });

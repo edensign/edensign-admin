@@ -10,11 +10,6 @@ import { CommonAPI } from "../../apis/CommonAPI";
 import { displayToast } from "../../redux/actions/ToastAction";
 
 export const Utility = () => {
-    /** Format date from the database
-     */
-    const formatDate = () => {
-        return;
-    };
     /** Format image name so that no special character or space is present in it
      */
     const formatImageName = (name) => {
@@ -35,7 +30,7 @@ export const Utility = () => {
         let fullName = authInfo?.username?.split(" ");
         if (fullName?.length) {
             firstNameInitial = fullName[0][0].toUpperCase();
-            if (fullName[1] !== undefined) {
+            if (fullName[1]?.[0] !== undefined) {
                 lastNameInitial = fullName[1][0].toUpperCase();
             };
         };
@@ -53,7 +48,7 @@ export const Utility = () => {
         let type = authInfo?.type;
         if (fullName?.length) {
             firstName = fullName[0][0].toUpperCase() + fullName[0].slice(1);
-            if (fullName[1] !== undefined) {
+            if (fullName[1]?.[0] !== undefined) {
                 lastName = fullName[1][0].toUpperCase() + fullName[1].slice(1);
             };
         };
@@ -84,7 +79,7 @@ export const Utility = () => {
     };
     /** Display toast message and navigate to the path if provided 
      */
-    const toastModal = (dispatch, display, severity, msg, navigateTo, path = null) => {
+    const toastAndNavigate = (dispatch, display, severity, msg, navigateTo, path = null) => {
         dispatch(displayToast({ toastAlert: display, toastSeverity: severity, toastMessage: msg }));
 
         setTimeout(() => {
@@ -94,15 +89,39 @@ export const Utility = () => {
             }
         }, 2000);
     };
+    /** Get user role from localStorage 
+    */
+    const getRole = () => {
+        return getLocalStorage("auth")?.type;
+    };
+    /** make an API call, set localStorage and dispatch an action
+     */
+    const setStorageAndDispatch = (navigate, api, dispatch, action, firstLoad = false) => {
+        api.SalonAPI.getSalonByUserId({ id: getLocalStorage("auth")?.id })
+            .then(({ data: salon }) => {
+                if (firstLoad) {
+                    setLocalStorage("menu", { "selected": "Salon Detail" });
+                    setLocalStorage("salon", { "id": salon.data?.id });
+                    dispatch(action("Salon Detail"));
+                    console.log("INSIDE 1ST LOAD", salon)
+                }
+                const path = salon.status === "Success" ? "/salon/update" : "/salon/create";
+                navigate(path, { state: { id: salon.data?.id } });
+            })
+            .catch(err => {
+                throw err;
+            });
+    };
 
     return {
-        formatDate,
         formatImageName,
         getInitials,
         getNameAndType,
         getLocalStorage,
+        getRole,
         verifyToken,
         setLocalStorage,
-        toastModal
+        setStorageAndDispatch,
+        toastAndNavigate
     };
 };

@@ -44,7 +44,7 @@ const ListingComponent = () => {
     const { getQueryParam } = useUser();
 
     const colors = tokens(theme.palette.mode);
-    const { getLocalStorage, toastModal } = Utility();
+    const { getLocalStorage } = Utility();
     const reloadBtn = document.getElementById("reload-btn");
 
     let condition = getQueryParam() ? {
@@ -142,7 +142,6 @@ const ListingComponent = () => {
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}
                 setSearchFlag={setSearchFlag}
-                toastModal={toastModal}
             />
         </Box>
     );

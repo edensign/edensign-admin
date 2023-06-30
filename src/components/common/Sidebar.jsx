@@ -23,15 +23,19 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import { tokens } from "../../theme";
 import { SidebarItem } from "./SidebarItem";
+import { Utility } from "../utility";
 
 import DummyImg from "./Faraz.png";
 
-const Sidebar = () => {
+const Sidebar = ({ role }) => {
   const theme = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const selected = useSelector(state => state.menuItems.selected);
   const colors = tokens(theme.palette.mode);
   const isMobile = useMediaQuery("(max-width:480px)");
+  const { getLocalStorage } = Utility();
+
+  const id = getLocalStorage("salon")?.id;
 
   useEffect(() => {
     setIsCollapsed(isMobile);
@@ -99,109 +103,138 @@ const Sidebar = () => {
               </Box>
             </Box>
           )}
+          {role === 'admin' && <>
+            {/* MENU ITEMS */}
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              <SidebarItem
+                title="Dashboard"
+                to="/"
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+              />
 
-          {/* MENU ITEMS */}
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <SidebarItem
-              title="Dashboard"
-              to="/"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-            />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Users
+              </Typography>
+              <SidebarItem
+                title="Employee"
+                to="/user/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Salon"
+                to="/user/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 10px" }}
-            >
-              Users
-            </Typography>
-            <SidebarItem
-              title="Employee"
-              to="/user/listing"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-            />
-            <SidebarItem
-              title="Salon"
-              to="/user/listing"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
+              />
+              <SidebarItem
+                title="Freelancer"
+                to="/user/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
 
-            />
-            <SidebarItem
-              title="Freelancer"
-              to="/user/listing"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-            />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Salons
+              </Typography>
+              <SidebarItem
+                title="Salon Detail"
+                to="/salon/listing"
+                icon={<FormatListBulletedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Salon Inventory"
+                to="/salon/inventory"
+                icon={<ReceiptLongIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Salon Cashflow"
+                to="/salon/cashflow"
+                icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 10px" }}
-            >
-              Salons
-            </Typography>
-            <SidebarItem
-              title="Salon Detail"
-              to="/salon/listing"
-              icon={<FormatListBulletedIcon />}
-              selected={selected}
-            />
-            <SidebarItem
-              title="Salon Inventory"
-              to="/salon/inventory"
-              icon={<ReceiptLongIcon />}
-              selected={selected}
-            />
-            <SidebarItem
-              title="Salon Cashflow"
-              to="/salon/cashflow"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-            />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Products
+              </Typography>
+              <SidebarItem
+                title="Product Listing"
+                to="/employee/listing"
+                icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Product Update"
+                to="/employee/update"
+                icon={<ContactsOutlinedIcon />}
+                selected={selected}
+              />
 
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 10px" }}
-            >
-              Products
-            </Typography>
-            <SidebarItem
-              title="Product Listing"
-              to="/employee/listing"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-            />
-            <SidebarItem
-              title="Product Update"
-              to="/employee/update"
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-            />
-
-            <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 10px" }}
-            >
-              Pages
-            </Typography>
-            <SidebarItem
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-            />
-            <SidebarItem
-              title="JFF Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-            />
-          </Box>
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Pages
+              </Typography>
+              <SidebarItem
+                title="FAQ Page"
+                to="/faq"
+                icon={<HelpOutlineOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="JFF Page"
+                to="/faq"
+                icon={<HelpOutlineOutlinedIcon />}
+                selected={selected}
+              />
+            </Box>
+          </>}
+          {role === 'salon' &&
+            <>
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Salons
+              </Typography>
+              <SidebarItem
+                title="Salon Detail"
+                to={id ? "/salon/update" : "/salon/create"}
+                icon={<FormatListBulletedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Salon Inventory"
+                to="/salon/inventory"
+                icon={<ReceiptLongIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Salon Cashflow"
+                to="/salon/cashflow"
+                icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+            </>}
         </Menu>
       </ProSidebar>
     </Box>

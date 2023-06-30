@@ -6,11 +6,13 @@
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-import { createStore, applyMiddleware, compose } from "redux";
+import { createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
 
 import reducers from "./reducers";
 
-const store = createStore(reducers, {}, compose(applyMiddleware(thunkMiddleware), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()));
+const store = createStore(reducers, {}, applyMiddleware(thunkMiddleware));
 
 export default store;
+
+// compose(window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())  -- only use in development

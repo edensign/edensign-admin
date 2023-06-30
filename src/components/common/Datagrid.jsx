@@ -24,12 +24,10 @@ export default function ServerPaginationGrid({
     columns,
     rows,
     count,
-    selected,
     pageSizeOptions,
     searchFlag,
     setOldPagination,
-    setSearchFlag,
-    toastModal
+    setSearchFlag
 }) {
     const initialState = {
         page: 0,
@@ -37,8 +35,10 @@ export default function ServerPaginationGrid({
     };
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const loading = useSelector(state => state.allUsers.loading);
     const [paginationModel, setPaginationModel] = useState(initialState);
+    const userLoading = useSelector(state => state.allUsers.loading);
+    const salonLoading = useSelector(state => state.allSalons.loading);
+    const selected = useSelector(state => state.menuItems.selected);
 
     useEffect(() => {
         //TO BE REFACTORED
@@ -123,7 +123,7 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={loading}
+                loading={selected === 'Salon Detail' ? salonLoading : userLoading}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,

@@ -45,16 +45,19 @@ const FormComponent = () => {
 
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-    const { typography } = themeSettings(theme.palette.mode);
-
     const selected = useSelector(state => state.menuItems.selected);
     const toastInfo = useSelector(state => state.toastInfo);
-    const { pathname, state } = useLocation();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
 
-    const { toastModal, getLocalStorage } = Utility();
+    const { typography } = themeSettings(theme.palette.mode);
+    const { pathname, state } = useLocation();
+    const { toastAndNavigate, getLocalStorage } = Utility();
+
     let id = state?.id;
+    const auth = getLocalStorage("auth");
+    const id2 = getLocalStorage("salon")?.id;
+    console.log("ID IN FOrM cOMPONENt=>", state, id2)
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -85,45 +88,55 @@ const FormComponent = () => {
             .then(responses => {
                 let status = true;
                 if (responses) {
-                    API.ImageAPI.deleteImage({
-                        parent: dataFields[2][0].parent,
-                        parent_id: dataFields[2][0].parent_id
-                    })
-                        .then(deleted => {
-                            formData.imageData?.values.map(image => {
+                    if (dataFields[2].length) {
+                        API.ImageAPI.deleteImage({
+                            parent: dataFields[2][0].parent,
+                            parent_id: dataFields[2][0].parent_id
+                        })
+                            .then(deleted => {
+                                formData.imageData?.values.map(image => {
+                                    API.ImageAPI.createImage({
+                                        image_src: image.image_src,
+                                        parent: image.parent,
+                                        parent_id: image.parent_id
+                                    })
+                                });
+                            })
+                            .catch(err => {
+                                setLoading(false);
+                                throw err;
+                            })
+                        if (formData.imageData.values.file) {
+                            Array.from(formData.imageData.values.file).map(async (image) => {
+                                let name = await uploadImageToAzure("salon", image);
                                 API.ImageAPI.createImage({
-                                    image_src: image.image_src,
-                                    parent: image.parent,
-                                    parent_id: image.parent_id
-                                })
+                                    image_src: name,
+                                    parent: 'salon',
+                                    parent_id: formData.salonData.values.id
+                                });
                             });
-                        })
-                        .catch(err => {
-                            setLoading(false);
-                            throw err;
-                        })
-                    if (formData.imageData.values.file) {
-                        Array.from(formData.imageData.values.file).map(async (image) => {
-                            let name = await uploadImageToAzure("salon", image);
-                            API.ImageAPI.createImage({
-                                image_src: name,
-                                parent: 'salon',
-                                parent_id: formData.salonData.values.id
-                            });
-                        });
+                        }
                     }
                 } else {
                     status = false;
                 }
                 if (status) {
                     setLoading(false);
-                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/salon/listing");
-                };
+                    if (auth.type === "admin") {
+                        toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/listing");
+                    } else {
+                        toastAndNavigate(dispatch, true, "info", "Successfully Updated");
+                        location.reload();
+                        if (id) {
+                            toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/update");
+                        }
+                    }
+                }
                 setLoading(false);
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     }, [formData]);
@@ -138,13 +151,12 @@ const FormComponent = () => {
                     addressData: responses[1]?.data?.data,
                     imageData: responses[2]?.data?.data
                 };
-                console.log("DATA from server=>", dataObj.userData)
                 setUpdatedValues(dataObj);
                 setLoading(false);
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };
@@ -152,6 +164,10 @@ const FormComponent = () => {
     const createSalon = () => {
         let promises;
         setLoading(true);
+        formData.salonData.values = {
+            ...formData.salonData.values,
+            user_id: getLocalStorage("auth").id
+        }
         API.SalonAPI.createSalon({ ...formData.salonData.values })
             .then(({ data: salon }) => {
                 if (salon?.status === 'Success') {
@@ -161,49 +177,64 @@ const FormComponent = () => {
                         parent: 'salon',
                     })
                         .then(async (address) => {
-                            promises = Array.from(formData.imageData.values.file).map(async (image) => {
-                                let name = await uploadImageToAzure("salon", image);
-                                API.ImageAPI.createImage({
-                                    image_src: name,
-                                    parent_id: salon.data.id,
-                                    parent: 'salon',
-                                })
-                            });
-                            return Promise.all(promises)
-                                .then(image => {
-                                    setLoading(false);
-                                    toastModal(dispatch, true, "success", "Success", navigateTo, "/salon/listing");
-                                })
-                                .catch(err => {
-                                    setLoading(false);
-                                    toastModal(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
-                                    throw err;
+                            if (formData.imageData.values.file?.length) {
+                                promises = Array.from(formData.imageData.values.file).map(async (image) => {
+                                    let name = await uploadImageToAzure("salon", image);
+                                    API.ImageAPI.createImage({
+                                        image_src: name,
+                                        parent_id: salon.data.id,
+                                        parent: 'salon',
+                                    })
                                 });
+                                return Promise.all(promises)
+                                    .then(data => {
+                                        setLoading(false);
+                                        if (auth.type === 'admin') {
+                                            toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/listing");
+                                        } else {
+                                            toastAndNavigate(dispatch, true, "success", "Successfully Created");
+                                            location.reload();
+                                        }
+                                    })
+                                    .catch(err => {
+                                        setLoading(false);
+                                        toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
+                                        throw err;
+                                    });
+                            } else {
+                                setLoading(false);
+                                if (auth.type === 'admin') {
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/listing");
+                                } else {
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created");
+                                    location.reload();
+                                }
+                            }
                         })
                         .catch(err => {
                             setLoading(false);
-                            toastModal(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
+                            toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred");
                             throw err;
                         });
                 };
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };
 
     //Create/Update/Populate salon
     useEffect(() => {
-        if (id && !submitted) {
+        if ((id || id2) && !submitted) {
             setTitle("Update");
-            populateSalonData(id);
+            populateSalonData(id || id2);
         }
         if (formData.salonData.validated && formData.addressData.validated) {
             formData.salonData.values?.id ? updateSalonAndAddress(formData) : createSalon();
         }
-    }, [id, submitted]);
+    }, [id, id2, submitted]);
 
     const handleSubmit = async () => {
         await salonFormRef.current.Submit();
@@ -286,7 +317,14 @@ const FormComponent = () => {
                         </Button>
                 }
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
-                    onClick={() => navigateTo('/salon/listing')}>
+                    onClick={() => {
+                        if (auth.type === 'admin') {
+                            navigateTo("/salon/listing");
+                        } else {
+                            toastAndNavigate(dispatch, true, "error", "Cancelled");
+                            // location.reload(); why
+                        }
+                    }}>
                     Cancel
                 </Button>
                 <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}
