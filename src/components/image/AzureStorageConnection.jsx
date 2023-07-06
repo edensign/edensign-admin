@@ -14,15 +14,12 @@ const blobServiceClient = new BlobServiceClient(
     "https://edensign.blob.core.windows.net/image-storage?sp=racwdl&st=2023-06-16T13:12:46Z&se=2023-07-16T21:12:46Z&spr=https&sv=2022-11-02&sr=c&sig=0a1%2BeoNqOGMszIBJa1MWF6LYY0gTd5E0JJLEcxdeN0U%3D"
 );
 
-export const uploadImageToAzure = async (folderName, file) => {
+export const uploadImageToAzure = async (folderName, file, name) => {
     /** Uploads the given image in the specified azure container 
      */
     try {
-        const { formatImageName } = Utility();
-        let formattedName = formatImageName(file.name);
-
         const containerClient = blobServiceClient.getContainerClient(folderName);
-        const blobClient = containerClient.getBlobClient(formattedName);
+        const blobClient = containerClient.getBlobClient(name);
         const blockBlobClient = blobClient.getBlockBlobClient();
         const result = await blockBlobClient.uploadData(file, {
             blockSize: 4 * 1024 * 1024,
@@ -32,7 +29,7 @@ export const uploadImageToAzure = async (folderName, file) => {
         return formattedName;
     } catch (err) {
         throw err;
-    };
+    }
 };
 
 export const deleteFileFromAzure = async (folderName, blobName) => {

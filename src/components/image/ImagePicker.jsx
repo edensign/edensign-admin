@@ -25,13 +25,12 @@ const ImagePicker = ({
     setDirty,
     reset,
     setReset,
+    preview, 
+    setPreview,
     updatedValues = null,
     deletedImage,
     setDeletedImage }) => {
     const [initialState, setInitialState] = useState(initialValues);
-    const [preview, setPreview] = useState([]);
-
-    const isNonMobile = useMediaQuery("(min-width:600px)");
 
     const formik = useFormik({
         initialValues: initialState,
@@ -54,7 +53,7 @@ const ImagePicker = ({
                     : false
             });
         };
-    }
+    };
 
     useEffect(() => {
         if (reset) {
@@ -65,7 +64,7 @@ const ImagePicker = ({
     }, [reset]);
 
     useEffect(() => {
-        if (formik.dirty) {
+        if (!formik.dirty) {
             setDirty(true);
         }
     }, [formik.dirty]);
@@ -105,6 +104,7 @@ const ImagePicker = ({
                                     name="file"
                                     onChange={(event) => {
                                         formik.setFieldValue("file", event.target.files);
+                                        setDirty(true);
                                     }}
                                 />
                             </IconButton>
@@ -116,7 +116,15 @@ const ImagePicker = ({
                 />
             </form>
             {formik.values.file || preview.length ?
-                <PreviewImage deletedImage={deletedImage} setDeletedImage={setDeletedImage} updatedValues={updatedValues} imageFiles={formik.values.file} preview={preview} setPreview={setPreview} />
+                <PreviewImage
+                    deletedImage={deletedImage}
+                    setDeletedImage={setDeletedImage}
+                    setDirty={setDirty}
+                    updatedValues={updatedValues}
+                    imageFiles={formik.values.file}
+                    preview={preview}
+                    setPreview={setPreview}
+                />
                 : null}
         </Box>
     );

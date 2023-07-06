@@ -61,7 +61,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
         enableReinitialize: true,
         onSubmit: () => watchForm()
     });
-    console.log("FORMIK VALUES=>", formik.values)
+    // console.log("FORMIK VALUES=>", formik.values)
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
             await formik.submitForm();
@@ -325,7 +325,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                             <Checkbox {...checkboxLabel} color="default"
                                 checked={formik.values.is_home ? true : false}
                                 name="is_home"
-                                onChange={() => formik.setFieldValue("is_home", true)}
+                                onChange={(event, value) => formik.setFieldValue("is_home", value)}
                                 value={formik.values.is_home}
                             />
                         } />
@@ -334,7 +334,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                             <Checkbox {...checkboxLabel} color="default"
                                 checked={formik.values?.is_featured}
                                 name="is_featured"
-                                onChange={() => formik.setFieldValue("is_featured", true)}
+                                onChange={(event, value) => formik.setFieldValue("is_featured", value)}
                                 value={formik.values.is_featured}
                             />
                         } />
@@ -343,7 +343,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                             <Checkbox {...checkboxLabel} color="default"
                                 checked={formik.values?.is_franchise}
                                 name="is_franchise"
-                                onChange={() => formik.setFieldValue("is_franchise", true)}
+                                onChange={(event, value) => formik.setFieldValue("is_franchise", value)}
                                 value={formik.values.is_franchise}
                             />
                         } />
@@ -352,7 +352,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                             <Checkbox {...checkboxLabel} color="default"
                                 checked={formik.values?.is_selfowned}
                                 name="is_selfowned"
-                                onChange={() => formik.setFieldValue("is_selfowned", true)}
+                                onChange={(event, value) => formik.setFieldValue("is_selfowned", value)}
                                 value={formik.values.is_selfowned}
                             />
                         } />
@@ -361,7 +361,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, update
                             <Checkbox {...checkboxLabel} color="default"
                                 checked={formik.values?.is_subscribed}
                                 name="is_subscribed"
-                                onChange={() => formik.setFieldValue("is_subscribed", true)}
+                                onChange={(event, value) => formik.setFieldValue("is_subscribed", value)}
                                 value={formik.values.is_subscribed}
                             />
                         } />

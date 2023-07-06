@@ -12,11 +12,13 @@ import { authReducer } from "./AuthReducer";
 import { menuItemReducer } from "./MenuItemReducer";
 import { displayToastReducer } from "./ToastReducer";
 import { setUserReducer } from "./UserReducers";
+import { setAgreementReducer } from "./UserReducers";
 import { setSalonReducer } from "./SalonReducer";
 
 const reducers = combineReducers({
     auth: authReducer,
     allUsers: setUserReducer,
+    agreementSigned: setAgreementReducer,
     allSalons: setSalonReducer,
     toastInfo: displayToastReducer,
     menuItems: menuItemReducer,

@@ -114,7 +114,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                 });
         };
         getStates();
-    }, [formik.values.country]);
+    }, [formik.values.country, countryId]);
 
     useEffect(() => {
         const getCities = () => {
@@ -134,7 +134,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                 });
         };
         getCities();
-    }, [formik.values.state]);
+    }, [formik.values.state, stateId]);
 
     return (
         <Box m="20px">

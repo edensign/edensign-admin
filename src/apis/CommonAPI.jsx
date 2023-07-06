@@ -21,7 +21,7 @@ export const CommonAPI = {
         }
         if (header) {
             commonConfig.headers = {
-                "x-access-token": getLocalStorage("auth").token
+                "x-access-token": getLocalStorage("auth")?.token
             }
         }
         return commonConfig;
@@ -29,6 +29,10 @@ export const CommonAPI = {
     /** Verify the authenticity of the provided token
      */
     verifyToken: async (cancel = false) => {
+        const { getLocalStorage } = Utility();
+        if (!getLocalStorage("auth")?.token) {
+            return false;
+        }
         const commonConfig = CommonAPI.commonConfig("GET", true, cancel);
         const { data: response } = await api.request({
             url: `/verify-token`,
@@ -45,6 +49,15 @@ export const CommonAPI = {
             ...commonConfig
         });
         return response;
+    },
+    /** Get true/false for salon user agreement
+    */
+    getAgreement: async (cancel = false) => {
+        const commonConfig = CommonAPI.commonConfig("GET", true, cancel);
+        return await api.request({
+            url: `/get-agreement`,
+            ...commonConfig
+        });
     },
     /** provide paths for multiple API calls & this function will make the request object 
      */

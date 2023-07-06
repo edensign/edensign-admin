@@ -27,6 +27,7 @@ const SalonListingComponent = lazy(() => import("./components/salons/detail/List
 import { Utility } from "./components/utility";
 import API from "./apis";
 import { setMenuItem } from "./redux/actions/NavigationAction";
+import { setAgreementSigned } from "./redux/actions/UserActions";
 // import Calendar from "./calendar/calendar";
 
 function App() {
@@ -36,7 +37,7 @@ function App() {
   const dispatch = useDispatch();
 
   const { pathname } = useLocation();
-  const { getLocalStorage, getRole, setStorageAndDispatch } = Utility();
+  const { getLocalStorage, getRole, setStorageAndDispatch, verifyToken } = Utility();
 
   useEffect(() => {
     const roleType = getRole();
@@ -50,7 +51,7 @@ function App() {
         navigateTo('/');
         break;
       case 'salon':
-        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, true);
+        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, true);
         break;
       case 'freelancer':
       // navigateTo('/salon/update');
@@ -70,7 +71,7 @@ function App() {
     timeout: parseInt(import.meta.env.VITE_LOGOUT_TIMER)    //30 minute idle timeout stored in environment variable file
   });
 
-  if (!getLocalStorage("auth")?.token && pathname !== '/login') {
+  if (!verifyToken() && pathname !== '/login') {
     return <Navigate to="/login" replace />
   };
 

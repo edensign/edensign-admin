@@ -13,6 +13,10 @@ const initialState = {
     loading: true
 };
 
+const agreementState = {
+    agreementSigned: null
+};
+
 export const setUserReducer = (state = initialState, action) => {
     switch (action.type) {
         case ActionTypes.SET_USERS:
@@ -20,6 +24,17 @@ export const setUserReducer = (state = initialState, action) => {
                 ...state,
                 listData: action.payload.listData,
                 loading: action.payload.loading
+            };
+        default:
+            return state;
+    };
+};
+
+export const setAgreementReducer = (state = agreementState, action) => {
+    switch (action.type) {
+        case ActionTypes.AGREEMENT_SIGNED:
+            return {
+                ...state, agreementSigned: action.payload,
             };
         default:
             return state;

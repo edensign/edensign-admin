@@ -63,6 +63,19 @@ export const ImageAPI = {
             data: fields,
             signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
         });
+    },
+    /**  */
+    uploadImage: async (data, cancel = false) => {
+        return await api.request({
+            url: `/upload-image`,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "POST",
+            data: data,
+            signal: cancel ? cancelApiObject[this.uploadImage.name].handleRequestCancellation().signal : undefined,
+        });
     }
 };
 

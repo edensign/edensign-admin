@@ -90,6 +90,7 @@ const FormComponent = () => {
     }, [formData]);
 
     const populateUserData = (id) => {
+        setLoading(true);
         const paths = [`/get-by-pk/users/${id}`, `/get-address/user/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
@@ -98,8 +99,10 @@ const FormComponent = () => {
                     addressData: responses[1]?.data?.data
                 };
                 setUpdatedValues(dataObj);
+                setLoading(false);
             })
             .catch(err => {
+                setLoading(false);
                 toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
@@ -186,7 +189,6 @@ const FormComponent = () => {
                     handleFormChange(data, 'address');
                 }}
                 refId={addressFormRef}
-                dirty={dirty}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}

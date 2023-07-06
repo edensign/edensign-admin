@@ -2,7 +2,7 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
@@ -16,10 +16,12 @@ import API from "../../../apis";
 import AddressFormComponent from "../../address/AddressFormComponent";
 import ImagePicker from "../../image/ImagePicker";
 import Loader from "../../common/Loader";
+import ResponsiveDialog from "../../common/Dialog";
 import SalonFormComponent from "./SalonFormComponent";
 import Toast from "../../common/Toast";
 
 import { setMenuItem } from "../../../redux/actions/NavigationAction";
+import { uploadDocumentToAzure } from "../../documents/AzureStorageConnection";
 import { Utility } from "../../utility";
 import { uploadImageToAzure, deleteFileFromAzure } from "../../image/AzureStorageConnection";
 import { tokens, themeSettings } from "../../../theme";
@@ -36,6 +38,7 @@ const FormComponent = () => {
     const [deletedImage, setDeletedImage] = useState([]);
     const [dirty, setDirty] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [preview, setPreview] = useState([]);
     const [reset, setReset] = useState(false);
     const [showTextfields, setShowTextfields] = useState(false);
 
@@ -52,12 +55,12 @@ const FormComponent = () => {
 
     const { typography } = themeSettings(theme.palette.mode);
     const { pathname, state } = useLocation();
-    const { toastAndNavigate, getLocalStorage } = Utility();
+    const { toastAndNavigate, getLocalStorage, getRole, formatImageName } = Utility();
 
-    let id = state?.id;
+    let id = state?.id || getLocalStorage("salon")?.id;
     const auth = getLocalStorage("auth");
-    const id2 = getLocalStorage("salon")?.id;
-    console.log("ID IN FOrM cOMPONENt=>", state, id2)
+    const role = getRole();
+    const { agreementSigned } = useSelector(state => state.agreementSigned);
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -69,70 +72,85 @@ const FormComponent = () => {
         }
     }, []);
 
-    const updateSalonAndAddress = useCallback((formData) => {
+    const isEmpty = (obj) => {
+        for (const prop in obj) {
+            if (Object.hasOwn(obj, prop)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const updateSalonAndAddress = useCallback(formData => {
+        setLoading(true);
+
+        const paths = ["/update-salon", "/update-address"];
         const dataFields = [
             { ...formData.salonData.values },
             { ...formData.addressData.values },
             { ...formData.imageData.values }
         ];
-        const paths = ["/update-salon", "/update-address"];
-        setLoading(true);
 
+        // delete the selected (removed) images from Azure
         if (deletedImage.length) {
+            console.log("DeletedImage =>", deletedImage)
             deletedImage.forEach(image => {
                 deleteFileFromAzure("salon", image);
-            })
+            });
         }
+        // delete all images from db on every update and later insert new and old again
+        API.ImageAPI.deleteImage({
+            parent: "salon",
+            parent_id: id
+        });
 
         API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
             .then(responses => {
-                let status = true;
+                let status = null;
+                let formattedName;
                 if (responses) {
-                    if (dataFields[2].length) {
-                        API.ImageAPI.deleteImage({
-                            parent: dataFields[2][0].parent,
-                            parent_id: dataFields[2][0].parent_id
-                        })
-                            .then(deleted => {
-                                formData.imageData?.values.map(image => {
-                                    API.ImageAPI.createImage({
-                                        image_src: image.image_src,
-                                        parent: image.parent,
-                                        parent_id: image.parent_id
-                                    })
-                                });
-                            })
-                            .catch(err => {
-                                setLoading(false);
-                                throw err;
-                            })
-                        if (formData.imageData.values.file) {
-                            Array.from(formData.imageData.values.file).map(async (image) => {
-                                let name = await uploadImageToAzure("salon", image);
+                    if (!isEmpty(dataFields[2])) {
+                        // upload new images to azure and insert in db
+                        if (formData.imageData.values?.file) {
+                            Array.from(formData.imageData.values.file).map(image => {
+
+                                formattedName = formatImageName(image.name);
+                                API.ImageAPI.uploadImage({ file: image, name: formattedName });
                                 API.ImageAPI.createImage({
-                                    image_src: name,
+                                    image_src: formattedName,
                                     parent: 'salon',
                                     parent_id: formData.salonData.values.id
-                                });
+                                })
                             });
+                            status = true;
                         }
-                    }
-                } else {
-                    status = false;
-                }
-                if (status) {
-                    setLoading(false);
-                    if (auth.type === "admin") {
-                        toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/listing");
+                        // insert old images only in db
+                        if (formData.imageData?.values) {
+                            formData.imageData.values.map(image => {
+                                API.ImageAPI.createImage({
+                                    image_src: image.image_src,
+                                    parent: image.parent,
+                                    parent_id: image.parent_id
+                                })
+                            });
+                            status = true;
+                        }
                     } else {
-                        toastAndNavigate(dispatch, true, "info", "Successfully Updated");
-                        location.reload();
-                        if (id) {
-                            toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/update");
+                        status = true;
+                    }
+                    if (status) {
+                        console.log('STATUS AT LAST=>', status);
+                        setLoading(false);
+                        if (auth.type === "admin") {
+                            toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/listing");
+                        } else {
+                            toastAndNavigate(dispatch, true, "info", "Successfully Updated");
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2500);
                         }
                     }
                 }
-                setLoading(false);
             })
             .catch(err => {
                 setLoading(false);
@@ -142,8 +160,8 @@ const FormComponent = () => {
     }, [formData]);
 
     const populateSalonData = (id) => {
-        setLoading(true);
         const paths = [`/get-by-pk/salon/${id}`, `/get-address/salon/${id}`, `/get-image/salon/${id}`];
+        setLoading(true);
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
                 const dataObj = {
@@ -179,9 +197,10 @@ const FormComponent = () => {
                         .then(async (address) => {
                             if (formData.imageData.values.file?.length) {
                                 promises = Array.from(formData.imageData.values.file).map(async (image) => {
-                                    let name = await uploadImageToAzure("salon", image);
+                                    let formattedName = formatImageName(image.name);
+                                    uploadImageToAzure("salon", image, formattedName);
                                     API.ImageAPI.createImage({
-                                        image_src: name,
+                                        image_src: formattedName,
                                         parent_id: salon.data.id,
                                         parent: 'salon',
                                     })
@@ -227,20 +246,23 @@ const FormComponent = () => {
 
     //Create/Update/Populate salon
     useEffect(() => {
-        if ((id || id2) && !submitted) {
+        if (id && !submitted) {
             setTitle("Update");
-            populateSalonData(id || id2);
+            populateSalonData(id);
         }
         if (formData.salonData.validated && formData.addressData.validated) {
             formData.salonData.values?.id ? updateSalonAndAddress(formData) : createSalon();
+        } else {
+            setSubmitted(false);
         }
-    }, [id, id2, submitted]);
+    }, [id, submitted]);
 
     const handleSubmit = async () => {
         await salonFormRef.current.Submit();
         await addressFormRef.current.Submit();
         await imageFormRef.current.Submit();
         setSubmitted(true);
+        setDirty(false);
     };
 
     const handleFormChange = (data, form) => {
@@ -251,6 +273,11 @@ const FormComponent = () => {
         } else {
             setFormData({ ...formData, imageData: data })
         };
+    };
+
+    const handleSubmitDialog = () => {
+        API.UserAPI.update({ id: auth.id, agreement: 1 });
+        // const uploading = await uploadDocumentToAzure(folder, file);
     };
 
     return (
@@ -265,6 +292,7 @@ const FormComponent = () => {
             >
                 {`${title} ${selected}`}
             </Typography>
+            <ResponsiveDialog agreement={agreementSigned} role={role} handleSubmitDialog={handleSubmitDialog} />
             <SalonFormComponent
                 onChange={(data) => {
                     handleFormChange(data, 'salon');
@@ -281,7 +309,6 @@ const FormComponent = () => {
                     handleFormChange(data, 'address');
                 }}
                 refId={addressFormRef}
-                dirty={dirty}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
@@ -293,10 +320,11 @@ const FormComponent = () => {
                     handleFormChange(data, 'image');
                 }}
                 refId={imageFormRef}
-                dirty={dirty}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
+                preview={preview}
+                setPreview={setPreview}
                 // userId={id}
                 updatedValues={updatedValues?.imageData}
                 deletedImage={deletedImage}
@@ -322,12 +350,13 @@ const FormComponent = () => {
                             navigateTo("/salon/listing");
                         } else {
                             toastAndNavigate(dispatch, true, "error", "Cancelled");
-                            // location.reload(); why
+                            location.reload();
                         }
                     }}>
                     Cancel
                 </Button>
-                <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}
+                <Button type="submit" id="submit-btn" onClick={() => handleSubmit()}
+                    disabled={!dirty}
                     color={title === "Update" ? "info" : "success"} variant="contained"
                 >
                     Submit

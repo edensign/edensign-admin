@@ -12,7 +12,14 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 
 import Loader from "../common/Loader";
 
-const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles, preview, setPreview }) => {
+const PreviewImage = ({
+    deletedImage,
+    setDeletedImage,
+    updatedValues,
+    imageFiles,
+    setDirty,
+    preview,
+    setPreview }) => {
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
     let uploadedImages = [];
@@ -40,7 +47,7 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
         const index = preview.indexOf(item);
         setDeletedImage([
             ...deletedImage,
-            updatedValues[index].image_src
+            updatedValues[index].image_src,
         ]);
         if (index > -1) {               // only splice 1 item from array when it is found
             preview.splice(index, 1);
@@ -48,6 +55,7 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
             setPreview([
                 ...preview
             ]);
+            setDirty(true);     //to enable the submit button
         }
     };
 
@@ -81,7 +89,7 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
                     </IconButton>
                     <img
                         src={item}
-                        alt="This image cannot be seen"
+                        alt="This image is not available"
                         loading="lazy"
                         style={{
                             objectFit: "cover",
