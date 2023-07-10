@@ -21,9 +21,8 @@ import SalonFormComponent from "./SalonFormComponent";
 import Toast from "../../common/Toast";
 
 import { setMenuItem } from "../../../redux/actions/NavigationAction";
-import { uploadDocumentToAzure } from "../../documents/AzureStorageConnection";
 import { Utility } from "../../utility";
-import { uploadImageToAzure, deleteFileFromAzure } from "../../image/AzureStorageConnection";
+import { deleteFileFromAzure, uploadDocumentToAzure } from "../../azure/AzureStorageConnection";
 import { tokens, themeSettings } from "../../../theme";
 
 const FormComponent = () => {
@@ -41,6 +40,7 @@ const FormComponent = () => {
     const [preview, setPreview] = useState([]);
     const [reset, setReset] = useState(false);
     const [showTextfields, setShowTextfields] = useState(false);
+    const [showSalonFields, setShowSalonFields] = useState(false);
 
     const salonFormRef = useRef();
     const addressFormRef = useRef();
@@ -65,6 +65,7 @@ const FormComponent = () => {
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
         dispatch(setMenuItem(selectedMenu.selected));
+        role === "admin" ? setShowSalonFields(true) : setShowSalonFields(false);
         if (pathname === "/salon/create" || pathname === "/salon/update") {
             setShowTextfields(true);
         } else {
@@ -93,7 +94,6 @@ const FormComponent = () => {
 
         // delete the selected (removed) images from Azure
         if (deletedImage.length) {
-            console.log("DeletedImage =>", deletedImage)
             deletedImage.forEach(image => {
                 deleteFileFromAzure("salon", image);
             });
@@ -139,9 +139,8 @@ const FormComponent = () => {
                         status = true;
                     }
                     if (status) {
-                        console.log('STATUS AT LAST=>', status);
                         setLoading(false);
-                        if (auth.type === "admin") {
+                        if (role === "admin") {
                             toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/listing");
                         } else {
                             toastAndNavigate(dispatch, true, "info", "Successfully Updated");
@@ -198,7 +197,7 @@ const FormComponent = () => {
                             if (formData.imageData.values.file?.length) {
                                 promises = Array.from(formData.imageData.values.file).map(async (image) => {
                                     let formattedName = formatImageName(image.name);
-                                    uploadImageToAzure("salon", image, formattedName);
+                                    API.ImageAPI.uploadImage({ file: image, name: formattedName });
                                     API.ImageAPI.createImage({
                                         image_src: formattedName,
                                         parent_id: salon.data.id,
@@ -208,7 +207,7 @@ const FormComponent = () => {
                                 return Promise.all(promises)
                                     .then(data => {
                                         setLoading(false);
-                                        if (auth.type === 'admin') {
+                                        if (role === 'admin') {
                                             toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/listing");
                                         } else {
                                             toastAndNavigate(dispatch, true, "success", "Successfully Created");
@@ -222,7 +221,7 @@ const FormComponent = () => {
                                     });
                             } else {
                                 setLoading(false);
-                                if (auth.type === 'admin') {
+                                if (role === 'admin') {
                                     toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/listing");
                                 } else {
                                     toastAndNavigate(dispatch, true, "success", "Successfully Created");
@@ -275,9 +274,9 @@ const FormComponent = () => {
         };
     };
 
-    const handleSubmitDialog = () => {
+    const handleSubmitDialog = (folderName, fileName, blobName) => {
         API.UserAPI.update({ id: auth.id, agreement: 1 });
-        // const uploading = await uploadDocumentToAzure(folder, file);
+        uploadDocumentToAzure(folderName, fileName, blobName);
     };
 
     return (
@@ -294,21 +293,22 @@ const FormComponent = () => {
             </Typography>
             <ResponsiveDialog agreement={agreementSigned} role={role} handleSubmitDialog={handleSubmitDialog} />
             <SalonFormComponent
-                onChange={(data) => {
+                onChange={data => {
                     handleFormChange(data, 'salon');
                 }}
                 refId={salonFormRef}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
-                userId={id}
+                showSalonFields={showSalonFields}
                 updatedValues={updatedValues?.userData}
             />
             <AddressFormComponent
-                onChange={(data) => {
+                onChange={data => {
                     handleFormChange(data, 'address');
                 }}
                 refId={addressFormRef}
+                update={id ? true : false}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
@@ -316,7 +316,7 @@ const FormComponent = () => {
                 showTextfields={showTextfields}
             />
             <ImagePicker
-                onChange={(data) => {
+                onChange={data => {
                     handleFormChange(data, 'image');
                 }}
                 refId={imageFormRef}
@@ -325,7 +325,6 @@ const FormComponent = () => {
                 setReset={setReset}
                 preview={preview}
                 setPreview={setPreview}
-                // userId={id}
                 updatedValues={updatedValues?.imageData}
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
@@ -346,7 +345,7 @@ const FormComponent = () => {
                 }
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
                     onClick={() => {
-                        if (auth.type === 'admin') {
+                        if (role === 'admin') {
                             navigateTo("/salon/listing");
                         } else {
                             toastAndNavigate(dispatch, true, "error", "Cancelled");

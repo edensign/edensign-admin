@@ -6,7 +6,7 @@
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { useFormik } from "formik";
 import { Box, FormControl, FormHelperText, InputLabel, MenuItem, Select, TextField, useMediaQuery } from "@mui/material";
@@ -20,12 +20,12 @@ const initialValues = {
     latitude: "",
     longitude: "",
     zipcode: "",
-    country: "",
-    state: "",
-    city: ""
+    country: 0,
+    state: 0,
+    city: 0
 };
 
-const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, showTextfields, updatedValues = null }) => {
+const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setReset, showTextfields, updatedValues = null }) => {
 
     const [initialState, setInitialState] = useState(initialValues);
     const [countries, setCountries] = useState([]);
@@ -97,43 +97,51 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
 
     useEffect(() => {
         const getStates = () => {
-            API.StateAPI.getStates(formik.values.country || countryId)
-                .then(data => {
-                    if (data?.status === 'Success') {
-                        setStates(data.data.list);
-                        setCities([]);
-                    } else {
-                        setStates([]);
-                        setCities([]);
-                        formik.setFieldValue("state", "");
-                        formik.setFieldValue("city", "");
-                    };
-                })
-                .catch(err => {
-                    throw err;
-                });
-        };
+            if (formik.values.country || countryId) {
+                API.StateAPI.getStates(formik.values.country || countryId)
+                    .then(data => {
+                        if (data?.status === 'Success') {
+                            setStates(data.data.list);
+                            setCities([]);
+                            if (update) {
+                                getCities();
+                            }
+                        } else {
+                            setStates([]);
+                            setCities([]);
+                            formik.setFieldValue("state", 0);
+                            formik.setFieldValue("city", 0);
+                        };
+                    })
+                    .catch(err => {
+                        throw err;
+                    });
+            };
+        }
         getStates();
     }, [formik.values.country, countryId]);
 
     useEffect(() => {
-        const getCities = () => {
-            API.CityAPI.getCities(formik.values.state || stateId)
-                .then(cities => {
-                    if (cities?.status === 'Success') {
-                        setCities(cities.data.list);
-                    } else {
-                        setCities([]);
-                        formik.setFieldValue("city", "");
-                    };
-                })
-                .catch(err => {
+        if (stateId) {
+            getCities();
+        }
+    }, [stateId]);
+
+    const getCities = useCallback(() => {
+        API.CityAPI.getCities(formik.values.state || stateId)
+            .then(cities => {
+                if (cities?.status === 'Success') {
+                    setCities(cities.data.list);
+                } else {
                     setCities([]);
-                    formik.setFieldValue("city", "");
-                    throw err;
-                });
-        };
-        getCities();
+                    formik.setFieldValue("city", 0);
+                };
+            })
+            .catch(err => {
+                setCities([]);
+                formik.setFieldValue("city", 0);
+                throw err;
+            });
     }, [formik.values.state, stateId]);
 
     return (
@@ -217,7 +225,7 @@ const AddressFormComponent = ({ onChange, refId, setDirty, reset, setReset, show
                         value={formik.values.zipcode}
                         error={!!formik.touched.zipcode && !!formik.errors.zipcode}
                         helperText={formik.touched.zipcode && formik.errors.zipcode}
-                        sx={{ gridColumn: "span 2" }}
+                        sx={{ gridColumn: "span 1" }}
                     />
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.country && !!formik.errors.country}

@@ -76,7 +76,6 @@ export const CommonAPI = {
 
         return Promise.all(promises)
             .then(responses => {
-                console.log('RESPONSES=>', responses);
                 return responses;
             })
             .catch(err => {

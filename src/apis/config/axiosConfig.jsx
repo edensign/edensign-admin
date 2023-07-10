@@ -22,7 +22,7 @@ const errorHandler = (error) => {
 
   // logging only errors that are not 401
   if (statusCode && statusCode !== 401) {
-    console.error(error);
+    throw error;
   };
 
   return Promise.reject(error);
