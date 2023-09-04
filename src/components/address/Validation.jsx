@@ -26,12 +26,12 @@ const checkoutSchema = yup.object({
     latitude: yup.string()
         .min(4, 'Too Short!')
         .max(40, 'Too Long!')
-        .matches(/[a-z]/, 'Invalid Latitude Detected')
+        // .matches(/[a-z]/, 'Invalid Latitude Detected')
         .matches(/[0-9]/, 'Invalid Latitude Detected'),
     longitude: yup.string()
         .min(4, 'Too Short!')
         .max(40, 'Too Long!')
-        .matches(/[a-z]/, 'Invalid Longitude Detected')
+        // .matches(/[a-z]/, 'Invalid Longitude Detected')
         .matches(/[0-9]/, 'Invalid Longitude Detected'),
     country: yup.number()
         .required("This Field is Required"),

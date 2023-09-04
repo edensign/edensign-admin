@@ -7,51 +7,45 @@
 */
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
 
 import API from "../../apis";
+import FormComponent from "./FormInModalComponent";
 import Search from "../common/Search";
 import ServerPaginationGrid from '../common/Datagrid';
 
-import { datagridColumns } from "./UserConfig";
+import { datagridColumns } from "./AmenityConfig";
+import { setAmenities } from "../../redux/actions/AmenityAction";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
-import { setUsers } from "../../redux/actions/UserActions"
 import { tokens } from "../../theme";
 import { useCommon } from "../hooks/common";
-import { useUser } from "../hooks/users";
 import { Utility } from "../utility";
 
 const pageSizeOptions = [5, 10, 20];
 
 const ListingComponent = () => {
-    const theme = useTheme();
-    const navigateTo = useNavigate();
-    const dispatch = useDispatch();
-    const isMobile = useMediaQuery("(max-width:480px)");
-    const isTab = useMediaQuery("(max-width:920px)");
-
-    const selected = useSelector(state => state.menuItems.selected);
-    const { listData } = useSelector(state => state.allUsers);
-
+    const [openDialog, setOpenDialog] = useState(false);
     //revisit for pagination
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
     const [oldPagination, setOldPagination] = useState();
+    const navigateTo = useNavigate();
+    const dispatch = useDispatch();
+    const selected = useSelector(state => state.menuItems.selected);
+    const { listData } = useSelector(state => state.allAmenities);
 
-    const { getPaginatedData } = useCommon();
-    const { getQueryParam } = useUser();
-
+    const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const { getLocalStorage } = Utility();
+    const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
     const reloadBtn = document.getElementById("reload-btn");
 
-    let condition = getQueryParam() ? {
-        key: 'type',
-        value: getQueryParam()
-    } : false;
+    const { getPaginatedData } = useCommon();
+    const { getLocalStorage } = Utility();
+
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -67,6 +61,12 @@ const ListingComponent = () => {
             oldPagination
         });
     };
+
+    //For form modal to open
+    const handleDialogOpen = () => {
+        setOpenDialog(true);
+    };
+
 
     return (
         <Box m="10px" position="relative">
@@ -93,9 +93,8 @@ const ListingComponent = () => {
                         {selected}
                     </Typography>
                     <Search
-                        action={setUsers}
-                        api={API.UserAPI}
-                        condition={condition}
+                        action={setAmenities}
+                        api={API.AmenityAPI}
                         getSearchData={getPaginatedData}
                         oldPagination={oldPagination}
                         reloadBtn={reloadBtn}
@@ -105,7 +104,10 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo(`/${selected}/create`) }}
+                        onClick={() => {
+                            navigateTo("#", { state: { id: undefined } });
+                            handleDialogOpen();
+                        }}
                         sx={{ height: isTab ? "4vh" : "auto" }}
                     >
                         Create New {selected}
@@ -131,11 +133,10 @@ const ListingComponent = () => {
                 Back
             </Button>
             <ServerPaginationGrid
-                action={setUsers}
-                api={API.UserAPI}
-                condition={condition}
+                action={setAmenities}
+                api={API.AmenityAPI}
                 getQuery={getPaginatedData}
-                columns={datagridColumns()}
+                columns={datagridColumns(handleDialogOpen)}
                 rows={listData.rows}
                 count={listData.count}
                 selected={selected}
@@ -144,6 +145,7 @@ const ListingComponent = () => {
                 searchFlag={searchFlag}
                 setSearchFlag={setSearchFlag}
             />
+            <FormComponent openDialog={openDialog} setOpenDialog={setOpenDialog} />
         </Box>
     );
 };

@@ -2,7 +2,7 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
@@ -86,7 +86,9 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                 .then(country => {
                     if (country?.status === 'Success') {
                         setCountries(country.data.list);
-                    };
+                    } else {
+                        console.log("An Error Occurred, Please Try Again");
+                    }
                 })
                 .catch(err => {
                     throw err;
@@ -145,7 +147,7 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
     }, [formik.values.state, stateId]);
 
     return (
-        <Box m="20px">
+        <Box m="20px" marginBottom="60px">
             <form ref={refId}>
                 <Box
                     display="grid"

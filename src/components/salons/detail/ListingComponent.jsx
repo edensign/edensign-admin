@@ -30,6 +30,7 @@ const ListingComponent = () => {
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
     const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
     const { listData } = useSelector(state => state.allSalons);
@@ -94,7 +95,7 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo("/salon/create") }}
+                        onClick={() => { navigateTo("/salon/detail/create") }}
                     >
                         Create New {selected}
                     </Button>
@@ -103,8 +104,8 @@ const ListingComponent = () => {
             <Button sx={{
                 display: "none",
                 position: "absolute",
-                top: isMobile ? "32vh" : "29.5vh",
-                left: isMobile? "99vw" : "44.5vw",
+                top: isMobile ? "23vh" : isTab ? "10.5vh" : "16.5vh",
+                left: isMobile ? "80vw" : isTab ? "39.5vw" : "26vw",
                 zIndex: 1,
                 borderRadius: "20%",
                 color: colors.grey[100]

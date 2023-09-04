@@ -8,12 +8,14 @@
 
 import { BlobServiceClient } from "@azure/storage-blob";
 
+const ENV = import.meta.env;
+
 const blobServiceClientDoc = new BlobServiceClient(
-    "https://edensign.blob.core.windows.net/document-storage?sp=racwdl&st=2023-06-30T07:28:29Z&se=2023-07-31T15:28:29Z&spr=https&sv=2022-11-02&sr=c&sig=vuHHr9WM2zTs85athx4lWWLl%2FgLefLjSI%2BJvyi%2BpqDQ%3D"
+    `${ENV.VITE_SAS_DOCUMENT_URL}?${ENV.VITE_SAS_DOCUMENT_TOKEN}`
 );
 
 const blobServiceClientImg = new BlobServiceClient(
-    "https://edensign.blob.core.windows.net/image-storage?sp=racwdl&st=2023-06-16T13:12:46Z&se=2023-07-16T21:12:46Z&spr=https&sv=2022-11-02&sr=c&sig=0a1%2BeoNqOGMszIBJa1MWF6LYY0gTd5E0JJLEcxdeN0U%3D"
+    `${ENV.VITE_SAS_URL}?${ENV.VITE_SAS_TOKEN}`
 );
 
 export const uploadDocumentToAzure = async (folderName, fileName, blob) => {
@@ -48,5 +50,12 @@ export const deleteFileFromAzure = async (folderName, blobName) => {
         await blockBlobClient.delete(options);
     } catch (err) {
         throw err;
-    };
+    } finally {
+        const options = {
+            deleteSnapshots: 'include' // or 'only'
+        };
+        const containerClient = blobServiceClientImg.getContainerClient(`${folderName}/banner`);
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        await blockBlobClient.delete(options);
+    }
 };

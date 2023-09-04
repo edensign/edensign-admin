@@ -7,7 +7,6 @@
  */
 
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
@@ -18,7 +17,6 @@ export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
-    const { listData } = useSelector(state => state.allUsers);
 
     const handleActionEdit = (id) => {
         navigateTo("/user/update", { state: { id: id } });

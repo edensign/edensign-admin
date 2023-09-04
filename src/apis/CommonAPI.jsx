@@ -69,7 +69,7 @@ export const CommonAPI = {
                 data: dataFields[index],
                 ...commonConfig
             })) :
-            paths.map((path) => api.request({
+            paths.map(path => api.request({
                 url: path,
                 ...commonConfig
             }));

@@ -6,10 +6,11 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import { useSelector } from "react-redux";
+import { Utility } from "../../utility";
 
 export const useUser = () => {
-    const { selected } = useSelector(state => state.menuItems);
+    const { getLocalStorage } = Utility();
+    const selected = getLocalStorage("menu")?.selected;
 
     /** Get query parameter according to user selection
      */

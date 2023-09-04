@@ -32,11 +32,12 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
         clicked: false,
         password: null
     });
+    const [initialState, setInitialState] = useState(initialValues);
+
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const isMobile = useMediaQuery("(max-width:480px)");
     const pwField = document.getElementById("pwField");
 
-    const [initialState, setInitialState] = useState(initialValues);
     const formik = useFormik({
         initialValues: initialState,
         validationSchema: userValidation,
@@ -59,7 +60,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                 values: formik.values,
                 validated: formik.isSubmitting
                     ? Object.keys(formik.errors).length === 0
-                    : false,
+                    : false
             });
         };
     }

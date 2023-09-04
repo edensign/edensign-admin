@@ -13,7 +13,7 @@ export const multipleSkeletons = () => {
     <Box
       sx={{ height: "max-content" }}
     >
-      {[...Array(7)].map((_, index) => {
+      {[...Array(6)].map((_, index) => {
         if (index % 2) {
           return <LoadingSkeleton key={index} variant="rounded" animation="wave" width={600} height={20} />
         } else {

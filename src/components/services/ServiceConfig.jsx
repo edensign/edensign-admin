@@ -11,15 +11,16 @@ import { useNavigate } from "react-router-dom";
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 
-import { tokens } from "../../../theme";
+import { tokens } from "../../theme";
 
-export const datagridColumns = () => {
+export const datagridColumns = (handleDialogOpen) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
 
     const handleActionEdit = (id) => {
-        navigateTo(`/salon/detail/update/${id}`, { state: { id: id } });
+        handleDialogOpen();
+        navigateTo("#", { state: { id: id } });
     };
 
     const columns = [
@@ -32,20 +33,12 @@ export const datagridColumns = () => {
             minWidth: 120
         },
         {
-            field: "contact_no",
-            headerName: "CONTACT",
+            field: "description",
+            headerName: "DESCRIPTION",
             headerAlign: "center",
             align: "center",
             flex: 1,
-            minWidth: 100
-        },
-        {
-            field: "email",
-            headerName: "EMAIL",
-            headerAlign: "center",
-            align: "center",
-            flex: 1,
-            minWidth: 200
+            minWidth: 280
         },
         {
             field: "updated_at",
@@ -113,4 +106,4 @@ export const datagridColumns = () => {
         }
     ];
     return columns;
-}
+};

@@ -33,3 +33,9 @@ const errorHandler = (error) => {
 api.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
 });
+
+//ask for token on every request made from edensign website
+api.interceptors.request.use(req => {
+  req.headers.Type = "admin";
+  return req;
+});

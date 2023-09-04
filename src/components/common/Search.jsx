@@ -7,6 +7,7 @@
  */
 
 import { useState } from "react";
+
 import { Box, IconButton, InputBase, useMediaQuery, useTheme } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 

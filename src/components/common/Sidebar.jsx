@@ -20,12 +20,16 @@ import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import ApiIcon from '@mui/icons-material/Api';
+import AssistantIcon from '@mui/icons-material/Assistant';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import { Api, TuneOutlined } from '@mui/icons-material';
 
 import { tokens } from "../../theme";
 import { SidebarItem } from "./SidebarItem";
 import { Utility } from "../utility";
 
-import DummyImg from "./Faraz.png";
+import edensignImg from "../assets/eden.jpg";
 
 const Sidebar = ({ role }) => {
   const theme = useTheme();
@@ -95,10 +99,8 @@ const Sidebar = ({ role }) => {
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
-                  width="80px"
-                  height="80px"
-                  src={DummyImg}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  src={edensignImg}
+                  style={{ cursor: "pointer", borderRadius: "10%", width: "60%" }}
                 />
               </Box>
             </Box>
@@ -122,20 +124,20 @@ const Sidebar = ({ role }) => {
               </Typography>
               <SidebarItem
                 title="Employee"
-                to="/user/listing"
+                to="/User/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon"
-                to="/user/listing"
+                to="/Salon/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
 
               />
               <SidebarItem
                 title="Freelancer"
-                to="/user/listing"
+                to="/Freelancer/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
@@ -149,7 +151,7 @@ const Sidebar = ({ role }) => {
               </Typography>
               <SidebarItem
                 title="Salon Detail"
-                to="/salon/listing"
+                to="/salon/detail/listing"
                 icon={<FormatListBulletedIcon />}
                 selected={selected}
               />
@@ -194,15 +196,21 @@ const Sidebar = ({ role }) => {
                 Pages
               </Typography>
               <SidebarItem
-                title="FAQ Page"
+                title="Amenity"
+                to="/amenity/listing"
+                icon={<ApiIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="FAQ"
                 to="/faq"
                 icon={<HelpOutlineOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
-                title="JFF Page"
-                to="/faq"
-                icon={<HelpOutlineOutlinedIcon />}
+                title="Service"
+                to="/service/listing"
+                icon={<LoyaltyIcon />}
                 selected={selected}
               />
             </Box>
@@ -218,7 +226,7 @@ const Sidebar = ({ role }) => {
               </Typography>
               <SidebarItem
                 title="Salon Detail"
-                to={id ? "/salon/update" : "/salon/create"}
+                to={id ? "/salon/detail/update/:id" : "/salon/detail/create"}
                 icon={<FormatListBulletedIcon />}
                 selected={selected}
               />

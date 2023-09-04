@@ -13,13 +13,14 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import Loader from "../common/Loader";
 
 const PreviewImage = ({
+    preview,
+    setPreview,
     deletedImage,
     setDeletedImage,
-    updatedValues,
-    imageFiles,
     setDirty,
-    preview,
-    setPreview }) => {
+    imageFiles,
+    updatedValues
+}) => {
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
     let uploadedImages = [];
@@ -28,12 +29,13 @@ const PreviewImage = ({
         const reader = new FileReader();
         reader.onloadend = () => {
             uploadedImages.push(reader.result);
-            setPreview([
+            setPreview([            //On update when we upload new images then it is appended inside preview
                 ...preview,
                 ...uploadedImages
             ]);
         }
         reader.readAsDataURL(file);
+        console.log("PreviewUploaded=>", uploadedImages)
     };
 
     useEffect(() => {
@@ -45,22 +47,28 @@ const PreviewImage = ({
 
     const handleDeleteClick = (item) => {
         const index = preview.indexOf(item);
-        setDeletedImage([
-            ...deletedImage,
-            updatedValues[index].image_src,
-        ]);
-        if (index > -1) {               // only splice 1 item from array when it is found
+        if (updatedValues) {
+            setDeletedImage([
+                ...deletedImage,
+                updatedValues[index]?.image_src,
+            ]);
+        }
+
+        if (index > -1) {                   // only splice 1 item from array when it is found
             preview.splice(index, 1);
-            updatedValues.splice(index, 1);
+            if (updatedValues) {
+                updatedValues.splice(index, 1);
+            }
             setPreview([
                 ...preview
             ]);
             setDirty(true);     //to enable the submit button
         }
     };
+    console.log("Deleted images=>", deletedImage)
 
     return (
-        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit" }}
+        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit", marginBottom: "8%" }}
             cols={3} rowHeight={isMobile ? 80 : isTab ? 160 : 220} gap={8}>
             {preview ? preview.map((item, index) => (
                 <ImageListItem key={index}>
@@ -81,7 +89,7 @@ const PreviewImage = ({
                         <Tooltip title="DELETE">
                             <HighlightOffOutlinedIcon sx={{
                                 "&:hover": {
-                                    color: "red", fontSize: "1.5rem", transition: "all 0.5s ease-in-out"
+                                    color: "red", fontSize: "1.5rem", transition: "all 0.3s ease-in-out"
                                 }
                             }}
                             />

@@ -2,13 +2,14 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * stricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
 import React, { useState, useEffect } from "react";
+import { useFormik } from "formik";
 
-import { Box, Checkbox, Select, TextField, useMediaQuery } from "@mui/material";
+import { Autocomplete, Box, Checkbox, Select, TextField, useMediaQuery } from "@mui/material";
 import { InputLabel, MenuItem, FormControl, FormControlLabel } from "@mui/material";
 
 import dayjs from "dayjs";
@@ -17,44 +18,46 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { DatePicker } from "@mui/x-date-pickers";
 
-import { useFormik } from "formik";
 import salonValidation from "./Validation";
 
-const initialValues = {
-    name: "",
-    email: "",
-    contact_no: "",
-    area: "",
-    description: "",
-    services: "",
-    policies: "",
-    cancellation_policy: "",
-    safety_measures: "",
-    amenities: "",
-    salon_code: "",
-    near_by: "",
-    priority: 0,
-    occupancy: 0,
-    staff_count: 0,
-    is_home: false,
-    is_featured: false,
-    is_franchise: false,
-    is_selfowned: false,
-    is_subscribed: false,
-    type: "",
-    category: "",
-    status: "inactive",
-    closed_on: "",
-    opening_time: dayjs("1997-03-16 09:00").format("h:mm A"),
-    closing_time: dayjs("1997-03-16 21:00"),
-    // estd_on: dayjs('01/01/2000')
-};
 
-const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSalonFields, updatedValues = null }) => {
-    const [initialState, setInitialState] = useState(initialValues);
+const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
+    showSalonFields, services, amenities, updatedValues = null }) => {
+
     const checkboxLabel = { inputProps: { 'aria-label': 'Checkboxes' } };
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const isMobile = useMediaQuery("(max-width:480px)");
+
+    const initialValues = {
+        name: "",
+        email: "",
+        contact_no: "",
+        area: "",
+        description: "",
+        services: [],
+        policies: "",
+        cancellation_policy: "",
+        safety_measures: "",
+        amenities: [],
+        near_by: "",
+        priority: 0,
+        occupancy: 0,
+        staff_count: 0,
+        is_home: false,
+        is_featured: false,
+        is_franchise: false,
+        is_selfowned: false,
+        is_subscribed: false,
+        type: "",
+        category: "",
+        status: "inactive",
+        closed_on: "",
+        opening_time: null,
+        closing_time: dayjs(updatedValues?.closing_time) || null,
+        estd_on: dayjs(updatedValues?.estd_on) || null
+    };
+
+    const [initialState, setInitialState] = useState(initialValues);
 
     const formik = useFormik({
         initialValues: initialState,
@@ -79,6 +82,15 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
             });
         };
     }
+    // console.log("formik=>", formik.values);
+    // console.log("backend formik=>", updatedValues?.opening_time);
+    // console.log("frontend formik=>", dayjs(updatedValues?.opening_time));
+
+    // console.log("backend formik=>", updatedValues?.estd_on);
+    // console.log("frontend formik=>", dayjs(updatedValues?.estd_on));
+    // const datevar = dayjs(Date.now())
+    // const arr = Object.entries(datevar)
+    // console.log((arr[2][1]))
 
     useEffect(() => {
         if (reset) {
@@ -98,6 +110,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
             setInitialState(updatedValues);
         }
     }, [updatedValues]);
+
 
     return (
         <Box m="20px">
@@ -152,22 +165,41 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                         helperText={formik.touched.contact_no && formik.errors.contact_no}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    {showSalonFields && <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                        <InputLabel id="categoryField">Category</InputLabel>
-                        <Select
-                            variant="filled"
-                            labelId="categoryField"
-                            label="Category"
-                            name="category"
-                            autoComplete="new-category"
-                            onChange={formik.handleChange}
-                            value={formik.values.category}
-                            error={!!formik.touched.category && !!formik.errors.category}
-                        >
-                            <MenuItem value="A">A</MenuItem>
-                            <MenuItem value="B">B</MenuItem>
-                        </Select>
-                    </FormControl>}
+                    {showSalonFields && <>
+                        <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                            <InputLabel id="categoryField">Category</InputLabel>
+                            <Select
+                                variant="filled"
+                                labelId="categoryField"
+                                label="Category"
+                                name="category"
+                                autoComplete="new-category"
+                                onChange={formik.handleChange}
+                                value={formik.values.category}
+                                error={!!formik.touched.category && !!formik.errors.category}
+                            >
+                                <MenuItem value="A">A</MenuItem>
+                                <MenuItem value="B">B</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                            <InputLabel id="statusField">Status</InputLabel>
+                            <Select
+                                variant="filled"
+                                labelId="statusField"
+                                label="Status"
+                                name="status"
+                                autoComplete="new-status"
+                                onChange={formik.handleChange}
+                                value={formik.values.status}
+                                error={!!formik.touched.status && !!formik.errors.status}
+                            >
+                                <MenuItem value="active">Active</MenuItem>
+                                <MenuItem value="inactive">Inactive</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </>}
+
                     <TextField
                         fullWidth
                         variant="filled"
@@ -196,19 +228,26 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                         helperText={formik.touched.description && formik.errors.description}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="services"
-                        label="Services"
-                        autoComplete="new-services"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
+
+                    <Autocomplete
+                        multiple
+                        options={services}
+                        getOptionLabel={option => option.name}
+                        disableCloseOnSelect
                         value={formik.values.services}
-                        error={!!formik.touched.services && !!formik.errors.services}
-                        helperText={formik.touched.services && formik.errors.services}
+                        onChange={(event, value) => formik.setFieldValue("services", value)}
                         sx={{ gridColumn: "span 2" }}
+                        renderInput={params => (
+                            <TextField
+                                {...params}
+                                variant="filled"
+                                type="text"
+                                name="services"
+                                label="Services"
+                                error={!!formik.touched.services && !!formik.errors.services}
+                                helperText={formik.touched.services && formik.errors.services}
+                            />
+                        )}
                     />
                     <TextField
                         fullWidth
@@ -252,7 +291,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                         helperText={formik.touched.safety_measures && formik.errors.safety_measures}
                         sx={{ gridColumn: "span 2" }}
                     />
-                    <TextField
+                    {/* <TextField
                         fullWidth
                         variant="filled"
                         type="text"
@@ -265,21 +304,50 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                         error={!!formik.touched.amenities && !!formik.errors.amenities}
                         helperText={formik.touched.amenities && formik.errors.amenities}
                         sx={{ gridColumn: "span 2" }}
-                    />
-                    {showSalonFields && <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="salon_code"
-                        label="Salon Code"
-                        autoComplete="new-salon_code"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.salon_code}
-                        error={!!formik.touched.salon_code && !!formik.errors.salon_code}
-                        helperText={formik.touched.salon_code && formik.errors.salon_code}
+                    /> */}
+
+                    {/* <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.amenities && !!formik.errors.amenities}
+                    >
+                        <InputLabel id="amenitiesField">--Select Amenities--</InputLabel>
+                        <Select
+                            autoComplete="new-amenities"
+                            defaultValue=""
+                            name="amenities"
+                            variant="filled"
+                            value={formik.values.amenities}
+                            onChange={event => formik.setFieldValue("amenities", event.target.value)}
+                        >
+                            {amenities.map(item => (
+                                <MenuItem value={item.id} name={item.name} key={item.name}>
+                                    {item.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        <FormHelperText>{formik.touched.amenities && formik.errors.amenities}</FormHelperText>
+                    </FormControl> */}
+
+                    <Autocomplete
                         sx={{ gridColumn: "span 2" }}
-                    />}
+                        multiple
+                        options={amenities}
+                        getOptionLabel={option => option.name}
+                        disableCloseOnSelect
+                        value={formik.values.amenities}
+                        onChange={(event, value) => formik.setFieldValue("amenities", value)}
+                        renderInput={params => (
+                            <TextField
+                                {...params}
+                                variant="filled"
+                                type="text"
+                                name="amenities"
+                                label="Amenities"
+                                error={!!formik.touched.amenities && !!formik.errors.amenities}
+                                helperText={formik.touched.amenities && formik.errors.amenities}
+                            />
+                        )}
+                    />
+
                     <TextField
                         fullWidth
                         variant="filled"
@@ -312,22 +380,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                             <MenuItem value="unisex">Unisex</MenuItem>
                         </Select>
                     </FormControl>
-                    {showSalonFields && <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                        <InputLabel id="statusField">Status</InputLabel>
-                        <Select
-                            variant="filled"
-                            labelId="statusField"
-                            label="Status"
-                            name="status"
-                            autoComplete="new-status"
-                            onChange={formik.handleChange}
-                            value={formik.values.status}
-                            error={!!formik.touched.status && !!formik.errors.status}
-                        >
-                            <MenuItem value="active">Active</MenuItem>
-                            <MenuItem value="inactive">Inactive</MenuItem>
-                        </Select>
-                    </FormControl>}
+
                     <FormControl variant="filled" sx={{ minWidth: 120 }}>
                         <InputLabel id="closedOnField">Closed On</InputLabel>
                         <Select
@@ -400,55 +453,42 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <TimePicker
-                            onChange={event => {
-                                // console.log("TIME=>", dayjs(event.toDate()).format("h:mm A"));
-                                formik.setFieldValue("opening_time", dayjs(event.toDate()).format("h:mm"))
+                            onChange={newOpeningTime => {
+                                console.log(newOpeningTime)
+                                formik.setFieldValue("opening_time", newOpeningTime);
                             }}
-                            value={formik.values.opening_time}
+                            value={dayjs(initialState.opening_time)}
                             format="h:mm A"
                             views={['hours', "minutes"]}
                             label="Opening Time"
-                            name="Opening Time"
-                            // valueFormatter={params => params?.value.substring(0, 10)}
-                            InputProps={{
-                                //     variant: "outlined",
-                                placeholder: dayjs().format("h:mm"),
-                                //     error: formik.touched.opening_time && Boolean(formik.errors.opening_time),
-                                //     helperText: formik.touched.opening_time && formik.errors.opening_time
-                            }}
+                            name="opening_time"
+                        // InputProps={{
+                        //         variant: "outlined",
+                        //     placeholder: dayjs().format("h:mm"),
+                        //         error: formik.touched.opening_time && Boolean(formik.errors.opening_time),
+                        //         helperText: formik.touched.opening_time && formik.errors.opening_time
+                        // }}
                         />
                         <TimePicker
-                            onChange={event => {
-                                // console.log("TIME=>", dayjs(event.toDate()).format("h:mm A"));
-                                formik.setFieldValue("closing_time", dayjs(event.toDate()).format("h:mm A"))
-                            }}
-                            value={formik.values.closing_time}
                             format="h:mm A"
                             views={['hours', "minutes"]}
                             label="Closing Time"
-                            name="Closing Time"
+                            name="closing_time"
+                            value={dayjs(initialState.closing_time)}
+                            onChange={newClosingTime => formik.setFieldValue("closing_time", newClosingTime)}
                         />
                         <DatePicker
-                            onChange={date => formik.setFieldValue("estd_on", date, true)}
-                            value={formik.values.estd_on}
-                            label="Established On"
+                            format="DD MMMM YYYY"            //ex - 25 July 2023
+                            views={['day', "month", "year"]}
+                            label="Established On.."
                             name="estd_on"
+                            value={initialState.estd_on}
+                            onChange={newEstdOn => {
+                                console.log("Date=>", newEstdOn)
+                                formik.setFieldValue("estd_on", newEstdOn)
+                            }}
                         />
                     </LocalizationProvider>
-                    {showSalonFields && <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="priority"
-                        label="Priority"
-                        autoComplete="new-priority"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.priority}
-                        error={!!formik.touched.priority && !!formik.errors.priority}
-                        helperText={formik.touched.priority && formik.errors.priority}
-                        sx={{ gridColumn: "span 2" }}
-                    />}
                     <TextField
                         fullWidth
                         variant="filled"
@@ -475,11 +515,24 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset, showSa
                         value={formik.values.staff_count}
                         error={!!formik.touched.staff_count && !!formik.errors.staff_count}
                         helperText={formik.touched.staff_count && formik.errors.staff_count}
-                        sx={{ gridColumn: "span 2" }}
                     />
+                    {showSalonFields && <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="priority"
+                        label="Priority"
+                        autoComplete="new-priority"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.priority}
+                        error={!!formik.touched.priority && !!formik.errors.priority}
+                        helperText={formik.touched.priority && formik.errors.priority}
+                        sx={{ gridColumn: "span 2" }}
+                    />}
                 </Box>
-            </form>
-        </Box>
+            </form >
+        </Box >
     );
 }
 

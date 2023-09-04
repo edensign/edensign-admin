@@ -9,17 +9,21 @@
 import { combineReducers } from "redux";
 
 import { authReducer } from "./AuthReducer";
+import { setAgreementReducer } from "./UserReducers";
+import { setAmenityReducer } from "./AmenityReducer";
 import { menuItemReducer } from "./MenuItemReducer";
 import { displayToastReducer } from "./ToastReducer";
-import { setUserReducer } from "./UserReducers";
-import { setAgreementReducer } from "./UserReducers";
 import { setSalonReducer } from "./SalonReducer";
+import { setServiceReducer } from "./ServiceReducer";
+import { setUserReducer } from "./UserReducers";
 
 const reducers = combineReducers({
     auth: authReducer,
-    allUsers: setUserReducer,
     agreementSigned: setAgreementReducer,
+    allAmenities: setAmenityReducer,
     allSalons: setSalonReducer,
+    allServices: setServiceReducer,
+    allUsers: setUserReducer,
     toastInfo: displayToastReducer,
     menuItems: menuItemReducer,
 });

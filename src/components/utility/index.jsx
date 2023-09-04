@@ -60,6 +60,13 @@ export const Utility = () => {
             type: formattedType
         };
     };
+
+    /** Create Salon Code from first & last letter of salon name with 3 digit random number
+     */
+    const createSalonCode = (name) => {
+        return `${name.charAt(0).toUpperCase()}${name.charAt(name.length - 1).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
+    };
+
     /** Set local storage with specified key value pair
      */
     const setLocalStorage = (key, value) => {
@@ -108,14 +115,14 @@ export const Utility = () => {
                 dispatch(menuAction("Salon Detail"));
                 api.CommonAPI.getAgreement()
                     .then(({ data: value }) => {
-                        if (value.status === "Success" && value.data === false) {
+                        if (value.status === "Success" && (value.data == false || value.data == null)) {
                             dispatch(agreementAction(false));
                         }
                     })
                     .catch(err => {
                         throw err;
                     });
-                const path = salon.status === "Success" ? "/salon/update" : "/salon/create";
+                const path = salon.status === "Success" ? `/salon/detail/update/${salon.data?.id}` : `/salon/detail/create`;
                 navigate(path, { state: { id: salon.data?.id } });
             })
             .catch(err => {
@@ -124,6 +131,7 @@ export const Utility = () => {
     };
 
     return {
+        createSalonCode,
         formatImageName,
         getInitials,
         getNameAndType,
