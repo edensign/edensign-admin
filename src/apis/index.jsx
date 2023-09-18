@@ -12,6 +12,7 @@ import { CityAPI } from "./CityAPI";
 import { CommonAPI } from "./CommonAPI";
 import { CountryAPI } from "./CountryAPI";
 import { ImageAPI } from "./ImageAPI";
+import { JobSeekerAPI } from "./JobSeekerAPI";
 import { SalonAPI } from "./SalonAPI";
 import { SalonEmployeeAPI } from "./SalonEmployeeAPI";
 import { ServiceAPI } from "./ServiceAPI";
@@ -25,6 +26,7 @@ export default {
     CommonAPI,
     CountryAPI,
     ImageAPI,
+    JobSeekerAPI,
     SalonAPI,
     SalonEmployeeAPI,
     ServiceAPI,

@@ -19,12 +19,20 @@ import Topbar from "./components/common/Topbar";
 import Sidebar from "./components/common/Sidebar";
 import Loader from "./components/common/Loader";
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
+
 const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
+
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
+
+const JobSeekerFormComponent = lazy(() => import("./components/jobSeeker/FormComponent"));
+const JobSeekerListingComponent = lazy(() => import("./components/jobSeeker/ListingComponent"));
+
 const ServiceListingComponent = lazy(() => import("./components/services/ListingComponent"));
+
 const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+
 import API from "./apis";
 import { Utility } from "./components/utility";
 import { setMenuItem } from "./redux/actions/NavigationAction";
@@ -94,20 +102,26 @@ function App() {
                     <>
                       <Route exact path="/" element={<Dashboard />} />
                       <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
+
                       <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
+
                       <Route exact path="/service/listing" element={<ServiceListingComponent />} />
 
-                      <Route exact path="/User/create" element={<UserFormComponent />} />
-                      <Route exact path="/User/update" element={<UserFormComponent />} />
-                      <Route exact path="/User/listing" element={<UserListingComponent />} />
-                      <Route exact path="/Salon/create" element={<UserFormComponent />} />
-                      <Route exact path="/Salon/update" element={<UserFormComponent />} />
-                      <Route exact path="/Salon/listing" element={<UserListingComponent />} />
-                      <Route exact path="/Freelancer/create" element={<UserFormComponent />} />
-                      <Route exact path="/Freelancer/update" element={<UserFormComponent />} />
-                      <Route exact path="/Freelancer/listing" element={<UserListingComponent />} />
+                      <Route exact path="/job/seeker/create" element={<JobSeekerFormComponent />} />
+                      <Route exact path="/job/seeker/update/:id" element={<JobSeekerFormComponent />} />
+                      <Route exact path="/job/seeker/listing" element={<JobSeekerListingComponent />} />
+
+                      <Route exact path="/employee/create" element={<UserFormComponent />} />
+                      <Route exact path="/employee/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/employee/listing" element={<UserListingComponent />} />
+                      <Route exact path="/salon/create" element={<UserFormComponent />} />
+                      <Route exact path="/salon/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/salon/listing" element={<UserListingComponent />} />
+                      <Route exact path="/freelancer/create" element={<UserFormComponent />} />
+                      <Route exact path="/freelancer/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/freelancer/listing" element={<UserListingComponent />} />
                       {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
                   {role === 'salon' &&

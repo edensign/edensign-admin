@@ -2,7 +2,7 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
@@ -14,74 +14,74 @@ import { Box, Button, Typography, useTheme } from "@mui/material";
 
 import API from "../../apis";
 import AddressFormComponent from "../address/AddressFormComponent";
+import JobSeekerFormComponent from "./JobSeekerFormComponent";
 import Loader from "../common/Loader";
 import Toast from "../common/Toast";
-import UserFormComponent from "./UserFormComponent";
 
+import { uploadResumeToAzure, uploadDocumentToAzure } from "../azure/AzureStorageConnection";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens, themeSettings } from "../../theme";
-import { useUser } from "../hooks/users";
 import { Utility } from "../utility";
 
 const FormComponent = () => {
     const [title, setTitle] = useState("Create");
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        userData: { values: null, validated: false },
+        jobSeekerData: { values: null, validated: false },
         addressData: { values: null, validated: false },
     });
     const [updatedValues, setUpdatedValues] = useState(null);
     const [dirty, setDirty] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [reset, setReset] = useState(false);
+    const [filename, setFilename] = useState();     //for uploaded resume file name
 
-    const userFormRef = useRef();
+    const jobSeekerFormRef = useRef();
     const addressFormRef = useRef();
+
+    const selected = useSelector(state => state.menuItems.selected);
+    const toastInfo = useSelector(state => state.toastInfo);
+    const theme = useTheme();
+    const { state } = useLocation();
+    const { toastAndNavigate, getLocalStorage } = Utility();
+    const { typography } = themeSettings(theme.palette.mode);
 
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
     const userParams = useParams();
-    const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const { typography } = themeSettings(theme.palette.mode);
-
-    const selected = useSelector(state => state.menuItems.selected);
-    const toastInfo = useSelector(state => state.toastInfo);
-    const { state } = useLocation();
-    const { getQueryParam } = useUser();
-    const { toastAndNavigate, getLocalStorage } = Utility();
     //after page refresh the id in router state becomes undefined, so getting user id from url params
     let id = state?.id || userParams?.id;
+
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
         dispatch(setMenuItem(selectedMenu.selected));
     }, []);
 
-    const updateUserAndAddress = useCallback(formData => {
+    const updateJobSeekerAndAddress = useCallback(formData => {
         const dataFields = [
-            { ...formData.userData.values },
+            { ...formData.jobSeekerData.values },
             { ...formData.addressData.values }
         ];
-        const paths = ["/update-user", "/update-address"];
+        const paths = ["/update-job-seeker", "/update-address"];
         setLoading(true);
 
-        if (!formData.userData.password) {
-            delete formData.userData.password;
-        };
         API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
             .then(responses => {
                 let status = true;
                 responses.forEach(response => {
                     if (response.data.status !== "Success") {
                         status = false;
-                    };
+                    }
                 });
                 if (status) {
                     setLoading(false);
-                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/${selected.toLowerCase()}/listing`);
-                };
-                setLoading(false);
+                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/job/seeker/listing`);
+                } else {
+                    setLoading(false);
+                    toastAndNavigate(dispatch, true, "error", "An Error Occurred. Please Try Again", navigateTo, 0);
+                }
             })
             .catch(err => {
                 setLoading(false);
@@ -90,46 +90,73 @@ const FormComponent = () => {
             });
     }, [formData]);
 
-    const populateUserData = (id) => {
+
+    const populateJobSeekerData = (id) => {
         setLoading(true);
-        const paths = [`/get-by-pk/users/${id}`, `/get-address/user/${id}`];
+        const paths = [`/get-by-pk/job_seeker/${id}`, `/get-address/job_seeker/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
+                console.log(responses)
                 const dataObj = {
-                    userData: responses[0].data.data,
+                    jobSeekerData: responses[0].data.data,
                     addressData: responses[1]?.data?.data
                 };
-                setUpdatedValues(dataObj);
                 setLoading(false);
+                setUpdatedValues(dataObj);
             })
             .catch(err => {
                 setLoading(false);
                 toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
+
     };
 
-    const registerUser = () => {
+
+    const formatResumeName = (name, file) => {
+        let formattedName;
+        if (name) {
+            formattedName = Math.ceil(Math.random() * 100) + name
+                .toLowerCase()
+                .trim()
+                .replace(/[!@#$%^&*();:'"`~`'$]/g, "")
+                .replace(/\s+/g, "_") + "-" + file
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[!@#$%^&*();:'"`~`'$]/g, "")
+                    .replace(/\s+/g, "_");
+        }
+        return formattedName;
+    };
+
+    const createJobSeeker = () => {
         setLoading(true);
-        const userType = getQueryParam();
-        API.UserAPI.register({ ...formData.userData.values, type: userType })
-            .then(({ data: user }) => {
-                if (user?.status === 'Success') {
+        if (formData.jobSeekerData?.values?.resume) {
+            let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
+            console.log("Uploading...");
+            uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
+            formData.jobSeekerData.values.resume = formattedResumeName;
+        }
+        console.log("JobSeeker data=>", formData.jobSeekerData.values)
+
+        API.JobSeekerAPI.createJobSeeker({ ...formData.jobSeekerData.values })
+            .then(({ data: jobSeeker }) => {
+                if (jobSeeker?.status === 'Success') {
                     API.AddressAPI.createAddress({
                         ...formData.addressData.values,
-                        parent_id: user.data.id,
-                        parent: 'user',
+                        parent_id: jobSeeker.data.id,
+                        parent: 'job_seeker',
                     })
                         .then(address => {
                             setLoading(false);
-                            toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, `/${selected.toLowerCase()}/listing`);
+                            toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, `/job/seeker/listing`);
                         })
                         .catch(err => {
                             setLoading(false);
-                            toastAndNavigate(dispatch, true, err ? err : "An Error Occurred");
+                            toastAndNavigate(dispatch, true, err ? err : "An Error Occurred. Please Try Again", navigateTo, 0);
                             throw err;
                         });
-                };
+                }
             })
             .catch(err => {
                 setLoading(false);
@@ -138,27 +165,27 @@ const FormComponent = () => {
             });
     };
 
-    //Create/Update/Populate user
+    //Create/Update/Populate Job Seeker
     useEffect(() => {
         if (id && !submitted) {
             setTitle("Update");
-            populateUserData(id);
+            populateJobSeekerData(id);
         }
-        if (formData.userData.validated && formData.addressData.validated) {
-            formData.userData.values?.id ? updateUserAndAddress(formData) : registerUser();
+        if (formData.jobSeekerData.validated && formData.addressData.validated) {
+            formData.jobSeekerData.values?.id ? updateJobSeekerAndAddress(formData) : createJobSeeker();
         } else {
             setSubmitted(false);
         }
     }, [id, submitted]);
 
     const handleSubmit = async () => {
-        await userFormRef.current.Submit();
+        await jobSeekerFormRef.current.Submit();
         await addressFormRef.current.Submit();
         setSubmitted(true);
     };
 
     const handleFormChange = (data, form) => {
-        form === 'user' ? setFormData({ ...formData, userData: data }) :
+        form === 'jobSeeker' ? setFormData({ ...formData, jobSeekerData: data }) :
             setFormData({ ...formData, addressData: data });
     };
 
@@ -174,16 +201,18 @@ const FormComponent = () => {
             >
                 {`${title} ${selected}`}
             </Typography>
-            <UserFormComponent
+            <JobSeekerFormComponent
                 onChange={(data) => {
-                    handleFormChange(data, 'user');
+                    handleFormChange(data, 'jobSeeker');
                 }}
-                refId={userFormRef}
+                refId={jobSeekerFormRef}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
-                userId={id}
-                updatedValues={updatedValues?.userData}
+                jobSeekerId={id}
+                updatedValues={updatedValues?.jobSeekerData}
+                filename={filename}
+                setFilename={setFilename}
             />
             <AddressFormComponent
                 onChange={(data) => {
@@ -212,7 +241,7 @@ const FormComponent = () => {
                         </Button>
                 }
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
-                    onClick={() => navigateTo(`/${selected.toLowerCase()}/listing`)}>
+                    onClick={() => navigateTo(`/job/seeker/listing`)}>
                     Cancel
                 </Button>
                 <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}

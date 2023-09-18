@@ -7,6 +7,7 @@
  */
 
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
@@ -16,10 +17,12 @@ import { tokens } from "../../theme";
 export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const selected = useSelector(state => state.menuItems.selected);
     const navigateTo = useNavigate();
 
     const handleActionEdit = (id) => {
-        navigateTo("/user/update", { state: { id: id } });
+        //the selected user will be 1 amoung 3- employee, salon or freelancer
+        navigateTo(`/${selected.toLowerCase()}/update/${id}`, { state: { id: id } });
     };
 
     const columns = [

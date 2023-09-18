@@ -10,7 +10,7 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 
 import { Autocomplete, Box, Checkbox, Select, TextField, useMediaQuery } from "@mui/material";
-import { InputLabel, MenuItem, FormControl, FormControlLabel } from "@mui/material";
+import { InputLabel, MenuItem, FormControl, FormHelperText, FormControlLabel } from "@mui/material";
 
 import dayjs from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -166,7 +166,9 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                         sx={{ gridColumn: "span 2" }}
                     />
                     {showSalonFields && <>
-                        <FormControl variant="filled" sx={{ minWidth: 120 }}>
+                        <FormControl variant="filled" sx={{ minWidth: 120 }}    //do like this for helpertext
+                            error={!!formik.touched.category && !!formik.errors.category}
+                        >
                             <InputLabel id="categoryField">Category</InputLabel>
                             <Select
                                 variant="filled"
@@ -176,11 +178,11 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                                 autoComplete="new-category"
                                 onChange={formik.handleChange}
                                 value={formik.values.category}
-                                error={!!formik.touched.category && !!formik.errors.category}
                             >
                                 <MenuItem value="A">A</MenuItem>
                                 <MenuItem value="B">B</MenuItem>
                             </Select>
+                            <FormHelperText>{formik.touched.category && formik.errors.category}</FormHelperText>
                         </FormControl>
                         <FormControl variant="filled" sx={{ minWidth: 120 }}>
                             <InputLabel id="statusField">Status</InputLabel>
@@ -306,35 +308,14 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                         sx={{ gridColumn: "span 2" }}
                     /> */}
 
-                    {/* <FormControl variant="filled" sx={{ minWidth: 120 }}
-                        error={!!formik.touched.amenities && !!formik.errors.amenities}
-                    >
-                        <InputLabel id="amenitiesField">--Select Amenities--</InputLabel>
-                        <Select
-                            autoComplete="new-amenities"
-                            defaultValue=""
-                            name="amenities"
-                            variant="filled"
-                            value={formik.values.amenities}
-                            onChange={event => formik.setFieldValue("amenities", event.target.value)}
-                        >
-                            {amenities.map(item => (
-                                <MenuItem value={item.id} name={item.name} key={item.name}>
-                                    {item.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        <FormHelperText>{formik.touched.amenities && formik.errors.amenities}</FormHelperText>
-                    </FormControl> */}
-
                     <Autocomplete
-                        sx={{ gridColumn: "span 2" }}
                         multiple
                         options={amenities}
                         getOptionLabel={option => option.name}
                         disableCloseOnSelect
                         value={formik.values.amenities}
                         onChange={(event, value) => formik.setFieldValue("amenities", value)}
+                        sx={{ gridColumn: "span 2" }}
                         renderInput={params => (
                             <TextField
                                 {...params}

@@ -14,7 +14,8 @@ import { Box, Button, Chip, Divider, Typography, useTheme } from "@mui/material"
 
 import API from "../../../apis";
 import AddressFormComponent from "../../address/AddressFormComponent";
-import ParentEmployeeFormComponent from "../employee/ParentEmployeeForm";
+// import ParentEmployeeFormComponent from "../employee/ParentEmployeeForm";
+import ParentEmployeeFormComponent from "../employee/ParentAnotherLogic";
 import ImagePicker from "../../image/ImagePicker";
 import Loader from "../../common/Loader";
 import ResponsiveDialog from "../../common/Dialog";
@@ -34,10 +35,11 @@ const FormComponent = () => {
     const [formData, setFormData] = useState({
         salonData: { values: null, validated: false },
         addressData: { values: null, validated: false },
-        employeeData: { values: null, validated: false },
+        employeeData: { values: null, validated: true },
         imageData: { values: null, validated: true },
         bannerImageData: { values: null, validated: true }
     });
+    const [salonEmployeeData, setSalonEmployeeData] = useState({});   //this will get all salon employee data
 
     const [updatedValues, setUpdatedValues] = useState(null);
     const [deletedImage, setDeletedImage] = useState([]);
@@ -52,7 +54,6 @@ const FormComponent = () => {
     const [showSalonFields, setShowSalonFields] = useState(false);
     const [services, setServices] = useState([]);       //for service table in salon form component
     const [amenities, setAmenities] = useState([]);     //for amenities table in salon form component
-    const [employeeFormCount, setEmployeeFormCount] = useState(1);     //counter for salon employee form components
 
     const salonFormRef = useRef();
     const addressFormRef = useRef();
@@ -60,15 +61,13 @@ const FormComponent = () => {
     const imageFormRef = useRef();
     const bannerImageFormRef = useRef();
 
-    let employeeFormRef;
-    for (let i = 1; i < 4; i++) {
-        window['employeeFormRef' + i] = useRef();
-        window['employeeValues_' + i] = `employeeValues_${i}`;
-    }
-    console.log(employeeValues_1);
-    console.log(employeeFormRef1);
-
-    const [employeeFormData, setEmployeeFormData] = useState({});
+    // let employeeFormRef;
+    // for (let i = 1; i < 4; i++) {
+    //     window['employeeFormRef' + i] = useRef();
+    //     window['employeeValues_' + i] = `employeeValues_${i}`;
+    // }
+    // console.log(employeeValues_1);
+    // console.log(employeeFormRef1);
 
 
     const navigateTo = useNavigate();
@@ -84,7 +83,6 @@ const FormComponent = () => {
     const colors = tokens(theme.palette.mode);
     const { typography } = themeSettings(theme.palette.mode);
     const { toastAndNavigate, getLocalStorage, getRole, formatImageName, createSalonCode } = Utility();
-
 
     let id = userParams?.id || getLocalStorage("salon")?.id;
     const auth = getLocalStorage("auth");
@@ -104,6 +102,7 @@ const FormComponent = () => {
         }
     }, []);
 
+    //function to check whether an object is empty
     const isEmpty = (obj) => {
         for (const prop in obj) {
             if (Object.hasOwn(obj, prop)) {
@@ -124,18 +123,28 @@ const FormComponent = () => {
                 amenities: getSelectedAmenities(formData.salonData.values.amenities)
             },
             { ...formData.addressData.values },
+            { ...formData.employeeData.values },
             { ...formData.imageData.values },
             { ...formData.bannerImageData.values }
         ];
         console.log("Datafields in update=>", dataFields)
+        console.log("formdatas in update=>", formData)
 
         // delete the selected (removed) images from Azure which are in deletedImage state
         if (deletedImage.length) {
             deletedImage.forEach(image => {
                 deleteFileFromAzure("salon", image);
-                console.log("Deleted  image from azure");
+                console.log("Deleted normal image from azure");
             });
         }
+        // delete the selected (removed) images from Azure which are in deletedBannerImage state
+        if (deletedBannerImage.length) {
+            deletedBannerImage.forEach(image => {
+                deleteFileFromAzure("salon/banner", image);
+                console.log("Deleted  banner image from azure");
+            });
+        }
+
         // delete all images from db on every update and later insert new and old again
         API.ImageAPI.deleteImage({
             parent: "salon",
@@ -149,10 +158,28 @@ const FormComponent = () => {
                 let formattedName;
                 if (responses) {
                     if (!isEmpty(dataFields[2])) {
+                        console.log("Inside datafields[2]")
+                        Object.values(formData.employeeData.values).forEach(employee => {
+                            // Array from creates an array from an iterable, which does not work on plain objects, using Object.values()
+                            employee.services = getSelectedServices(employee.services);
+                            console.log("Update loop=>", employee)
+                            API.SalonEmployeeAPI.updateSalonEmployee({
+                                ...employee
+                            })
+                        });
+                        console.log("Updated salon employee")
+                        status = true;
+                    }
+                    if (!isEmpty(dataFields[3])) {
                         // upload new images normal to azure and insert in db
                         if (formData.imageData.values?.Normal) {
-                            console.log("Formdata.imagedata=>", formData.imageData?.values)
-                            Array.from(formData.imageData.values.Normal).map(async image => {
+                            //to do, it is a quick fix to remove deleted images from formData.imageData
+                            const newFilteredImageData = Array.from(formData.imageData.values.Normal).filter(val => !deletedImage.includes(val.image_src));
+
+                            console.log("Formdata.imagedata.normal new=>", Array.from(formData.imageData.values?.Normal))
+                            console.log("new Filtered imagedata=>", newFilteredImageData)
+
+                            newFilteredImageData.map(image => {
                                 formattedName = formatImageName(image.name);
                                 API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
                                 API.ImageAPI.createImage({
@@ -162,44 +189,59 @@ const FormComponent = () => {
                                     type: 'normal'
                                 })
                             });
-                            console.log("Created normal image")
+                            console.log("Created new normal image")
                             status = true;
                         }
                         // insert old images normal only in db & not on azure
                         if (formData.imageData?.values) {
+                            //to do, it is a quick fix to remove deleted images from formData.imageData
+                            const oldFilteredImageData = formData.imageData.values.filter(val => !deletedImage.includes(val.image_src));
+
                             console.log("Formdata.imagedata.old=>", formData.imageData?.values)
-                            formData.imageData.values.map(image => {
+                            console.log("old Filtered imagedata=>", oldFilteredImageData)
+
+                            oldFilteredImageData.map(image => {
                                 API.ImageAPI.createImage({
                                     image_src: image.image_src,
                                     parent_id: image.parent_id,
-                                    parent: image.parent
+                                    parent: image.parent,
+                                    type: image.type
                                 })
                             });
                             console.log("Created old normal image only in db")
                             status = true;
                         }
-                    } else if (!isEmpty(dataFields[3])) {
+                    }
+                    if (!isEmpty(dataFields[4])) {
                         // upload new banner images to azure and insert in db
-                        if (formData.bannerImageData.values.Banner?.length) {
-                            console.log("Formdata.bannerImagedata=>", formData.bannerImageData.values?.Normal)
-                            Array.from(formData.bannerImageData.values.Banner).map(async (image) => {
+                        if (formData.bannerImageData.values?.Banner) {
+                            //to do, it is a quick fix to remove deleted images from formData.imageData
+                            const newFilteredBannerImageData = Array.from(formData.bannerImageData.values?.Banner).filter(val => !deletedBannerImage.includes(val.image_src));
+
+                            console.log("Formdata.bannerImagedata=>", Array.from(formData.bannerImageData.values?.Banner))
+                            console.log("new Filtered imagedata=>", newFilteredBannerImageData)
+
+                            newFilteredBannerImageData.map(async (image) => {
                                 let formattedName = formatImageName(image.name);
                                 API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
                                 API.ImageAPI.createImage({
                                     image_src: formattedName,
-                                    parent_id: salon.data.id,
+                                    parent_id: formData.salonData.values.id,
                                     parent: 'salon',
                                     type: 'banner'
                                 })
                             });
-                            console.log("Created banner image")
+                            console.log("Created new banner image")
                             status = true;
                         }
-
                         // insert old images banner only in db & not on azure
                         if (formData.bannerImageData?.values) {
+                            //to do, it is a quick fix to remove deleted images from formData.bannerImageData
+                            const oldFilteredBannerImageData = formData.bannerImageData.values.filter(val => !deletedBannerImage.includes(val.image_src));
+
                             console.log("Formdata.bannerImagedata=>", formData.bannerImageData?.values)
-                            formData.bannerImageData.values.map(image => {
+                            console.log("old Filtered bannerimage=>", oldFilteredBannerImageData)
+                            oldFilteredBannerImageData.map(image => {
                                 API.ImageAPI.createImage({
                                     image_src: image.image_src,
                                     parent_id: image.parent_id,
@@ -210,14 +252,15 @@ const FormComponent = () => {
                             console.log("Created old banner image only in db")
                             status = true;
                         }
-                    }
-                    else {
-                        status = true;      //ye hai !isemoty datafeilds[2]
+                    } else {
+                        status = true;      //ye hai isempty datafields[3]
                     }
                     if (status) {
                         setLoading(false);
                         if (role === "admin") {
+                            console.log("I have ended updating all fields")
                             toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/detail/listing");
+                            // if (pathname === `/salon/detail/update/${id}`) navigateTo("/salon/detail/listing");    //to hide Autocomplete error
                         } else {
                             toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, 0);
                         }
@@ -250,13 +293,17 @@ const FormComponent = () => {
         setLoading(true);
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
+                console.log("responses=>", responses);
                 if (responses[0].data.data) {
                     responses[0].data.data.amenities = getSelectedAmenitiesByName(responses[0].data.data?.amenities);
                     responses[0].data.data.services = getSelectedServicesByName(responses[0].data.data?.services);
                 }
                 if (responses[3].data.data) {
-                    responses[3].data.data.services = getSelectedServicesByName(responses[3].data.data?.services);
+                    responses[3].data.data.forEach(response => {
+                        response.services = getSelectedServicesByName(response.services);
+                    })
                 }
+
                 const dataObj = {
                     salonData: responses[0].data.data,
                     addressData: responses[1]?.data?.data,
@@ -265,7 +312,7 @@ const FormComponent = () => {
                 };
                 setLoading(false);
                 setUpdatedValues(dataObj);
-                console.log("Populated data=>", dataObj);
+                console.log("dataObj=>", dataObj);
             })
             .catch(err => {
                 setLoading(false);
@@ -292,111 +339,104 @@ const FormComponent = () => {
         return amenityId.toString();
     };
 
-    console.log("Form count=>", employeeFormCount)
     const createSalon = () => {
         let promises;       //multiple images so multiple async operations will run, we get them in promises
         let bannerPromises;
+        let employeePromises;
         setLoading(true);
-        console.log("Salon detail data=>", formData)
 
-        // formData.salonData.values = {
-        //     ...formData.salonData.values,
-        //     user_id: getLocalStorage("auth").id,
-        //     salon_code: createSalonCode(formData.salonData.values.name),
-        //     services: getSelectedServices(formData.salonData.values?.services),
-        //     amenities: getSelectedAmenities(formData.salonData.values?.amenities)
-        // };
+        formData.salonData.values = {
+            ...formData.salonData.values,
+            user_id: getLocalStorage("auth").id,
+            salon_code: createSalonCode(formData.salonData.values.name),
+            services: getSelectedServices(formData.salonData.values?.services),
+            amenities: getSelectedAmenities(formData.salonData.values?.amenities)
+        };
 
-        // API.SalonAPI.createSalon({ ...formData.salonData.values })
-        //     .then(({ data: salon }) => {
+        API.SalonAPI.createSalon({ ...formData.salonData.values })
+            .then(({ data: salon }) => {
+                if (salon?.status === 'Success') {
+                    API.AddressAPI.createAddress({
+                        ...formData.addressData.values,
+                        parent_id: salon.data.id,
+                        parent: 'salon',
+                    })
+                        .then(address => {
 
-        //         if (salon?.status === 'Success') {
-        //             API.AddressAPI.createAddress({
-        //                 ...formData.addressData.values,
-        //                 parent_id: salon.data.id,
-        //                 parent: 'salon',
-        //             })
-        //                 .then(address => {
+                            console.log("Salon employee data=>", formData);
 
-        //                     formData.employeeData.values = {
-        //                         ...formData.employeeData.values,
-        //                         services: getSelectedServices(formData.employeeData?.values?.services)
-        //                     };
-        //                     API.SalonEmployeeAPI.createSalonEmployee({
-        //                         ...formData.employeeData.values,
-        //                         salon_id: salon.data.id
-        //                     })
-        //                         .then((salonEmployee) => {
+                            employeePromises = Object.values(formData.employeeData.values).map(employee => {
+                                // Array from creates an array from an iterable, which does not work on plain objects, using Object.values()
+                                employee.services = getSelectedServices(employee.services);
+                                API.SalonEmployeeAPI.createSalonEmployee({
+                                    ...employee,
+                                    salon_id: salon.data.id
+                                })
+                            });
 
-        //                             if (formData.imageData.values.Normal?.length) {
-        //                                 promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
-        //                                     let formattedName = formatImageName(image.name);
-        //                                     API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
-        //                                     API.ImageAPI.createImage({
-        //                                         image_src: formattedName,
-        //                                         parent_id: salon.data.id,
-        //                                         parent: 'salon',
-        //                                         type: 'normal'
-        //                                     })
-        //                                 });
+                            if (formData.imageData.values.Normal?.length) {
+                                promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
+                                    let formattedName = formatImageName(image.name);
+                                    API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
+                                    API.ImageAPI.createImage({
+                                        image_src: formattedName,
+                                        parent_id: salon.data.id,
+                                        parent: 'salon',
+                                        type: 'normal'
+                                    })
+                                });
 
-        //                                 if (formData.bannerImageData.values.Banner?.length) {
-        //                                     bannerPromises = Array.from(formData.bannerImageData.values.Banner).map(async (image) => {
-        //                                         let formattedName = formatImageName(image.name);
-        //                                         API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
-        //                                         API.ImageAPI.createImage({
-        //                                             image_src: formattedName,
-        //                                             parent_id: salon.data.id,
-        //                                             parent: 'salon',
-        //                                             type: 'banner'
-        //                                         })
-        //                                     })
+                                if (formData.bannerImageData.values.Banner?.length) {
+                                    bannerPromises = Array.from(formData.bannerImageData.values.Banner).map(async (image) => {
+                                        let formattedName = formatImageName(image.name);
+                                        API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
+                                        API.ImageAPI.createImage({
+                                            image_src: formattedName,
+                                            parent_id: salon.data.id,
+                                            parent: 'salon',
+                                            type: 'banner'
+                                        })
+                                    });
 
-        //                                     return Promise.all([promises, bannerPromises])
-        //                                         .then(data => {
-        //                                             setLoading(false);
-        //                                             if (role === 'admin') {
-        //                                                 toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
-        //                                             } else {
-        //                                                 toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
-        //                                             }
-        //                                         })
-        //                                         .catch(err => {
-        //                                             setLoading(false);
-        //                                             toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
-        //                                             throw err;
-        //                                         });
-        //                                 }
-        //                             }       //run when there are no images submitted
-        //                             else {
-        //                                 setLoading(false);
-        //                                 if (role === 'admin') {
-        //                                     console.log("Form submitted without images")
-        //                                     toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
-        //                                 } else {
-        //                                     console.log("Form submitted without images")
-        //                                     toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
-        //                                 }
-        //                             }
-        //                         })
-        //                         .catch(err => {
-        //                             setLoading(false);
-        //                             toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
-        //                             throw err;
-        //                         })
-        //                 })
-        //                 .catch(err => {
-        //                     setLoading(false);
-        //                     toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
-        //                     throw err;
-        //                 });
-        //         }
-        //     })
-        //     .catch(err => {
-        //         setLoading(false);
-        //         toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, 0);
-        //         throw err;
-        //     });
+                                    return Promise.all([employeePromises, promises, bannerPromises])
+                                        .then(data => {
+                                            setLoading(false);
+                                            if (role === 'admin') {
+                                                toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
+                                            } else {
+                                                toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
+                                            }
+                                        })
+                                        .catch(err => {
+                                            setLoading(false);
+                                            toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
+                                            throw err;
+                                        });
+                                }
+                            }       //run when there are no images submitted
+                            else {
+                                setLoading(false);
+                                if (role === 'admin') {
+                                    console.log("Form submitted without images")
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
+                                } else {
+                                    console.log("Form submitted without images")
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
+                                }
+                            }
+                        })
+                        .catch(err => {
+                            setLoading(false);
+                            toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
+                            throw err;
+                        });
+                }
+            })
+            .catch(err => {
+                setLoading(false);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, 0);
+                throw err;
+            });
     };
 
     //get all services from service table stored in db before populating data
@@ -443,6 +483,8 @@ const FormComponent = () => {
             populateSalonData(id);
         }
         if (formData.salonData.validated && formData.addressData.validated) {
+            //fill salonEmployee state values into formData
+            formData ? formData.employeeData.values = salonEmployeeData : null;
             formData.salonData.values?.id ? updateSalonAndAddress(formData) : createSalon();
         } else {
             setSubmitted(false);
@@ -454,31 +496,32 @@ const FormComponent = () => {
         await addressFormRef.current.Submit();
         await imageFormRef.current.Submit();
         await bannerImageFormRef.current.Submit();
-        await employeeFormRef1.current.Submit();
-        await employeeFormRef2.current.Submit();
-        await employeeFormRef3.current.Submit();
-
+        // await employeeFormRef1.current.Submit();
+        // await employeeFormRef2.current.Submit();
+        // await employeeFormRef3.current.Submit();
 
         setSubmitted(true);
         setDirty(false);
     };
-    console.log("formData=>", formData)
-    console.log("employeeformData=>", employeeFormData)
+    // console.log("formData=>", formData)
+    // console.log("salonemploData=>", salonEmployeeData)
 
-    const handleEmployeeFormChange = (data, index) => {
-        console.log("I is cakked=>", index, data)
-        setEmployeeFormData({
-            ...employeeFormData, [`employeeValues_${index}`]: data
-        });
+
+    const handleEmployeeFormChange = () => {
+        // console.log("I is cakked=>", index, data)
+        // setEmployeeFormData({
+        //     ...employeeFormData, [`employeeValues_${index}`]: data
+        // });
     };
 
-    const handleFormChange = (data, form, index) => {
+    const handleFormChange = (data, form) => {
         if (form === 'salon') {
             setFormData({ ...formData, salonData: data });
         } else if (form === 'address') {
             setFormData({ ...formData, addressData: data });
         } else if (form === `employee`) {
-            handleEmployeeFormChange(data, index);
+            console.log("Employee details....)")
+            // handleEmployeeFormChange(data, index);
             // setFormCount(prevCount => prevCount + 1);
         } else if (form === 'image') {
             setFormData({ ...formData, imageData: data })
@@ -532,7 +575,7 @@ const FormComponent = () => {
             />
 
 
-            <Divider variant="fullWidth" sx={{ gridColumn: "span 4" }}>
+            <Divider variant="fullWidth">
                 <Chip color="info" label={id ? `Here is a list of salon employees` : `Add Salon Employee Details Here`}
                     sx={{
                         fontSize: "13px", fontWeight: "600", letterSpacing: "0.2em", padding: "12px", textTransform: "capitalize"
@@ -540,28 +583,26 @@ const FormComponent = () => {
                 />
             </Divider>
             <ParentEmployeeFormComponent
-                onChange1={data => {
-                    const index = 1;
-                    handleFormChange(data, `employee`, index);
-                }}
-                onChange2={data => {
-                    const index = 2;
-                    handleFormChange(data, `employee`, index);
-                }}
-                onChange3={data => {
-                    const index = 3;
-                    handleFormChange(data, `employee`, index);
-                }}
-                refId1={employeeFormRef1}
-                refId2={employeeFormRef2}
-                refId3={employeeFormRef3}
-                setDirty={setDirty}
-                reset={reset}
-                setReset={setReset}
+                // onChange1={data => {
+                //     handleFormChange(data, `employee`, 1);
+                // }}
+                // onChange2={data => {
+                //     handleFormChange(data, `employee`, 2);
+                // }}
+                // onChange3={data => {
+                //     handleFormChange(data, `employee`, 3);
+                // }}
+                // refId1={employeeFormRef1}
+                // refId2={employeeFormRef2}
+                // refId3={employeeFormRef3}
+                // setDirty={setDirty}
+                // reset={reset}
+                // setReset={setReset}
+                masterValues={salonEmployeeData}
+                setMasterValues={setSalonEmployeeData}
                 updatedValues={updatedValues?.employeeData}
                 services={services}
-                // formCount={formCount}
-                setEmployeeFormCount={setEmployeeFormCount}
+            // setEmployeeFormCount={setEmployeeFormCount}
             />
 
 

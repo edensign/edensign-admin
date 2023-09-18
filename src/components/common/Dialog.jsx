@@ -13,7 +13,7 @@ import { useTheme } from '@mui/material/styles';
 
 import { Utility } from '../utility';
 
-const responsiveDialog = ({ agreement, handleSubmitDialog, role }) => {
+const ResponsiveDialog = ({ agreement, handleSubmitDialog, role }) => {
     const [openDialog, setOpenDialog] = useState(agreement === false && role === 'salon');
     const [checked, setChecked] = useState(false);
     const theme = useTheme();
@@ -255,4 +255,4 @@ This Agreement constitutes the entire understanding between the Salon\nand the E
     );
 }
 
-export default responsiveDialog;
+export default ResponsiveDialog;

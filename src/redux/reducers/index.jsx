@@ -9,10 +9,11 @@
 import { combineReducers } from "redux";
 
 import { authReducer } from "./AuthReducer";
+import { displayToastReducer } from "./ToastReducer";
+import { menuItemReducer } from "./MenuItemReducer";
 import { setAgreementReducer } from "./UserReducers";
 import { setAmenityReducer } from "./AmenityReducer";
-import { menuItemReducer } from "./MenuItemReducer";
-import { displayToastReducer } from "./ToastReducer";
+import { setJobSeekerReducer } from "./JobSeekerReducer";
 import { setSalonReducer } from "./SalonReducer";
 import { setServiceReducer } from "./ServiceReducer";
 import { setUserReducer } from "./UserReducers";
@@ -21,11 +22,12 @@ const reducers = combineReducers({
     auth: authReducer,
     agreementSigned: setAgreementReducer,
     allAmenities: setAmenityReducer,
+    allJobSeekers: setJobSeekerReducer,
     allSalons: setSalonReducer,
     allServices: setServiceReducer,
     allUsers: setUserReducer,
-    toastInfo: displayToastReducer,
     menuItems: menuItemReducer,
+    toastInfo: displayToastReducer,
 });
 
 export default reducers;

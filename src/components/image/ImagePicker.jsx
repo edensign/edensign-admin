@@ -25,12 +25,13 @@ const ImagePicker = ({
     preview,
     setPreview,
     updatedValues = null,
-    deletedImage,
+    deletedImage = [],
     setDeletedImage,
     imageType,
     azurePath
 }) => {
     const initialValues = {};
+    let newCount;
 
     initialValues[`${imageType}`] = null;
 
@@ -39,7 +40,7 @@ const ImagePicker = ({
     const formik = useFormik({
         initialValues: initialState,
         enableReinitialize: true,
-        onSubmit: () => watchForm(),
+        onSubmit: () => watchForm()
     });
 
     React.useImperativeHandle(refId, () => ({
@@ -58,7 +59,8 @@ const ImagePicker = ({
             });
         };
     };
-    console.log("imagepicker=>", formik.values)
+
+    console.log(`imagepicker formik values ${imageType}=>`, formik.values);
     useEffect(() => {
         if (reset) {
             formik.resetForm();
@@ -87,6 +89,13 @@ const ImagePicker = ({
         }
     }, [updatedValues?.length]);
 
+    // useEffect(() => {
+    //     if (deletedImage) {
+    //         delete formik.values(deletedImage);
+    //     }
+    // }, [deletedImage?.length]);
+
+
     return (
         <Box m="10px">
             <form ref={refId} encType="multipart/form-data">
@@ -108,7 +117,10 @@ const ImagePicker = ({
                                     type="file"
                                     name="file"
                                     onChange={(event) => {
+                                        console.log(`Onchange picker ${imageType} files=>`, event.target.files)
                                         formik.setFieldValue(`${imageType}`, event.target.files);
+                                        newCount = event.target.files.length;
+                                        console.log(newCount)
                                         setDirty(true);
                                     }}
                                 />
@@ -122,6 +134,7 @@ const ImagePicker = ({
             </form>
             {formik.values[`${imageType}`] || preview.length ?
                 <PreviewImage
+                    formik={formik}
                     deletedImage={deletedImage}
                     setDeletedImage={setDeletedImage}
                     setDirty={setDirty}
@@ -130,6 +143,7 @@ const ImagePicker = ({
                     preview={preview}
                     setPreview={setPreview}
                     imageType={imageType}
+                    newCount={newCount}
                 />
                 : null}
         </Box>

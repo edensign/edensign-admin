@@ -124,20 +124,20 @@ const Sidebar = ({ role }) => {
               </Typography>
               <SidebarItem
                 title="Employee"
-                to="/User/listing"
+                to="/employee/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon"
-                to="/Salon/listing"
+                to="/salon/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
 
               />
               <SidebarItem
                 title="Freelancer"
-                to="/Freelancer/listing"
+                to="/freelancer/listing"
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
@@ -204,6 +204,12 @@ const Sidebar = ({ role }) => {
               <SidebarItem
                 title="FAQ"
                 to="/faq"
+                icon={<HelpOutlineOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Job Seeker"
+                to="/job/seeker/listing"
                 icon={<HelpOutlineOutlinedIcon />}
                 selected={selected}
               />

@@ -13,29 +13,32 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import Loader from "../common/Loader";
 
 const PreviewImage = ({
+    formik,
     preview,
     setPreview,
-    deletedImage,
+    deletedImage = [],
     setDeletedImage,
     setDirty,
     imageFiles,
+    imageType,
+    newCount,
     updatedValues
 }) => {
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
+    let oldCount;
     let uploadedImages = [];
 
     const readImageFiles = (file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
             uploadedImages.push(reader.result);
-            setPreview([            //On update when we upload new images then it is appended inside preview
+            setPreview([            //When we upload new images then it is appended inside preview
                 ...preview,
                 ...uploadedImages
             ]);
         }
         reader.readAsDataURL(file);
-        console.log("PreviewUploaded=>", uploadedImages)
     };
 
     useEffect(() => {
@@ -47,25 +50,37 @@ const PreviewImage = ({
 
     const handleDeleteClick = (item) => {
         const index = preview.indexOf(item);
+
+
         if (updatedValues) {
+            oldCount = updatedValues.length;
             setDeletedImage([
                 ...deletedImage,
                 updatedValues[index]?.image_src,
             ]);
         }
 
+        // console.log(formik.values[index]?.Banner)
+        // console.log("imagefiles=>", imageFiles[index])
+        // console.log("imagefiles=>", Array.from(imageFiles))
+        console.log("oldcount, index=>", oldCount, index)
+        // setDeletedImage([...deletedImage]);
+
+
         if (index > -1) {                   // only splice 1 item from array when it is found
             preview.splice(index, 1);
             if (updatedValues) {
                 updatedValues.splice(index, 1);
+                // formik.setFieldValue(updatedValues[index]);
+                // console.log("Values after delete=>", updatedValues[index]);
+                console.log("Values after delete=>", updatedValues);
             }
-            setPreview([
-                ...preview
-            ]);
+            setPreview([...preview]);
             setDirty(true);     //to enable the submit button
         }
     };
-    console.log("Deleted images=>", deletedImage)
+    console.log("Deleted images=>", deletedImage);
+
 
     return (
         <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit", marginBottom: "8%" }}
@@ -88,6 +103,7 @@ const PreviewImage = ({
                     >
                         <Tooltip title="DELETE">
                             <HighlightOffOutlinedIcon sx={{
+                                color: "#002147",
                                 "&:hover": {
                                     color: "red", fontSize: "1.5rem", transition: "all 0.3s ease-in-out"
                                 }

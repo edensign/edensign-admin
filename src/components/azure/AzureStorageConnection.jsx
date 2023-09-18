@@ -36,6 +36,24 @@ export const uploadDocumentToAzure = async (folderName, fileName, blob) => {
 };
 
 
+export const uploadResumeToAzure = async (folderName, fileName, blob) => {
+    /** Uploads the resume file in the specified azure container 
+     */
+    const containerClient = blobServiceClientDoc.getContainerClient(folderName);
+    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+    const response = await blockBlobClient.uploadData(blob, {
+        blobHTTPHeaders: {
+            blobContentType: "application/json",
+        }
+    });
+    if (response._response.status !== 201) {
+        throw new Error(
+            `Error uploading document ${blockBlobClient.name} to container ${blockBlobClient.containerName}`
+        );
+    }
+};
+
+
 export const deleteFileFromAzure = async (folderName, blobName) => {
     /** Deletes the given blob from the specified azure container 
      */
@@ -50,12 +68,5 @@ export const deleteFileFromAzure = async (folderName, blobName) => {
         await blockBlobClient.delete(options);
     } catch (err) {
         throw err;
-    } finally {
-        const options = {
-            deleteSnapshots: 'include' // or 'only'
-        };
-        const containerClient = blobServiceClientImg.getContainerClient(`${folderName}/banner`);
-        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-        await blockBlobClient.delete(options);
     }
 };

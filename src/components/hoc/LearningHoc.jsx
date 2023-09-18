@@ -1,13 +1,16 @@
 import React from "react";
 
-const UpdatedComponent = (OriginalComponent) => {
+const updatedComponent = (WrappedComponent) => {
     class NewComponent extends React.Component {
+
+        
+
         render() {
-            return <OriginalComponent />
+            return <WrappedComponent />
         }
     }
 
     return NewComponent;
 }
 
-export default UpdatedComponent;
+export default updatedComponent;

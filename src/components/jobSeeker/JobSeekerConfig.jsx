@@ -13,15 +13,13 @@ import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRen
 
 import { tokens } from "../../theme";
 
-export const datagridColumns = (handleDialogOpen) => {
+export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
 
     const handleActionEdit = (id) => {
-        handleDialogOpen();
-        //using hash will navigate to no where, only set id in the react-router state
-        navigateTo("#", { state: { id: id } });
+        navigateTo(`/job/seeker/update/${id}`, { state: { id: id } });
     };
 
     const columns = [
@@ -34,12 +32,20 @@ export const datagridColumns = (handleDialogOpen) => {
             minWidth: 120
         },
         {
-            field: "description",
-            headerName: "DESCRIPTION",
+            field: "contact_no",
+            headerName: "CONTACT",
             headerAlign: "center",
             align: "center",
             flex: 1,
-            minWidth: 280
+            minWidth: 100
+        },
+        {
+            field: "email",
+            headerName: "EMAIL",
+            headerAlign: "center",
+            align: "center",
+            flex: 1,
+            minWidth: 200
         },
         {
             field: "updated_at",

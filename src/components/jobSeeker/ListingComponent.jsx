@@ -2,7 +2,7 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
@@ -13,16 +13,16 @@ import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
 
-import API from "../../../apis";
-import Search from "../../common/Search";
-import ServerPaginationGrid from '../../common/Datagrid';
+import API from "../../apis";
+import Search from "../common/Search";
+import ServerPaginationGrid from '../common/Datagrid';
 
-import { datagridColumns } from "./SalonConfig";
-import { setMenuItem } from "../../../redux/actions/NavigationAction";
-import { setSalons } from "../../../redux/actions/SalonAction";
-import { tokens } from "../../../theme";
-import { useCommon } from "../../hooks/common";
-import { Utility } from "../../utility";
+import { datagridColumns } from "./JobSeekerConfig";
+import { setMenuItem } from "../../redux/actions/NavigationAction";
+import { setJobSeekers } from "../../redux/actions/JobSeekerAction";
+import { tokens } from "../../theme";
+import { useCommon } from "../hooks/common";
+import { Utility } from "../utility";
 
 const pageSizeOptions = [5, 10, 20];
 
@@ -34,7 +34,7 @@ const ListingComponent = () => {
     const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
-    const { listData } = useSelector(state => state.allSalons);
+    const { listData } = useSelector(state => state.allJobSeekers);
 
     //revisit for pagination
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
@@ -62,9 +62,9 @@ const ListingComponent = () => {
     };
 
     return (
-        <Box m="10px">
+        <Box m="10px" position="relative">
             <Box
-                height={isMobile ? "19vh" : "11vh"}
+                height={isMobile ? "19vh" : isTab ? "8vh" : "11vh"}
                 borderRadius="4px"
                 padding={isMobile ? "1vh" : "2vh"}
                 backgroundColor={colors.blueAccent[700]}
@@ -75,6 +75,7 @@ const ListingComponent = () => {
                     flexDirection={isMobile ? "column" : "row"}
                     justifyContent={"space-between"}
                     alignItems={isMobile ? "center" : "normal"}
+
                 >
                     <Typography
                         component="h2"
@@ -85,8 +86,8 @@ const ListingComponent = () => {
                         {selected}
                     </Typography>
                     <Search
-                        action={setSalons}
-                        api={API.SalonAPI}
+                        action={setJobSeekers}
+                        api={API.JobSeekerAPI}
                         getSearchData={getPaginatedData}
                         setSearchFlag={setSearchFlag}
                         oldPagination={oldPagination}
@@ -96,7 +97,8 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo("/salon/detail/create") }}
+                        onClick={() => { navigateTo(`/job/seeker/create`) }}
+                        sx={{ height: isTab ? "4vh" : "auto" }}
                     >
                         Create New {selected}
                     </Button>
@@ -112,7 +114,7 @@ const ListingComponent = () => {
                 color: colors.grey[100]
             }}
                 id="reload-btn"
-                type="submit"
+                type="button"
                 onClick={handleReload}
             >
                 <span style={{ display: "inherit", marginRight: "5px", marginLeft: "-2px" }}>
@@ -121,8 +123,8 @@ const ListingComponent = () => {
                 Back
             </Button>
             <ServerPaginationGrid
-                action={setSalons}
-                api={API.SalonAPI}
+                action={setJobSeekers}
+                api={API.JobSeekerAPI}
                 getQuery={getPaginatedData}
                 columns={datagridColumns()}
                 rows={listData.rows}

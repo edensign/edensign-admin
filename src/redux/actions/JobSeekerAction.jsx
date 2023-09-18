@@ -8,9 +8,9 @@
 
 import { ActionTypes } from "../constants/action-types";
 
-export const setSalons = (salons) => {
+export const setJobSeekers = (seekers) => {
     return {
-        type: ActionTypes.SET_SALONS,
-        payload: salons
+        type: ActionTypes.SET_JOB_SEEKERS,
+        payload: seekers
     };
 };

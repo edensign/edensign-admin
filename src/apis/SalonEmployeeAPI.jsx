@@ -15,16 +15,30 @@ const { getLocalStorage } = Utility();
 export const SalonEmployeeAPI = {
     /** Create salon employee in the database 
       */
-    createSalonEmployee: async (salon_employee, cancel = false) => {
-        console.log("Salon emolyee api=>", salon_employee)
+    createSalonEmployee: async (employee, cancel = false) => {
+        console.log("Salon emolyee api=>", employee)
         return await api.request({
             url: `/create-salon-employee`,
             headers: {
                 "x-access-token": getLocalStorage("auth").token
             },
             method: "POST",
-            data: salon_employee,
+            data: employee,
             signal: cancel ? cancelApiObject[this.createSalonEmployee.name].handleRequestCancellation().signal : undefined,
+        });
+    },
+    /** Update Salon Employee in the database
+    */
+    updateSalonEmployee: async (fields, cancel = false) => {
+        console.log("Salon emolyee api=>", fields)
+        return await api.request({
+            url: `/update-salon-employee`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "PATCH",
+            data: fields,
+            signal: cancel ? cancelApiObject[this.updateSalonEmployee.name].handleRequestCancellation().signal : undefined,
         });
     },
 };

@@ -22,7 +22,7 @@ import Toast from "../common/Toast";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens, themeSettings } from "../../theme";
 import { Utility } from "../utility";
-// import userValidation from "./Validation";
+// import Validation from "./Validation";
 
 const initialValues = {
     name: "",
@@ -80,25 +80,17 @@ const FormComponent = ({ openDialog, setOpenDialog }) => {
                     toastAndNavigate(dispatch, true, "info", "Successfully Updated");
                     setTimeout(() => {
                         handleDialogClose();
-                        location.href = "/amenity/listing";
+                        location.href = "/amenity/listing";     //same as location.reload()
                     }, 2000);
-                } else {
-                    setLoading(false);
-                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again");
-                    setTimeout(() => {
-                        handleDialogClose();
-                        location.reload();
-                    }, 2000);
+                } else {          //without settimeout, the page is reloaded immediately, which
+                    setLoading(false);      //we do when there is error in updating, not when success
+                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again", navigateTo, location.reload());
                 }
             })
             .catch(err => {
                 setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
-                setTimeout(() => {
-                    handleDialogClose();
-                    location.reload();
-                    throw err;
-                }, 2000);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, location.reload());
+                throw err;
             });
     };
 
@@ -112,14 +104,12 @@ const FormComponent = ({ openDialog, setOpenDialog }) => {
                     setLoading(false);
                 } else {
                     setLoading(false);
-                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again");
-                    handleDialogClose();
+                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again", navigateTo, location.reload());
                 }
             })
             .catch(err => {
                 setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
-                handleDialogClose();
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, location.reload());
                 throw err;
             });
     };
@@ -137,21 +127,13 @@ const FormComponent = ({ openDialog, setOpenDialog }) => {
                     }, 2000);
                 } else {
                     setLoading(false);
-                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again");
-                    setTimeout(() => {
-                        handleDialogClose();
-                        location.reload();
-                    }, 2000);
+                    toastAndNavigate(dispatch, true, "error", "An Error Occurred, Please Try Again", navigateTo, location.reload());
                 }
             })
             .catch(err => {
                 setLoading(false);
-                toastAndNavigate(dispatch, true, err ? err.response?.data?.msg : "An Error Occurred");
-                setTimeout(() => {
-                    handleDialogClose();
-                    location.reload();
-                    throw err;
-                }, 2000);
+                toastAndNavigate(dispatch, true, err ? err.response?.data?.msg : "An Error Occurred", navigateTo, location.reload());
+                throw err;
             });
     };
 

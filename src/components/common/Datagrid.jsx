@@ -37,8 +37,9 @@ export default function ServerPaginationGrid({
     const colors = tokens(theme.palette.mode);
     const [paginationModel, setPaginationModel] = useState(initialState);
     const amenityLoading = useSelector(state => state.allAmenities.loading);
-    const serviceLoading = useSelector(state => state.allServices.loading);
+    const jobSeekerLoading = useSelector(state => state.allJobSeekers.loading);
     const salonLoading = useSelector(state => state.allSalons.loading);
+    const serviceLoading = useSelector(state => state.allServices.loading);
     const userLoading = useSelector(state => state.allUsers.loading);
     const selected = useSelector(state => state.menuItems.selected);
 
@@ -125,8 +126,9 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={selected === 'Salon Detail' ? salonLoading : selected === "Amenity" ? amenityLoading :
-                    selected === "Service" ? serviceLoading : userLoading}
+                loading={selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
+                    selected === "Service" ? serviceLoading : selected === 'Job Seeker' ? jobSeekerLoading :
+                        userLoading}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,

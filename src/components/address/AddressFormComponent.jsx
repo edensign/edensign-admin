@@ -235,7 +235,6 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                         <InputLabel id="countryField">--Select Country*--</InputLabel>
                         <Select
                             autoComplete="new-country"
-                            defaultValue=""
                             name="country"
                             variant="filled"
                             value={formik.values.country}
