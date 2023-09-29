@@ -173,13 +173,7 @@ const FormComponent = () => {
                     if (!isEmpty(dataFields[3])) {
                         // upload new images normal to azure and insert in db
                         if (formData.imageData.values?.Normal) {
-                            //to do, it is a quick fix to remove deleted images from formData.imageData
-                            const newFilteredImageData = Array.from(formData.imageData.values.Normal).filter(val => !deletedImage.includes(val.image_src));
-
-                            console.log("Formdata.imagedata.normal new=>", Array.from(formData.imageData.values?.Normal))
-                            console.log("new Filtered imagedata=>", newFilteredImageData)
-
-                            newFilteredImageData.map(image => {
+                            Array.from(formData.imageData.values.Normal).map(image => {
                                 formattedName = formatImageName(image.name);
                                 API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
                                 API.ImageAPI.createImage({
@@ -194,13 +188,8 @@ const FormComponent = () => {
                         }
                         // insert old images normal only in db & not on azure
                         if (formData.imageData?.values) {
-                            //to do, it is a quick fix to remove deleted images from formData.imageData
-                            const oldFilteredImageData = formData.imageData.values.filter(val => !deletedImage.includes(val.image_src));
 
-                            console.log("Formdata.imagedata.old=>", formData.imageData?.values)
-                            console.log("old Filtered imagedata=>", oldFilteredImageData)
-
-                            oldFilteredImageData.map(image => {
+                            formData.imageData.values.map(image => {
                                 API.ImageAPI.createImage({
                                     image_src: image.image_src,
                                     parent_id: image.parent_id,
@@ -215,13 +204,8 @@ const FormComponent = () => {
                     if (!isEmpty(dataFields[4])) {
                         // upload new banner images to azure and insert in db
                         if (formData.bannerImageData.values?.Banner) {
-                            //to do, it is a quick fix to remove deleted images from formData.imageData
-                            const newFilteredBannerImageData = Array.from(formData.bannerImageData.values?.Banner).filter(val => !deletedBannerImage.includes(val.image_src));
 
-                            console.log("Formdata.bannerImagedata=>", Array.from(formData.bannerImageData.values?.Banner))
-                            console.log("new Filtered imagedata=>", newFilteredBannerImageData)
-
-                            newFilteredBannerImageData.map(async (image) => {
+                            Array.from(formData.bannerImageData.values?.Banner).map(async (image) => {
                                 let formattedName = formatImageName(image.name);
                                 API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
                                 API.ImageAPI.createImage({
@@ -236,12 +220,7 @@ const FormComponent = () => {
                         }
                         // insert old images banner only in db & not on azure
                         if (formData.bannerImageData?.values) {
-                            //to do, it is a quick fix to remove deleted images from formData.bannerImageData
-                            const oldFilteredBannerImageData = formData.bannerImageData.values.filter(val => !deletedBannerImage.includes(val.image_src));
-
-                            console.log("Formdata.bannerImagedata=>", formData.bannerImageData?.values)
-                            console.log("old Filtered bannerimage=>", oldFilteredBannerImageData)
-                            oldFilteredBannerImageData.map(image => {
+                            formData.bannerImageData.values.map(image => {
                                 API.ImageAPI.createImage({
                                     image_src: image.image_src,
                                     parent_id: image.parent_id,
@@ -620,6 +599,7 @@ const FormComponent = () => {
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
                 azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}`}
+                ENV={ENV}
             />
             <ImagePicker
                 key="banner"
@@ -635,6 +615,7 @@ const FormComponent = () => {
                 setDeletedImage={setDeletedBannerImage}
                 imageType="Banner"
                 azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/banner`}
+                ENV={ENV}
             />
 
             <Box display="flex" justifyContent="end" mt="20px" pb="20px">

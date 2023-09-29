@@ -14,7 +14,6 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 import PreviewImage from "./PreviewImage";
 
-const ENV = import.meta.env;
 
 const ImagePicker = ({
     onChange,
@@ -28,7 +27,8 @@ const ImagePicker = ({
     deletedImage = [],
     setDeletedImage,
     imageType,
-    azurePath
+    azurePath,
+    ENV
 }) => {
     const initialValues = {};
     let newCount;
@@ -60,7 +60,6 @@ const ImagePicker = ({
         };
     };
 
-    console.log(`imagepicker formik values ${imageType}=>`, formik.values);
     useEffect(() => {
         if (reset) {
             formik.resetForm();
@@ -79,13 +78,13 @@ const ImagePicker = ({
         if (updatedValues) {
             console.log("Updated Values=>", updatedValues)
             setInitialState(updatedValues);
-            const srcArray = [];
-            updatedValues.map(img => {
-                if (img.image_src) {
-                    srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
-                }
-            });
-            setPreview(srcArray);
+            // const srcArray = [];
+            // updatedValues.map(img => {
+            //     if (img.image_src) {
+            //         srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
+            //     }
+            // });
+            // setPreview(srcArray);
         }
     }, [updatedValues?.length]);
 
@@ -95,7 +94,7 @@ const ImagePicker = ({
     //     }
     // }, [deletedImage?.length]);
 
-
+    console.log(`imagepicker formik values ${imageType}=>`, formik.values);
     return (
         <Box m="10px">
             <form ref={refId} encType="multipart/form-data">
@@ -118,9 +117,13 @@ const ImagePicker = ({
                                     name="file"
                                     onChange={(event) => {
                                         console.log(`Onchange picker ${imageType} files=>`, event.target.files)
-                                        formik.setFieldValue(`${imageType}`, event.target.files);
-                                        newCount = event.target.files.length;
-                                        console.log(newCount)
+                                        //keeping old image files also in formik while inserting new files, so
+                                        formik.values[`${imageType}`] ?     //we do not need to manual merge in
+                                            formik.setFieldValue(`${imageType}`,        //previewImage
+                                                [
+                                                    ...formik.values[`${imageType}`],
+                                                    ...event.target.files
+                                                ]) : formik.setFieldValue(`${imageType}`, event.target.files);
                                         setDirty(true);
                                     }}
                                 />
@@ -132,7 +135,7 @@ const ImagePicker = ({
                     sx={{ m: 1, outline: "none", width: "15%" }}
                 />
             </form>
-            {formik.values[`${imageType}`] || preview.length ?
+            {formik.values[`${imageType}`] || updatedValues?.length ?
                 <PreviewImage
                     formik={formik}
                     deletedImage={deletedImage}
@@ -144,6 +147,9 @@ const ImagePicker = ({
                     setPreview={setPreview}
                     imageType={imageType}
                     newCount={newCount}
+                    azurePath={azurePath}
+                    ENV={ENV}
+                    setInitialState={setInitialState}
                 />
                 : null}
         </Box>

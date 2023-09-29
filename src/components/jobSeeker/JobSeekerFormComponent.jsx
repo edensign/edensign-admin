@@ -24,6 +24,11 @@ const initialValues = {
     gender: "",
     qualification: "",
     status: "inactive",
+    paid: "no",
+    hired_in: "",
+    designation: "",
+    description: "",
+    previous_employer: "",
     skills: "",
     hobbies: "",
     experience: "",
@@ -151,6 +156,33 @@ const JobSeekerFormComponent = ({
                         fullWidth
                         variant="filled"
                         type="text"
+                        name="designation"
+                        label="Designation"
+                        autoComplete="new-designation"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.designation}
+                        error={!!formik.touched.designation && !!formik.errors.designation}
+                        helperText={formik.touched.designation && formik.errors.designation}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="description"
+                        label="Description"
+                        autoComplete="new-description"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.description}
+                        error={!!formik.touched.description && !!formik.errors.description}
+                        helperText={formik.touched.description && formik.errors.description}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
                         name="age"
                         label="Age"
                         autoComplete="new-age"
@@ -159,6 +191,45 @@ const JobSeekerFormComponent = ({
                         value={formik.values.age}
                         error={!!formik.touched.age && !!formik.errors.age}
                         helperText={formik.touched.age && formik.errors.age}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="skills"
+                        label="Skills"
+                        autoComplete="new-skills"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.skills}
+                        error={!!formik.touched.skills && !!formik.errors.skills}
+                        helperText={formik.touched.skills && formik.errors.skills}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="hobbies"
+                        label="Hobbies"
+                        autoComplete="new-hobbies"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.hobbies}
+                        error={!!formik.touched.hobbies && !!formik.errors.hobbies}
+                        helperText={formik.touched.hobbies && formik.errors.hobbies}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="experience"
+                        label="Experience"
+                        autoComplete="new-experience"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.experience}
+                        error={!!formik.touched.experience && !!formik.errors.experience}
+                        helperText={formik.touched.experience && formik.errors.experience}
                     />
 
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
@@ -202,6 +273,24 @@ const JobSeekerFormComponent = ({
                     </FormControl>
 
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.paid && !!formik.errors.paid}
+                    >
+                        <InputLabel id="paidField">Paid</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="paidField"
+                            name="paid"
+                            autoComplete="new-paid"
+                            value={formik.values.paid}
+                            onChange={formik.handleChange}
+                        >
+                            <MenuItem value={"yes"}>Yes</MenuItem>
+                            <MenuItem value={"no"}>No</MenuItem>
+                        </Select>
+                        <FormHelperText>{formik.touched.paid && formik.errors.paid}</FormHelperText>
+                    </FormControl>
+
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.status && !!formik.errors.status}
                     >
                         <InputLabel id="statusField">Status</InputLabel>
@@ -224,40 +313,27 @@ const JobSeekerFormComponent = ({
                         fullWidth
                         variant="filled"
                         type="text"
-                        name="skills"
-                        label="Skills"
-                        autoComplete="new-skills"
+                        name="previous_employer"
+                        label="Previous Employer"
+                        autoComplete="new-previous_employer"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
-                        value={formik.values.skills}
-                        error={!!formik.touched.skills && !!formik.errors.skills}
-                        helperText={formik.touched.skills && formik.errors.skills}
+                        value={formik.values.previous_employer}
+                        error={!!formik.touched.previous_employer && !!formik.errors.previous_employer}
+                        helperText={formik.touched.previous_employer && formik.errors.previous_employer}
                     />
                     <TextField
                         fullWidth
                         variant="filled"
                         type="text"
-                        name="hobbies"
-                        label="Hobbies"
-                        autoComplete="new-hobbies"
+                        name="hired_in"
+                        label="Hired In"
+                        autoComplete="new-hired_in"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
-                        value={formik.values.hobbies}
-                        error={!!formik.touched.hobbies && !!formik.errors.hobbies}
-                        helperText={formik.touched.hobbies && formik.errors.hobbies}
-                    />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="experience"
-                        label="Experience"
-                        autoComplete="new-experience"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.experience}
-                        error={!!formik.touched.experience && !!formik.errors.experience}
-                        helperText={formik.touched.experience && formik.errors.experience}
+                        value={formik.values.hired_in}
+                        error={!!formik.touched.hired_in && !!formik.errors.hired_in}
+                        helperText={formik.touched.hired_in && formik.errors.hired_in}
                     />
 
                     <TextField

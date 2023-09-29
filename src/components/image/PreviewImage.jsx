@@ -22,64 +22,93 @@ const PreviewImage = ({
     imageFiles,
     imageType,
     newCount,
-    updatedValues
+    updatedValues,
+    azurePath,
+    ENV,
+    setInitialState
 }) => {
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
     let oldCount;
     let uploadedImages = [];
 
+    useEffect(() => {
+        console.log('USE EFFECT 2')
+        const srcArray = [];
+        if (updatedValues) {
+            updatedValues.map(img => {
+                if (img.image_src) {
+                    srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
+                }
+            });
+        }
+
+        setPreview([
+            ...srcArray,         //We are not doing ...preview because in imagePicker file we have already
+        ]);
+    }, [updatedValues?.length]);
+
     const readImageFiles = (file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
             uploadedImages.push(reader.result);
-            setPreview([            //When we upload new images then it is appended inside preview
-                ...preview,
-                ...uploadedImages
+
+            const srcArray = [];
+            if (updatedValues) {
+                updatedValues.map(img => {
+                    if (img.image_src) {
+                        srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
+                    }
+                });
+            }
+
+            setPreview([
+                ...srcArray,         //We are not doing ...preview because in imagePicker file we have already
+                ...uploadedImages   //done manual merge of formik.values in onchange of input
             ]);
         }
         reader.readAsDataURL(file);
     };
 
     useEffect(() => {
+        console.log('USE EFFECT 1');
         if (imageFiles) {
+            console.log('imageFiles', imageFiles);
             let arrayOfImages = Array.from(imageFiles);
             arrayOfImages.forEach(item => readImageFiles(item));
         }
     }, [imageFiles]);
+    console.log('preview=>', preview);
 
     const handleDeleteClick = (item) => {
         const index = preview.indexOf(item);
 
-
         if (updatedValues) {
-            oldCount = updatedValues.length;
             setDeletedImage([
                 ...deletedImage,
                 updatedValues[index]?.image_src,
             ]);
         }
 
-        // console.log(formik.values[index]?.Banner)
-        // console.log("imagefiles=>", imageFiles[index])
-        // console.log("imagefiles=>", Array.from(imageFiles))
-        console.log("oldcount, index=>", oldCount, index)
-        // setDeletedImage([...deletedImage]);
-
-
         if (index > -1) {                   // only splice 1 item from array when it is found
             preview.splice(index, 1);
             if (updatedValues) {
                 updatedValues.splice(index, 1);
-                // formik.setFieldValue(updatedValues[index]);
-                // console.log("Values after delete=>", updatedValues[index]);
+                setInitialState({
+                    ...updatedValues
+                });
                 console.log("Values after delete=>", updatedValues);
+            }
+            // On update imageFiles is empty
+            if (imageFiles) {
+                imageFiles.splice(index, 1);
+                formik.setFieldValue(imageType, imageFiles);
             }
             setPreview([...preview]);
             setDirty(true);     //to enable the submit button
         }
     };
-    console.log("Deleted images=>", deletedImage);
+    console.log("TEST updatedValues =>", updatedValues);
 
 
     return (
