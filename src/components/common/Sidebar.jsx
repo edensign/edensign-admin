@@ -213,6 +213,12 @@ const Sidebar = ({ role }) => {
                 icon={<HelpOutlineOutlinedIcon />}
                 selected={selected}
               />
+               <SidebarItem
+                title="Skill"
+                to="/skill/listing"
+                icon={<HelpOutlineOutlinedIcon />}
+                selected={selected}
+              />
               <SidebarItem
                 title="Service"
                 to="/service/listing"

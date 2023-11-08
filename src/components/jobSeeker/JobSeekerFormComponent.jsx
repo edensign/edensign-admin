@@ -10,7 +10,7 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 
 import { Box, InputLabel, IconButton, MenuItem, FormControl, FormHelperText } from "@mui/material";
-import { Select, TextField, useMediaQuery } from "@mui/material";
+import { Autocomplete, Select, TextField, useMediaQuery } from "@mui/material";
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 // import AttachFileIcon from '@mui/icons-material/AttachFile';
 
@@ -24,12 +24,7 @@ const initialValues = {
     gender: "",
     qualification: "",
     status: "inactive",
-    paid: "no",
-    hired_in: "",
-    designation: "",
-    description: "",
-    previous_employer: "",
-    skills: "",
+    skills: [],
     hobbies: "",
     experience: "",
     resume: []
@@ -41,6 +36,7 @@ const JobSeekerFormComponent = ({
     filename,
     setFilename,
     setDirty,
+    skills,
     reset,
     setReset,
     updatedValues = null }) => {
@@ -230,6 +226,27 @@ const JobSeekerFormComponent = ({
                         value={formik.values.experience}
                         error={!!formik.touched.experience && !!formik.errors.experience}
                         helperText={formik.touched.experience && formik.errors.experience}
+                    />
+
+                    <Autocomplete
+                        multiple
+                        options={skills}
+                        getOptionLabel={option => option.name}
+                        disableCloseOnSelect
+                        value={formik.values.skills}
+                        onChange={(event, value) => formik.setFieldValue("skills", value)}
+                        sx={{ gridColumn: "span 2" }}
+                        renderInput={params => (
+                            <TextField
+                                {...params}
+                                variant="filled"
+                                type="text"
+                                name="skills"
+                                label="Skills"
+                                error={!!formik.touched.skills && !!formik.errors.skills}
+                                helperText={formik.touched.skills && formik.errors.skills}
+                            />
+                        )}
                     />
 
                     <FormControl variant="filled" sx={{ minWidth: 120 }}

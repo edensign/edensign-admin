@@ -40,6 +40,7 @@ export default function ServerPaginationGrid({
     const jobSeekerLoading = useSelector(state => state.allJobSeekers.loading);
     const salonLoading = useSelector(state => state.allSalons.loading);
     const serviceLoading = useSelector(state => state.allServices.loading);
+    const skillLoading = useSelector(state => state.allSkills.loading);
     const userLoading = useSelector(state => state.allUsers.loading);
     const selected = useSelector(state => state.menuItems.selected);
 
@@ -128,7 +129,7 @@ export default function ServerPaginationGrid({
                 // page={count + 1}
                 loading={selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
                     selected === "Service" ? serviceLoading : selected === 'Job Seeker' ? jobSeekerLoading :
-                        userLoading}
+                        selected === 'Skill' ? skillLoading : userLoading}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,

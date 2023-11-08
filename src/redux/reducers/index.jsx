@@ -16,6 +16,7 @@ import { setAmenityReducer } from "./AmenityReducer";
 import { setJobSeekerReducer } from "./JobSeekerReducer";
 import { setSalonReducer } from "./SalonReducer";
 import { setServiceReducer } from "./ServiceReducer";
+import { setSkillReducer } from "./SkillReducer";
 import { setUserReducer } from "./UserReducers";
 
 const reducers = combineReducers({
@@ -25,6 +26,7 @@ const reducers = combineReducers({
     allJobSeekers: setJobSeekerReducer,
     allSalons: setSalonReducer,
     allServices: setServiceReducer,
+    allSkills: setSkillReducer,
     allUsers: setUserReducer,
     menuItems: menuItemReducer,
     toastInfo: displayToastReducer,
