@@ -35,6 +35,7 @@ const FormComponent = () => {
     const [submitted, setSubmitted] = useState(false);
     const [reset, setReset] = useState(false);
     const [filename, setFilename] = useState();     //for uploaded resume file name
+    const [skills, setSkills] = useState([]);       //for skill table in salon form component
 
     const jobSeekerFormRef = useRef();
     const addressFormRef = useRef();
@@ -61,7 +62,10 @@ const FormComponent = () => {
 
     const updateJobSeekerAndAddress = useCallback(formData => {
         const dataFields = [
-            { ...formData.jobSeekerData.values },
+            {
+                ...formData.jobSeekerData.values,
+                skills: getSelectedSkills(formData.jobSeekerData.values.skills),
+            },
             { ...formData.addressData.values }
         ];
         const paths = ["/update-job-seeker", "/update-address"];
@@ -91,12 +95,23 @@ const FormComponent = () => {
     }, [formData]);
 
 
+    const getSelectedSkillsByName = (dataObj) => {
+        const objId = dataObj?.split(",");
+        if (objId) {
+            return skills.filter(skill => objId.includes(skill.id.toString()));
+        }
+    };
+
     const populateJobSeekerData = (id) => {
         setLoading(true);
         const paths = [`/get-by-pk/job_seeker/${id}`, `/get-address/job_seeker/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
-                console.log(responses)
+                console.log("responses=", responses)
+                if (responses[0]?.data?.data) {
+                    responses[0].data.data.skills = getSelectedSkillsByName(responses[0].data.data?.skills);
+                }
+
                 const dataObj = {
                     jobSeekerData: responses[0].data.data,
                     addressData: responses[1]?.data?.data
@@ -112,6 +127,14 @@ const FormComponent = () => {
 
     };
 
+    //taking out only the id from skills object from formData.jobSeekerData.values.skills
+    function getSelectedSkills(skills) {
+        let skillId = [];          //using traditional function statement for hoisting
+        skills?.forEach(skill => {
+            skillId.push(skill.id);
+        });
+        return skillId.toString();
+    };
 
     const formatResumeName = (name, file) => {
         let formattedName;
@@ -136,6 +159,10 @@ const FormComponent = () => {
             console.log("Uploading...");
             uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
             formData.jobSeekerData.values.resume = formattedResumeName;
+        }
+        formData.jobSeekerData.values = {
+            ...formData.jobSeekerData.values,
+            skills: getSelectedSkills(formData.jobSeekerData.values?.skills),
         }
         console.log("JobSeeker data=>", formData.jobSeekerData.values)
 
@@ -165,9 +192,28 @@ const FormComponent = () => {
             });
     };
 
+    //get all skills from skill table stored in db before populating data
+    useEffect(() => {
+        const getskills = () => {
+            API.SkillAPI.getAll(false, 0, 30)
+                .then(skills => {
+                    if (skills.status === 'Success') {
+                        setSkills(skills.data.rows);
+                    } else {
+                        console.log("Error, Please Try Again");
+                    }
+                })
+                .catch(err => {
+                    throw err;
+                });
+        };
+        getskills();
+    }, []);
+
+
     //Create/Update/Populate Job Seeker
     useEffect(() => {
-        if (id && !submitted) {
+        if (id && !submitted && skills) {
             setTitle("Update");
             populateJobSeekerData(id);
         }
@@ -176,7 +222,7 @@ const FormComponent = () => {
         } else {
             setSubmitted(false);
         }
-    }, [id, submitted]);
+    }, [id, submitted, skills]);
 
     const handleSubmit = async () => {
         await jobSeekerFormRef.current.Submit();
@@ -213,6 +259,7 @@ const FormComponent = () => {
                 updatedValues={updatedValues?.jobSeekerData}
                 filename={filename}
                 setFilename={setFilename}
+                skills={skills}
             />
             <AddressFormComponent
                 onChange={(data) => {
@@ -226,7 +273,7 @@ const FormComponent = () => {
                 updatedValues={updatedValues?.addressData}
             />
 
-            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
+            <Box display="flex" justifyContent="end" m="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

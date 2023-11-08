@@ -637,7 +637,7 @@ const FormComponent = () => {
                 azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/banner`}
             />
 
-            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
+            <Box display="flex" justifyContent="end" m="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

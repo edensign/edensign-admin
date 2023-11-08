@@ -30,6 +30,8 @@ const JobSeekerListingComponent = lazy(() => import("./components/jobSeeker/List
 
 const ServiceListingComponent = lazy(() => import("./components/services/ListingComponent"));
 
+const SkillListingComponent = lazy(() => import("./components/skill/ListingComponent"));
+
 const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
 
@@ -108,6 +110,8 @@ function App() {
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
 
                       <Route exact path="/service/listing" element={<ServiceListingComponent />} />
+
+                      <Route exact path="/skill/listing" element={<SkillListingComponent />} />
 
                       <Route exact path="/job/seeker/create" element={<JobSeekerFormComponent />} />
                       <Route exact path="/job/seeker/update/:id" element={<JobSeekerFormComponent />} />
