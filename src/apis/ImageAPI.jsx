@@ -36,7 +36,7 @@ export const ImageAPI = {
             },
             method: "POST",
             data: image,
-            signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject[this.createImage.name].handleRequestCancellation().signal : undefined,
         });
     },
     /** Update the image in the database and azure storage
@@ -49,10 +49,11 @@ export const ImageAPI = {
             },
             method: "PATCH",
             data: fields,
-            signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject[this.updateImage.name].handleRequestCancellation().signal : undefined,
         });
     },
-    /**  */
+    /** Delete all the images from db on every update
+     */
     deleteImage: async (fields, cancel = false) => {
         return await api.request({
             url: `/delete-image`,
@@ -61,7 +62,21 @@ export const ImageAPI = {
             },
             method: "DELETE",
             data: fields,
-            signal: cancel ? cancelApiObject[this.create.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject[this.deleteImage.name].handleRequestCancellation().signal : undefined,
+        });
+    },
+    /** Upload image to the backend from where it is uploaded to azure storage
+     */
+    uploadImage: async (data, cancel = false) => {
+        return await api.request({
+            url: `/upload-image`,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "POST",
+            data: data,
+            signal: cancel ? cancelApiObject[this.uploadImage.name].handleRequestCancellation().signal : undefined,
         });
     }
 };

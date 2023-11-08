@@ -9,17 +9,27 @@
 import { combineReducers } from "redux";
 
 import { authReducer } from "./AuthReducer";
-import { menuItemReducer } from "./MenuItemReducer";
 import { displayToastReducer } from "./ToastReducer";
-import { setUserReducer } from "./UserReducers";
+import { menuItemReducer } from "./MenuItemReducer";
+import { setAgreementReducer } from "./UserReducers";
+import { setAmenityReducer } from "./AmenityReducer";
+import { setJobSeekerReducer } from "./JobSeekerReducer";
 import { setSalonReducer } from "./SalonReducer";
+import { setServiceReducer } from "./ServiceReducer";
+import { setSkillReducer } from "./SkillReducer";
+import { setUserReducer } from "./UserReducers";
 
 const reducers = combineReducers({
     auth: authReducer,
-    allUsers: setUserReducer,
+    agreementSigned: setAgreementReducer,
+    allAmenities: setAmenityReducer,
+    allJobSeekers: setJobSeekerReducer,
     allSalons: setSalonReducer,
-    toastInfo: displayToastReducer,
+    allServices: setServiceReducer,
+    allSkills: setSkillReducer,
+    allUsers: setUserReducer,
     menuItems: menuItemReducer,
+    toastInfo: displayToastReducer,
 });
 
 export default reducers;

@@ -7,21 +7,31 @@
  */
 
 import { AddressAPI } from "./AddressAPI";
+import { AmenityAPI } from "./AmenityAPI";
 import { CityAPI } from "./CityAPI";
 import { CommonAPI } from "./CommonAPI";
 import { CountryAPI } from "./CountryAPI";
 import { ImageAPI } from "./ImageAPI";
+import { JobSeekerAPI } from "./JobSeekerAPI";
 import { SalonAPI } from "./SalonAPI";
+import { SalonEmployeeAPI } from "./SalonEmployeeAPI";
+import { ServiceAPI } from "./ServiceAPI";
+import { SkillAPI } from "./SkillAPI";
 import { StateAPI } from "./StateAPI";
 import { UserAPI } from "./UserAPI";
 
 export default {
     AddressAPI,
+    AmenityAPI,
     CityAPI,
     CommonAPI,
     CountryAPI,
     ImageAPI,
+    JobSeekerAPI,
     SalonAPI,
+    SalonEmployeeAPI,
+    ServiceAPI,
+    SkillAPI,
     StateAPI,
     UserAPI
 };

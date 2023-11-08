@@ -32,11 +32,12 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
         clicked: false,
         password: null
     });
+    const [initialState, setInitialState] = useState(initialValues);
+
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const isMobile = useMediaQuery("(max-width:480px)");
     const pwField = document.getElementById("pwField");
 
-    const [initialState, setInitialState] = useState(initialValues);
     const formik = useFormik({
         initialValues: initialState,
         validationSchema: userValidation,
@@ -59,7 +60,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                 values: formik.values,
                 validated: formik.isSubmitting
                     ? Object.keys(formik.errors).length === 0
-                    : false,
+                    : false
             });
         };
     }
@@ -107,15 +108,6 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
             formik.values.password = updatePassword.password;
         };
     };
-    // {userId ? <Button type="button" color="primary" variant="contained"
-    //     sx={{
-    //         position: "absolute",
-    //         right: 20,
-    //         top: 100
-    //     }}
-    //     onClick={handleUpdatePassword}
-    // >
-    //     {updatePassword.clicked === true ? "Update" : "Cancel Update"} Password </Button> : null}
 
     return (
         <Box m="20px">
@@ -143,7 +135,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         variant="filled"
                         type="text"
                         name="username"
-                        label="Username"
+                        label="Username*"
                         autoComplete="new-username"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -156,7 +148,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         fullWidth
                         variant="filled"
                         id="pwField"
-                        label="Password"
+                        label="Password*"
                         name="password"
                         type={showPassword ? "text" : "password"} // <-- This is where the pw toggle happens
                         autoComplete="new-password"
@@ -185,7 +177,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         fullWidth
                         variant="filled"
                         type="text"
-                        label="Email"
+                        label="Email*"
                         name="email"
                         autoComplete="new-email"
                         onBlur={formik.handleBlur}
@@ -199,7 +191,7 @@ const UserFormComponent = ({ onChange, refId, setDirty, reset, setReset, userId,
                         fullWidth
                         variant="filled"
                         type="text"
-                        label="Contact Number"
+                        label="Contact Number*"
                         name="contact_no"
                         autoComplete="new-contact"
                         onBlur={formik.handleBlur}

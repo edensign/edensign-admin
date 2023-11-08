@@ -29,6 +29,7 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+
   const { getInitials, getNameAndType } = Utility();
   const { username, type } = getNameAndType();
 

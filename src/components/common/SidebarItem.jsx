@@ -41,3 +41,6 @@ export const SidebarItem = ({ title, to, icon, selected }) => {
         </MenuItem>
     );
 };
+        //to be continued in link to
+// {(getRole() === 'salon' && getLocalStorage("menu")?.selected === 'Salon Detail') ?
+// setStorageAndDispatch(navigateTo, API) 

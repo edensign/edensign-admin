@@ -12,16 +12,28 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 
 import Loader from "../common/Loader";
 
-const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles, preview, setPreview }) => {
+const PreviewImage = ({
+    formik,
+    preview,
+    setPreview,
+    deletedImage = [],
+    setDeletedImage,
+    setDirty,
+    imageFiles,
+    imageType,
+    newCount,
+    updatedValues
+}) => {
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
+    let oldCount;
     let uploadedImages = [];
 
     const readImageFiles = (file) => {
         const reader = new FileReader();
         reader.onloadend = () => {
             uploadedImages.push(reader.result);
-            setPreview([
+            setPreview([            //When we upload new images then it is appended inside preview
                 ...preview,
                 ...uploadedImages
             ]);
@@ -38,21 +50,40 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
 
     const handleDeleteClick = (item) => {
         const index = preview.indexOf(item);
-        setDeletedImage([
-            ...deletedImage,
-            updatedValues[index].image_src
-        ]);
-        if (index > -1) {               // only splice 1 item from array when it is found
-            preview.splice(index, 1);
-            updatedValues.splice(index, 1);
-            setPreview([
-                ...preview
+
+
+        if (updatedValues) {
+            oldCount = updatedValues.length;
+            setDeletedImage([
+                ...deletedImage,
+                updatedValues[index]?.image_src,
             ]);
         }
+
+        // console.log(formik.values[index]?.Banner)
+        // console.log("imagefiles=>", imageFiles[index])
+        // console.log("imagefiles=>", Array.from(imageFiles))
+        console.log("oldcount, index=>", oldCount, index)
+        // setDeletedImage([...deletedImage]);
+
+
+        if (index > -1) {                   // only splice 1 item from array when it is found
+            preview.splice(index, 1);
+            if (updatedValues) {
+                updatedValues.splice(index, 1);
+                // formik.setFieldValue(updatedValues[index]);
+                // console.log("Values after delete=>", updatedValues[index]);
+                console.log("Values after delete=>", updatedValues);
+            }
+            setPreview([...preview]);
+            setDirty(true);     //to enable the submit button
+        }
     };
+    console.log("Deleted images=>", deletedImage);
+
 
     return (
-        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit" }}
+        <ImageList sx={{ width: "80%", height: "60%", overflow: "inherit", marginBottom: "8%" }}
             cols={3} rowHeight={isMobile ? 80 : isTab ? 160 : 220} gap={8}>
             {preview ? preview.map((item, index) => (
                 <ImageListItem key={index}>
@@ -72,8 +103,9 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
                     >
                         <Tooltip title="DELETE">
                             <HighlightOffOutlinedIcon sx={{
+                                color: "#002147",
                                 "&:hover": {
-                                    color: "red", fontSize: "1.5rem", transition: "all 0.5s ease-in-out"
+                                    color: "red", fontSize: "1.5rem", transition: "all 0.3s ease-in-out"
                                 }
                             }}
                             />
@@ -81,7 +113,7 @@ const PreviewImage = ({ deletedImage, setDeletedImage, updatedValues, imageFiles
                     </IconButton>
                     <img
                         src={item}
-                        alt="This image cannot be seen"
+                        alt="This image is not available"
                         loading="lazy"
                         style={{
                             objectFit: "cover",

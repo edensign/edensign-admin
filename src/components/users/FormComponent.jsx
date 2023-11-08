@@ -7,7 +7,7 @@
  */
 
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Box, Button, Typography, useTheme } from "@mui/material";
@@ -40,6 +40,7 @@ const FormComponent = () => {
 
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
+    const userParams = useParams();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const { typography } = themeSettings(theme.palette.mode);
@@ -48,9 +49,9 @@ const FormComponent = () => {
     const toastInfo = useSelector(state => state.toastInfo);
     const { state } = useLocation();
     const { getQueryParam } = useUser();
-
-    const { toastModal, getLocalStorage } = Utility();
-    let id = state?.id;
+    const { toastAndNavigate, getLocalStorage } = Utility();
+    //after page refresh the id in router state becomes undefined, so getting user id from url params
+    let id = state?.id || userParams?.id;
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -78,18 +79,19 @@ const FormComponent = () => {
                 });
                 if (status) {
                     setLoading(false);
-                    toastModal(dispatch, true, "info", "Updated", navigateTo, "/user/listing");
+                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/${selected.toLowerCase()}/listing`);
                 };
                 setLoading(false);
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     }, [formData]);
 
     const populateUserData = (id) => {
+        setLoading(true);
         const paths = [`/get-by-pk/users/${id}`, `/get-address/user/${id}`];
         API.CommonAPI.multipleAPICall("GET", paths)
             .then(responses => {
@@ -98,9 +100,11 @@ const FormComponent = () => {
                     addressData: responses[1]?.data?.data
                 };
                 setUpdatedValues(dataObj);
+                setLoading(false);
             })
             .catch(err => {
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                setLoading(false);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };
@@ -118,18 +122,18 @@ const FormComponent = () => {
                     })
                         .then(address => {
                             setLoading(false);
-                            toastModal(dispatch, true, "success", "Success", navigateTo, "/user/listing");
+                            toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, `/${selected.toLowerCase()}/listing`);
                         })
                         .catch(err => {
                             setLoading(false);
-                            toastModal(dispatch, true, err ? err : "An Error Occurred");
+                            toastAndNavigate(dispatch, true, err ? err : "An Error Occurred");
                             throw err;
                         });
                 };
             })
             .catch(err => {
                 setLoading(false);
-                toastModal(dispatch, true, "error", err?.response?.data?.msg);
+                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
                 throw err;
             });
     };
@@ -186,18 +190,18 @@ const FormComponent = () => {
                     handleFormChange(data, 'address');
                 }}
                 refId={addressFormRef}
-                dirty={dirty}
+                update={id ? true : false}
                 setDirty={setDirty}
                 reset={reset}
                 setReset={setReset}
                 updatedValues={updatedValues?.addressData}
             />
 
-            <Box display="flex" justifyContent="end" mt="20px" pb="20px">
+            <Box display="flex" justifyContent="end" m="20px">
                 {   //hide reset button on user update
                     title === "Update" ? null :
                         <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}
-                            disabled={!dirty}
+                            disabled={!dirty || submitted}
                             onClick={() => {
                                 if (window.confirm("Do You Really Want To Reset?")) {
                                     setReset(true);
@@ -208,7 +212,7 @@ const FormComponent = () => {
                         </Button>
                 }
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
-                    onClick={() => navigateTo('/user/listing')}>
+                    onClick={() => navigateTo(`/${selected.toLowerCase()}/listing`)}>
                     Cancel
                 </Button>
                 <Button type="submit" onClick={() => handleSubmit()} disabled={!dirty}

@@ -8,9 +8,11 @@
 
 import axios from "axios";
 
+const ENV = import.meta.env;
+
 export const api = axios.create({
   withCredentials: true,
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: ENV.VITE_BASE_URL,
   validateStatus: (status) => (status >= 200 && status < 300) || status == 404
 });
 
@@ -20,7 +22,7 @@ const errorHandler = (error) => {
 
   // logging only errors that are not 401
   if (statusCode && statusCode !== 401) {
-    console.error(error);
+    throw error;
   };
 
   return Promise.reject(error);
@@ -30,4 +32,10 @@ const errorHandler = (error) => {
 // "api" axios instance
 api.interceptors.response.use(undefined, (error) => {
   return errorHandler(error);
+});
+
+//ask for token on every request made from edensign website
+api.interceptors.request.use(req => {
+  req.headers.Type = "admin";
+  return req;
 });

@@ -28,3 +28,10 @@ export const setAuthInfo = (payload) => {
         payload: payload
     };
 };
+
+export const setAgreementSigned = (payload) => {
+    return {
+        type: ActionTypes.AGREEMENT_SIGNED,
+        payload: payload
+    };
+};

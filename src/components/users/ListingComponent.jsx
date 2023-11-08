@@ -2,7 +2,7 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
@@ -16,12 +16,13 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import API from "../../apis";
 import Search from "../common/Search";
 import ServerPaginationGrid from '../common/Datagrid';
+
 import { datagridColumns } from "./UserConfig";
-import { useCommon } from "../hooks/common";
-import { useUser } from "../hooks/users";
+import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { setUsers } from "../../redux/actions/UserActions"
 import { tokens } from "../../theme";
-import { setMenuItem } from "../../redux/actions/NavigationAction";
+import { useCommon } from "../hooks/common";
+import { useUser } from "../hooks/users";
 import { Utility } from "../utility";
 
 const pageSizeOptions = [5, 10, 20];
@@ -44,7 +45,7 @@ const ListingComponent = () => {
     const { getQueryParam } = useUser();
 
     const colors = tokens(theme.palette.mode);
-    const { getLocalStorage, toastModal } = Utility();
+    const { getLocalStorage } = Utility();
     const reloadBtn = document.getElementById("reload-btn");
 
     let condition = getQueryParam() ? {
@@ -104,7 +105,7 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo("/user/create") }}
+                        onClick={() => { navigateTo(`/${selected}/create`) }}
                         sx={{ height: isTab ? "4vh" : "auto" }}
                     >
                         Create New {selected}
@@ -142,7 +143,6 @@ const ListingComponent = () => {
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}
                 setSearchFlag={setSearchFlag}
-                toastModal={toastModal}
             />
         </Box>
     );

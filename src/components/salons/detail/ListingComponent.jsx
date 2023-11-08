@@ -16,11 +16,12 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import API from "../../../apis";
 import Search from "../../common/Search";
 import ServerPaginationGrid from '../../common/Datagrid';
+
 import { datagridColumns } from "./SalonConfig";
-import { useCommon } from "../../hooks/common";
+import { setMenuItem } from "../../../redux/actions/NavigationAction";
 import { setSalons } from "../../../redux/actions/SalonAction";
 import { tokens } from "../../../theme";
-import { setMenuItem } from "../../../redux/actions/NavigationAction";
+import { useCommon } from "../../hooks/common";
 import { Utility } from "../../utility";
 
 const pageSizeOptions = [5, 10, 20];
@@ -30,6 +31,7 @@ const ListingComponent = () => {
     const navigateTo = useNavigate();
     const dispatch = useDispatch();
     const isMobile = useMediaQuery("(max-width:480px)");
+    const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
     const { listData } = useSelector(state => state.allSalons);
@@ -39,9 +41,9 @@ const ListingComponent = () => {
     const [oldPagination, setOldPagination] = useState();
 
     const { getPaginatedData } = useCommon();
+    const { getLocalStorage } = Utility();
 
     const colors = tokens(theme.palette.mode);
-    const { getLocalStorage } = Utility();
     const reloadBtn = document.getElementById("reload-btn");
 
     useEffect(() => {
@@ -94,7 +96,7 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo("/salon/create") }}
+                        onClick={() => { navigateTo("/salon/detail/create") }}
                     >
                         Create New {selected}
                     </Button>
@@ -103,8 +105,8 @@ const ListingComponent = () => {
             <Button sx={{
                 display: "none",
                 position: "absolute",
-                top: isMobile ? "32vh" : "29.5vh",
-                left: isMobile? "99vw" : "44.5vw",
+                top: isMobile ? "23vh" : isTab ? "10.5vh" : "16.5vh",
+                left: isMobile ? "80vw" : isTab ? "39.5vw" : "26vw",
                 zIndex: 1,
                 borderRadius: "20%",
                 color: colors.grey[100]
@@ -125,7 +127,6 @@ const ListingComponent = () => {
                 columns={datagridColumns()}
                 rows={listData.rows}
                 count={listData.count}
-                selected={selected}
                 pageSizeOptions={pageSizeOptions}
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}

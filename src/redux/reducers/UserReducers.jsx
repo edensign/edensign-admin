@@ -10,7 +10,11 @@ import { ActionTypes } from "../constants/action-types";
 
 const initialState = {
     listData: [],
-    loading: false
+    loading: true
+};
+
+const agreementState = {
+    agreementSigned: null
 };
 
 export const setUserReducer = (state = initialState, action) => {
@@ -18,7 +22,19 @@ export const setUserReducer = (state = initialState, action) => {
         case ActionTypes.SET_USERS:
             return {
                 ...state,
-                listData: action.payload.listData
+                listData: action.payload.listData,
+                loading: action.payload.loading
+            };
+        default:
+            return state;
+    };
+};
+
+export const setAgreementReducer = (state = agreementState, action) => {
+    switch (action.type) {
+        case ActionTypes.AGREEMENT_SIGNED:
+            return {
+                ...state, agreementSigned: action.payload,
             };
         default:
             return state;

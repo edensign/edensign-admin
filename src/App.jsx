@@ -2,12 +2,13 @@
  * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
  *
  * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
+ * restricted rights software. The use, reproduction, or disclosure of this software is subject to
  * restrictions set forth in your license agreement with Eden Sign.
 */
 
-import { lazy, Suspense } from "react";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Routes, Route, useLocation, Navigate, useNavigate } from "react-router-dom";
 
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { useIdleTimer } from 'react-idle-timer';
@@ -18,17 +19,61 @@ import Topbar from "./components/common/Topbar";
 import Sidebar from "./components/common/Sidebar";
 import Loader from "./components/common/Loader";
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
-const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
-const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+
+const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
+
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
+
+const JobSeekerFormComponent = lazy(() => import("./components/jobSeeker/FormComponent"));
+const JobSeekerListingComponent = lazy(() => import("./components/jobSeeker/ListingComponent"));
+
+const ServiceListingComponent = lazy(() => import("./components/services/ListingComponent"));
+
+const SkillListingComponent = lazy(() => import("./components/skill/ListingComponent"));
+
+const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
+const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+
+import API from "./apis";
 import { Utility } from "./components/utility";
+import { setMenuItem } from "./redux/actions/NavigationAction";
+import { setAgreementSigned } from "./redux/actions/UserActions";
 // import Calendar from "./calendar/calendar";
 
 function App() {
+  const [role, setRole] = useState(null);
   const [theme, colorMode] = useMode();
+  const navigateTo = useNavigate();
+  const dispatch = useDispatch();
+
   const { pathname } = useLocation();
-  const { getLocalStorage } = Utility();
+  const { getLocalStorage, getRole, setStorageAndDispatch, verifyToken } = Utility();
+
+
+  useEffect(() => {
+    const roleType = getRole();
+    setRole(roleType);
+    switchRole(roleType);
+  }, [getLocalStorage("auth")?.type]);
+
+
+  const switchRole = (userRole) => {
+    switch (userRole) {
+      case 'admin':
+        navigateTo(pathname);
+        break;
+      case 'salon':
+        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, true);
+        break;
+      case 'freelancer':
+      // navigateTo('/freelancer/update');
+      // break;
+      default:
+        navigateTo('/login');
+        break;
+    }
+  };
 
   const onIdle = () => {
     localStorage.clear();
@@ -40,9 +85,9 @@ function App() {
     timeout: parseInt(import.meta.env.VITE_LOGOUT_TIMER)    //30 minute idle timeout stored in environment variable file
   });
 
-  if (!getLocalStorage("auth")?.token && pathname !== '/login') {
+  if (!verifyToken() && pathname !== '/login') {
     return <Navigate to="/login" replace />
-  };
+  }
 
   return (
     <ColorModeContext.Provider value={colorMode}>
@@ -51,22 +96,48 @@ function App() {
         <div className="app">
           {getLocalStorage("auth")?.token &&
             <Suspense fallback={<Loader />}>
-              <Sidebar />
+              <Sidebar role={role} />
               <main className="content">
                 <Topbar />
                 <Routes>
-                  <Route exact path="/" element={<Dashboard />} />
-                  <Route exact path="/user/create" element={<UserFormComponent />} />
-                  <Route exact path="/user/update" element={<UserFormComponent />} />
-                  <Route exact path="/user/listing" element={<UserListingComponent />} />
-                  <Route exact path="/salon/create" element={<SalonFormComponent />} />
-                  <Route exact path="/salon/update" element={<SalonFormComponent />} />
-                  <Route exact path="/salon/listing" element={<SalonListingComponent />} />
-                  {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                  {role === 'admin' &&
+                    <>
+                      <Route exact path="/" element={<Dashboard />} />
+                      <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
+
+                      <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
+
+                      <Route exact path="/service/listing" element={<ServiceListingComponent />} />
+
+                      <Route exact path="/skill/listing" element={<SkillListingComponent />} />
+
+                      <Route exact path="/job/seeker/create" element={<JobSeekerFormComponent />} />
+                      <Route exact path="/job/seeker/update/:id" element={<JobSeekerFormComponent />} />
+                      <Route exact path="/job/seeker/listing" element={<JobSeekerListingComponent />} />
+
+                      <Route exact path="/employee/create" element={<UserFormComponent />} />
+                      <Route exact path="/employee/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/employee/listing" element={<UserListingComponent />} />
+                      <Route exact path="/salon/create" element={<UserFormComponent />} />
+                      <Route exact path="/salon/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/salon/listing" element={<UserListingComponent />} />
+                      <Route exact path="/freelancer/create" element={<UserFormComponent />} />
+                      <Route exact path="/freelancer/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/freelancer/listing" element={<UserListingComponent />} />
+                      {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                    </>}
+                  {role === 'salon' &&
+                    <>
+                      <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
+                    </>}
+                  {/* {role === 'freelancer' &&
+                    <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}
                 </Routes>
               </main>
-            </Suspense>
-          }
+            </Suspense>}
           <Routes>
             <Route exact path="/login" element={<Login />} />
           </Routes>
