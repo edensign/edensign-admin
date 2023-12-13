@@ -77,16 +77,31 @@ export const Utility = () => {
     const getLocalStorage = (key) => {
         return JSON.parse(localStorage.getItem(key));
     };
-    /** Verifying the token authenticity by making API call
+    /** Asynchronously verifying the token authenticity by using CommonAPI
      */
     const verifyToken = async () => {
-        return CommonAPI.verifyToken()
-            .then(verified => {
-                return verified.data === "Verfified";
-            })
-            .catch(err => {
-                throw err;
-            });
+        try {
+            const verified = await CommonAPI.verifyToken();
+            // Check if verification was successful
+            if (verified.status === 'Success' && verified.data === 'Verified') {
+                return true; // Token is valid
+            } else if (verified.status === 'Success' && verified.message === 'Failed To Authenticate Token') {
+                // Token verification failed with authentication error
+                console.error("Failed to authenticate:", verified.message);
+                return false;
+            } else if (verified.status === 'Error' && verified.message === 'No Token Provided') {
+                // Token verification failed because no token was provided
+                console.error("No token provided:", verified.message);
+                return false;
+            } else {
+                // Handle other error scenarios
+                console.error("Unexpected verification error:", verified);
+                return false;
+            }
+        } catch (err) {
+            console.error("Error verifying token:", err);
+            return false;
+        };
     };
     /** Display toast message and navigate to the path if provided 
      */

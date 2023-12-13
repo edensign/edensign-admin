@@ -176,14 +176,14 @@ const Sidebar = ({ role }) => {
                 Products
               </Typography>
               <SidebarItem
-                title="Product Listing"
-                to="/employee/listing"
+                title="Product Detail"
+                to="/product/detail/listing"
                 icon={<ReceiptOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
-                title="Product Update"
-                to="/employee/update"
+                title="Product Inventory"
+                to="/product/no-page"
                 icon={<ContactsOutlinedIcon />}
                 selected={selected}
               />
@@ -213,7 +213,7 @@ const Sidebar = ({ role }) => {
                 icon={<HelpOutlineOutlinedIcon />}
                 selected={selected}
               />
-               <SidebarItem
+              <SidebarItem
                 title="Skill"
                 to="/skill/listing"
                 icon={<HelpOutlineOutlinedIcon />}
