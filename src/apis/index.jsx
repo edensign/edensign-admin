@@ -13,6 +13,8 @@ import { CommonAPI } from "./CommonAPI";
 import { CountryAPI } from "./CountryAPI";
 import { ImageAPI } from "./ImageAPI";
 import { JobSeekerAPI } from "./JobSeekerAPI";
+import { ProductAPI } from "./ProductAPI";
+import { ProductImageAPI } from "./ProductImageAPI";
 import { SalonAPI } from "./SalonAPI";
 import { SalonEmployeeAPI } from "./SalonEmployeeAPI";
 import { ServiceAPI } from "./ServiceAPI";
@@ -28,6 +30,8 @@ export default {
     CountryAPI,
     ImageAPI,
     JobSeekerAPI,
+    ProductAPI,
+    ProductImageAPI,
     SalonAPI,
     SalonEmployeeAPI,
     ServiceAPI,

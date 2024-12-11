@@ -164,7 +164,6 @@ const FormComponent = () => {
             ...formData.jobSeekerData.values,
             skills: getSelectedSkills(formData.jobSeekerData.values?.skills),
         }
-        console.log("JobSeeker data=>", formData.jobSeekerData.values)
 
         API.JobSeekerAPI.createJobSeeker({ ...formData.jobSeekerData.values })
             .then(({ data: jobSeeker }) => {
@@ -281,6 +280,7 @@ const FormComponent = () => {
                             onClick={() => {
                                 if (window.confirm("Do You Really Want To Reset?")) {
                                     setReset(true);
+                                    location.reload();
                                 };
                             }}
                         >

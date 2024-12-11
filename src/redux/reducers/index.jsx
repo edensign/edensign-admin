@@ -14,6 +14,7 @@ import { menuItemReducer } from "./MenuItemReducer";
 import { setAgreementReducer } from "./UserReducers";
 import { setAmenityReducer } from "./AmenityReducer";
 import { setJobSeekerReducer } from "./JobSeekerReducer";
+import { setProductReducer } from "./ProductReducer";
 import { setSalonReducer } from "./SalonReducer";
 import { setServiceReducer } from "./ServiceReducer";
 import { setSkillReducer } from "./SkillReducer";
@@ -24,6 +25,7 @@ const reducers = combineReducers({
     agreementSigned: setAgreementReducer,
     allAmenities: setAmenityReducer,
     allJobSeekers: setJobSeekerReducer,
+    allProducts: setProductReducer,
     allSalons: setSalonReducer,
     allServices: setServiceReducer,
     allSkills: setSkillReducer,

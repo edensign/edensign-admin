@@ -475,22 +475,9 @@ const FormComponent = () => {
         await addressFormRef.current.Submit();
         await imageFormRef.current.Submit();
         await bannerImageFormRef.current.Submit();
-        // await employeeFormRef1.current.Submit();
-        // await employeeFormRef2.current.Submit();
-        // await employeeFormRef3.current.Submit();
 
         setSubmitted(true);
         setDirty(false);
-    };
-    // console.log("formData=>", formData)
-    // console.log("salonemploData=>", salonEmployeeData)
-
-
-    const handleEmployeeFormChange = () => {
-        // console.log("I is cakked=>", index, data)
-        // setEmployeeFormData({
-        //     ...employeeFormData, [`employeeValues_${index}`]: data
-        // });
     };
 
     const handleFormChange = (data, form) => {

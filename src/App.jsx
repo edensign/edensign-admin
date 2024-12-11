@@ -22,6 +22,9 @@ const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
 
 const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
 
+const ProductFormComponent = lazy(() => import("./components/products/FormComponent"));
+const ProductListingComponent = lazy(() => import("./components/products/ListingComponent"));
+
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
 
@@ -104,6 +107,10 @@ function App() {
                     <>
                       <Route exact path="/" element={<Dashboard />} />
                       <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
+
+                      <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
+                      <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
+                      <Route exact path="/product/detail/listing" element={<ProductListingComponent />} />
 
                       <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
