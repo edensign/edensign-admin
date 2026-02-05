@@ -97,7 +97,7 @@ const FormComponent = () => {
         // delete the selected (removed) images from Azure which are in deletedImage state
         if (deletedImage.length) {
             deletedImage.forEach(image => {
-                deleteFileFromAzure("product", image);
+                // deleteFileFromAzure("product", image);
                 console.log("Deleted normal image from azure");
             });
         }
@@ -115,7 +115,7 @@ const FormComponent = () => {
                     if (formData.imageData.values?.Normal) {
                         Array.from(formData.imageData.values.Normal).map(image => {
                             formattedName = formatImageName(image.name);
-                            API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
+                            // API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
                             API.ProductImageAPI.createProductImage({
                                 image_src: formattedName,
                                 parent_id: formData.productData.values.id,
@@ -195,7 +195,7 @@ const FormComponent = () => {
                             if (formData.imageData.values.Normal?.length) {
                                 promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
                                     let formattedName = formatImageName(image.name);
-                                    API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
+                                    // API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
                                     API.ProductImageAPI.createProductImage({
                                         image_src: formattedName,
                                         parent_id: product.data.id,

@@ -238,7 +238,7 @@ const Sidebar = ({ role }) => {
               </Typography>
               <SidebarItem
                 title="Salon Detail"
-                to={id ? "/salon/detail/update/:id" : "/salon/detail/create"}
+                to={id ? `/salon/detail/update/${id}` : "/salon/detail/create"}
                 icon={<FormatListBulletedIcon />}
                 selected={selected}
               />

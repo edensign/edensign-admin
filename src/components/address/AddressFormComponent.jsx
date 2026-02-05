@@ -232,6 +232,7 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                     <FormControl variant="filled" sx={{ minWidth: 120 }}
                         error={!!formik.touched.country && !!formik.errors.country}
                     >
+                        <InputLabel id="countryField">--Select Country*--</InputLabel>
                         <Select
                             displayEmpty
                             autoComplete="new-country"
@@ -244,7 +245,6 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                                 formik.setFieldValue("country", event.target.value);
                             }}
                         >
-                            <MenuItem value="" disabled>--Select Country*--</MenuItem>
                             {countries.map(item => (
                                 <MenuItem value={item.id} name={item.name} key={item.name}>
                                     {item.name}

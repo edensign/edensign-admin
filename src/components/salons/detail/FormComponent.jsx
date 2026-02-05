@@ -39,7 +39,7 @@ const FormComponent = () => {
         imageData: { values: null, validated: true },
         bannerImageData: { values: null, validated: true }
     });
-    const [salonEmployeeData, setSalonEmployeeData] = useState({});   //this will get all salon employee data
+    const [salonEmployeeData, setSalonEmployeeData] = useState();   //this will get all salon employee data
 
     const [updatedValues, setUpdatedValues] = useState(null);
     const [deletedImage, setDeletedImage] = useState([]);
@@ -131,19 +131,19 @@ const FormComponent = () => {
         console.log("formdatas in update=>", formData)
 
         // delete the selected (removed) images from Azure which are in deletedImage state
-        if (deletedImage.length) {
-            deletedImage.forEach(image => {
-                deleteFileFromAzure("salon", image);
-                console.log("Deleted normal image from azure");
-            });
-        }
+        // if (deletedImage.length) {
+        //     deletedImage.forEach(image => {
+        //         deleteFileFromAzure("salon", image);
+        //         console.log("Deleted normal image from azure");
+        //     });
+        // }
         // delete the selected (removed) images from Azure which are in deletedBannerImage state
-        if (deletedBannerImage.length) {
-            deletedBannerImage.forEach(image => {
-                deleteFileFromAzure("salon/banner", image);
-                console.log("Deleted  banner image from azure");
-            });
-        }
+        // if (deletedBannerImage.length) {
+        //     deletedBannerImage.forEach(image => {
+        //         deleteFileFromAzure("salon/banner", image);
+        //         console.log("Deleted  banner image from azure");
+        //     });
+        // }
 
         // delete all images from db on every update and later insert new and old again
         API.ImageAPI.deleteImage({
@@ -175,7 +175,7 @@ const FormComponent = () => {
                         if (formData.imageData.values?.Normal) {
                             Array.from(formData.imageData.values.Normal).map(image => {
                                 formattedName = formatImageName(image.name);
-                                API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
+                                API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
                                 API.ImageAPI.createImage({
                                     image_src: formattedName,
                                     parent_id: formData.salonData.values.id,
@@ -183,7 +183,6 @@ const FormComponent = () => {
                                     type: 'normal'
                                 })
                             });
-                            console.log("Created new normal image")
                             status = true;
                         }
                         // insert old images normal only in db & not on azure
@@ -207,7 +206,7 @@ const FormComponent = () => {
 
                             Array.from(formData.bannerImageData.values?.Banner).map(async (image) => {
                                 let formattedName = formatImageName(image.name);
-                                API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
+                                API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
                                 API.ImageAPI.createImage({
                                     image_src: formattedName,
                                     parent_id: formData.salonData.values.id,
@@ -215,7 +214,6 @@ const FormComponent = () => {
                                     type: 'banner'
                                 })
                             });
-                            console.log("Created new banner image")
                             status = true;
                         }
                         // insert old images banner only in db & not on azure
@@ -356,7 +354,7 @@ const FormComponent = () => {
                             if (formData.imageData.values.Normal?.length) {
                                 promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
                                     let formattedName = formatImageName(image.name);
-                                    API.ImageAPI.uploadImage({ folder: 'salon', file: image, name: formattedName });
+                                    API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
                                     API.ImageAPI.createImage({
                                         image_src: formattedName,
                                         parent_id: salon.data.id,
@@ -368,7 +366,7 @@ const FormComponent = () => {
                                 if (formData.bannerImageData.values.Banner?.length) {
                                     bannerPromises = Array.from(formData.bannerImageData.values.Banner).map(async (image) => {
                                         let formattedName = formatImageName(image.name);
-                                        API.ImageAPI.uploadImage({ folder: 'salon/banner', file: image, name: formattedName });
+                                        API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
                                         API.ImageAPI.createImage({
                                             image_src: formattedName,
                                             parent_id: salon.data.id,
@@ -498,7 +496,7 @@ const FormComponent = () => {
 
     const handleSubmitDialog = (folderName, fileName, blobName) => {
         API.UserAPI.update({ id: auth.id, agreement: 1 });
-        uploadDocumentToAzure(folderName, fileName, blobName);
+        // uploadDocumentToAzure(folderName, fileName, blobName);
     };
 
     return (
@@ -585,7 +583,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
-                azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}`}
+                azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/normal`}
                 ENV={ENV}
             />
             <ImagePicker

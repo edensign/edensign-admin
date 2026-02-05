@@ -24,6 +24,11 @@ const initialValues = {
     gender: "",
     qualification: "",
     status: "inactive",
+    paid: "no",
+    hired_in: "",
+    designation: "",
+    description: "",
+    previous_employer: "",
     skills: [],
     hobbies: "",
     experience: "",
@@ -88,13 +93,12 @@ const JobSeekerFormComponent = ({
             setInitialState(updatedValues);
 
             //we are modifying our formatted resume name to only contain the filename
-            if (updatedValues.resume.startsWith(updatedValues.name.toLowerCase(), 2)) {
-                const modifiedName = updatedValues.resume.replace(updatedValues.name.toLowerCase(), "");
-                setFilename(modifiedName.split("").splice(3).join(""));
+            if (updatedValues.resume.startsWith(updatedValues.name.replace(/\s+/g, "_").toLowerCase(), 2)) {
+                setFilename(updatedValues.resume.split("").splice(2).join(""));
             }
         }
     }, [updatedValues]);
-    console.log(filename)
+
 
     return (
         <Box m="20px">
@@ -152,8 +156,8 @@ const JobSeekerFormComponent = ({
                         fullWidth
                         variant="filled"
                         type="text"
-                        name="designation"
                         label="Designation"
+                        name="designation"
                         autoComplete="new-designation"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
@@ -187,19 +191,6 @@ const JobSeekerFormComponent = ({
                         value={formik.values.age}
                         error={!!formik.touched.age && !!formik.errors.age}
                         helperText={formik.touched.age && formik.errors.age}
-                    />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="skills"
-                        label="Skills"
-                        autoComplete="new-skills"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.skills}
-                        error={!!formik.touched.skills && !!formik.errors.skills}
-                        helperText={formik.touched.skills && formik.errors.skills}
                     />
                     <TextField
                         fullWidth
@@ -369,6 +360,7 @@ const JobSeekerFormComponent = ({
                                         name="resume"
                                         onChange={event => {
                                             const file = event.target.files[0];
+                                            console.log('resume', file)
                                             formik.setFieldValue("resume", file);
                                             setFilename(file.name);
                                             setDirty(true);

@@ -31,6 +31,7 @@ const PreviewImage = ({
     const isTab = useMediaQuery("(max-width:920px)");
     let oldCount;
     let uploadedImages = [];
+    console.log('azurePath', azurePath);
 
     useEffect(() => {
         console.log('USE EFFECT 2')
@@ -38,7 +39,7 @@ const PreviewImage = ({
         if (updatedValues) {
             updatedValues.map(img => {
                 if (img.image_src) {
-                    srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
+                    srcArray.push(`${azurePath}/${img.image_src}`);
                 }
             });
         }
@@ -57,7 +58,7 @@ const PreviewImage = ({
             if (updatedValues) {
                 updatedValues.map(img => {
                     if (img.image_src) {
-                        srcArray.push(`${azurePath}/${img.image_src}?${ENV.VITE_SAS_TOKEN}`);
+                        srcArray.push(`${azurePath}/${img.image_src}`);
                     }
                 });
             }

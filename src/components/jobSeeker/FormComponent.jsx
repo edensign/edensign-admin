@@ -61,6 +61,13 @@ const FormComponent = () => {
     }, []);
 
     const updateJobSeekerAndAddress = useCallback(formData => {
+        console.log(formData)
+        if (formData.jobSeekerData?.values?.resume) {
+            let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
+            console.log("Uploading...");
+            // uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
+            formData.jobSeekerData.values.resume = formattedResumeName;
+        }
         const dataFields = [
             {
                 ...formData.jobSeekerData.values,
@@ -70,9 +77,11 @@ const FormComponent = () => {
         ];
         const paths = ["/update-job-seeker", "/update-address"];
         setLoading(true);
+        console.log('jobseeker datafields=', dataFields)
 
         API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
             .then(responses => {
+                console.log('jobseeker respomses=', responses)
                 let status = true;
                 responses.forEach(response => {
                     if (response.data.status !== "Success") {
@@ -157,7 +166,7 @@ const FormComponent = () => {
         if (formData.jobSeekerData?.values?.resume) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
             console.log("Uploading...");
-            uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
+            // uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
             formData.jobSeekerData.values.resume = formattedResumeName;
         }
         formData.jobSeekerData.values = {

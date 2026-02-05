@@ -107,11 +107,12 @@ const ChildAnotherLogic = ({ index, services, masterValues, setMasterValues, upd
                         options={services}
                         getOptionLabel={option => option.name}
                         disableCloseOnSelect    //updatedValues && updatedValues[index - 1] ? updatedValues[index - 1].services
-                        value={initialState.services}
+                        value={undefined}
                         onBlur={handleBlur}
                         // onChange={(event, value) => handleChange(event, value)}
                         onChange={(event, value) => {
                             console.log("Changed service=>", value);
+                            console.log("initial service=>", initialState);
                             setInitialState({ ...initialState, services: value });
                         }}
                         sx={{ gridColumn: "span 2" }}

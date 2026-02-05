@@ -52,7 +52,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
         category: "",
         status: "inactive",
         closed_on: "",
-        opening_time: null,
+        opening_time: dayjs(updatedValues?.closing_time) || null,
         closing_time: dayjs(updatedValues?.closing_time) || null,
         estd_on: dayjs(updatedValues?.estd_on) || null
     };
