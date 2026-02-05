@@ -79,7 +79,7 @@ This Agreement constitutes the entire understanding between the Salon\nand the E
         finally {
             setTimeout(() => {
                 location.reload();
-            }, 1000);
+            }, 2000);
         }
     };
 

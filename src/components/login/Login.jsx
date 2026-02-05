@@ -47,7 +47,7 @@ const Login = () => {
   const { typography } = themeSettings(theme.palette.mode);
   const { toastAndNavigate, setLocalStorage } = Utility();
 
-    const boxstyle = {
+  const boxstyle = {
     position: "absolute",
     top: isMobile ? "35%" : "42%",
     left: "50%",
@@ -85,6 +85,7 @@ const Login = () => {
         })
         .catch(err => {
           setLoading(false);
+          initialValues.password = '';
           toastAndNavigate(dispatch, true, "error", err?.message);
         });
     };
