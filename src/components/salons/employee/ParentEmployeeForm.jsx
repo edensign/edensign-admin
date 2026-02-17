@@ -37,7 +37,8 @@ const ParentEmployeeFormComponent = ({
         contact_no: "",
         services: [],
         gender: "",
-        age: ""
+        age: "",
+        slots: []
     });
     const isNonMobile = useMediaQuery("(min-width:600px)");
 

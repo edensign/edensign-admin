@@ -8,10 +8,13 @@
 
 import { AddressAPI } from "./AddressAPI";
 import { AmenityAPI } from "./AmenityAPI";
+import { AppointmentAPI } from "./AppointmentAPI";
 import { CityAPI } from "./CityAPI";
 import { CommonAPI } from "./CommonAPI";
+import { ContactAPI } from "./ContactAPI";
 import { CountryAPI } from "./CountryAPI";
 import { ImageAPI } from "./ImageAPI";
+import { InventoryAPI } from "./InventoryAPI";
 import { JobSeekerAPI } from "./JobSeekerAPI";
 import { ProductAPI } from "./ProductAPI";
 import { ProductImageAPI } from "./ProductImageAPI";
@@ -25,10 +28,13 @@ import { UserAPI } from "./UserAPI";
 export default {
     AddressAPI,
     AmenityAPI,
+    AppointmentAPI,
     CityAPI,
     CommonAPI,
+    ContactAPI,
     CountryAPI,
     ImageAPI,
+    InventoryAPI,
     JobSeekerAPI,
     ProductAPI,
     ProductImageAPI,
@@ -39,3 +45,4 @@ export default {
     StateAPI,
     UserAPI
 };
+

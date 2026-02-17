@@ -20,7 +20,8 @@ const initialValues = {
     contact_no: "",
     services: [],
     gender: "",
-    age: ""
+    age: "",
+    slots: ""
 };
 
 const ChildEmployeeFormComponent = ({
@@ -69,7 +70,9 @@ const ChildEmployeeFormComponent = ({
                 contact_no: formik.values.contact_no,
                 services: formik.values.services,
                 gender: formik.values.gender,
-                age: formik.values.age
+                gender: formik.values.gender,
+                age: formik.values.age,
+                slots: formik.values.slots ? formik.values.slots.split(',').map(s => s.trim()) : []
             }))
         };
     }
@@ -195,6 +198,21 @@ const ChildEmployeeFormComponent = ({
                 value={formik.values.age}
                 error={!!formik.touched.age && !!formik.errors.age}
                 helperText={formik.touched.age && formik.errors.age}
+            />
+            <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Slots (comma separated)"
+                name="slots"
+                placeholder="e.g. 10:00-11:00, 12:00-1:00"
+                autoComplete="new-slots"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.slots}
+                error={!!formik.touched.slots && !!formik.errors.slots}
+                helperText={formik.touched.slots && formik.errors.slots}
+                sx={{ gridColumn: "span 4" }}
             />
             <Divider variant="fullWidth" sx={{ gridColumn: "span 4" }}>
                 <Chip color="info" label={`${index} Employee Detail`}

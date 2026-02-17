@@ -21,9 +21,13 @@ import Loader from "./components/common/Loader";
 const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
 
 const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
+const AppointmentListingComponent = lazy(() => import("./components/appointments/ListingComponent"));
 
 const ProductFormComponent = lazy(() => import("./components/products/FormComponent"));
 const ProductListingComponent = lazy(() => import("./components/products/ListingComponent"));
+
+const InventoryListingComponent = lazy(() => import("./components/inventory/ListingComponent"));
+const InventoryFormComponent = lazy(() => import("./components/inventory/InventoryFormComponent"));
 
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
@@ -34,6 +38,7 @@ const JobSeekerListingComponent = lazy(() => import("./components/jobSeeker/List
 const ServiceListingComponent = lazy(() => import("./components/services/ListingComponent"));
 
 const SkillListingComponent = lazy(() => import("./components/skill/ListingComponent"));
+const ContactListingComponent = lazy(() => import("./components/contactUs/ListingComponent"));
 
 const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
@@ -107,16 +112,22 @@ function App() {
                     <>
                       <Route exact path="/" element={<Dashboard />} />
                       <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
+                      <Route exact path="/appointment/listing" element={<AppointmentListingComponent />} />
 
                       <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/listing" element={<ProductListingComponent />} />
+
+                      <Route exact path="/inventory/listing" element={<InventoryListingComponent />} />
+                      <Route exact path="/inventory/create" element={<InventoryFormComponent />} />
+                      <Route exact path="/inventory/update/:id" element={<InventoryFormComponent />} />
 
                       <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
 
                       <Route exact path="/service/listing" element={<ServiceListingComponent />} />
+                      <Route exact path="/contact/listing" element={<ContactListingComponent />} />
 
                       <Route exact path="/skill/listing" element={<SkillListingComponent />} />
 

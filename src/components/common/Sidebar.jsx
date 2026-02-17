@@ -156,6 +156,12 @@ const Sidebar = ({ role }) => {
                 selected={selected}
               />
               <SidebarItem
+                title="Appointments"
+                to="/appointment/listing"
+                icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
                 title="Salon Inventory"
                 to="/salon/inventory"
                 icon={<ReceiptLongIcon />}
@@ -183,11 +189,24 @@ const Sidebar = ({ role }) => {
               />
               <SidebarItem
                 title="Product Inventory"
-                to="/product/no-page"
+                to="/inventory/listing"
                 icon={<ContactsOutlinedIcon />}
                 selected={selected}
               />
 
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Enquiries
+              </Typography>
+              <SidebarItem
+                title="Contact Enquiries"
+                to="/contact/listing"
+                icon={<ContactsOutlinedIcon />}
+                selected={selected}
+              />
               <Typography
                 variant="h6"
                 color={colors.grey[300]}
@@ -225,6 +244,7 @@ const Sidebar = ({ role }) => {
                 icon={<LoyaltyIcon />}
                 selected={selected}
               />
+
             </Box>
           </>}
           {role === 'salon' &&
