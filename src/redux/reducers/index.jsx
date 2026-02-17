@@ -13,6 +13,7 @@ import { displayToastReducer } from "./ToastReducer";
 import { menuItemReducer } from "./MenuItemReducer";
 import { setAgreementReducer } from "./UserReducers";
 import { setAmenityReducer } from "./AmenityReducer";
+import { setInventoryReducer } from "./InventoryReducer";
 import { setJobSeekerReducer } from "./JobSeekerReducer";
 import { setProductReducer } from "./ProductReducer";
 import { setSalonReducer } from "./SalonReducer";
@@ -24,6 +25,7 @@ const reducers = combineReducers({
     auth: authReducer,
     agreementSigned: setAgreementReducer,
     allAmenities: setAmenityReducer,
+    allInventory: setInventoryReducer,
     allJobSeekers: setJobSeekerReducer,
     allProducts: setProductReducer,
     allSalons: setSalonReducer,
