@@ -29,6 +29,12 @@ const ProductListingComponent = lazy(() => import("./components/products/Listing
 const InventoryListingComponent = lazy(() => import("./components/inventory/ListingComponent"));
 const InventoryFormComponent = lazy(() => import("./components/inventory/InventoryFormComponent"));
 
+const SalonInventoryListingComponent = lazy(() => import("./components/salonInventory/SalonInventoryListingComponent"));
+const SalonInventoryFormComponent = lazy(() => import("./components/salonInventory/SalonInventoryFormComponent"));
+
+const CashflowListingComponent = lazy(() => import("./components/cashflow/CashflowListingComponent"));
+const CashflowFormComponent = lazy(() => import("./components/cashflow/CashflowFormComponent"));
+
 const SalonFormComponent = lazy(() => import("./components/salons/detail/FormComponent"));
 const SalonListingComponent = lazy(() => import("./components/salons/detail/ListingComponent"));
 
@@ -125,6 +131,13 @@ function App() {
                       <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
+
+                      <Route exact path="/salon-inventory/listing" element={<SalonInventoryListingComponent />} />
+                      <Route exact path="/salon-inventory/update/:id" element={<SalonInventoryFormComponent />} />
+
+                      <Route exact path="/salon/cashflow" element={<CashflowListingComponent />} />
+                      <Route exact path="/salon/cashflow/create" element={<CashflowFormComponent />} />
+                      <Route exact path="/salon/cashflow/update/:id" element={<CashflowFormComponent />} />
 
                       <Route exact path="/service/listing" element={<ServiceListingComponent />} />
                       <Route exact path="/contact/listing" element={<ContactListingComponent />} />

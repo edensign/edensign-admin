@@ -9,6 +9,7 @@
 import { AddressAPI } from "./AddressAPI";
 import { AmenityAPI } from "./AmenityAPI";
 import { AppointmentAPI } from "./AppointmentAPI";
+import { CashflowAPI } from "./CashflowAPI";
 import { CityAPI } from "./CityAPI";
 import { CommonAPI } from "./CommonAPI";
 import { ContactAPI } from "./ContactAPI";
@@ -19,6 +20,7 @@ import { JobSeekerAPI } from "./JobSeekerAPI";
 import { ProductAPI } from "./ProductAPI";
 import { ProductImageAPI } from "./ProductImageAPI";
 import { SalonAPI } from "./SalonAPI";
+import { SalonInventoryAPI } from "./SalonInventoryAPI";
 import { SalonEmployeeAPI } from "./SalonEmployeeAPI";
 import { ServiceAPI } from "./ServiceAPI";
 import { SkillAPI } from "./SkillAPI";
@@ -29,6 +31,7 @@ export default {
     AddressAPI,
     AmenityAPI,
     AppointmentAPI,
+    CashflowAPI,
     CityAPI,
     CommonAPI,
     ContactAPI,
@@ -39,6 +42,7 @@ export default {
     ProductAPI,
     ProductImageAPI,
     SalonAPI,
+    SalonInventoryAPI,
     SalonEmployeeAPI,
     ServiceAPI,
     SkillAPI,
