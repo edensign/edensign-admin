@@ -41,6 +41,18 @@ export const SalonEmployeeAPI = {
             signal: cancel ? cancelApiObject[this.updateSalonEmployee.name].handleRequestCancellation().signal : undefined,
         });
     },
+    /** Get salon employees by salon id
+     */
+    getBySalonId: async (salonId, cancel = false) => {
+        return await api.request({
+            url: `/get-by-id/${salonId}`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "GET",
+            signal: cancel ? cancelApiObject[this.getBySalonId.name].handleRequestCancellation().signal : undefined,
+        });
+    },
 };
 
 // defining the cancel API object for SalonEmployeeAPI

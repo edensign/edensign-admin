@@ -27,7 +27,11 @@ export default function ServerPaginationGrid({
     pageSizeOptions,
     searchFlag,
     setOldPagination,
-    setSearchFlag
+    setSearchFlag,
+    loading = null,
+    noRowsLabel,
+    onNoRowsAction,
+    noRowsActionLabel
 }) {
     const initialState = {
         page: 0,
@@ -131,15 +135,22 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
+                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
                     selected === 'Salon Inventory' ? salonInventoryLoading : selected === 'Salon Cashflow' ? cashflowLoading : selected === "Service" ? serviceLoading :
                         selected === 'Job Seeker' ? jobSeekerLoading : selected === 'Product Detail' ? productLoading :
-                            selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : userLoading}
+                            selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : userLoading)}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,
                     LoadingOverlay: multipleSkeletons,
                     noRowsOverlay: EmptyOverlayGrid
+                }}
+                componentsProps={{
+                    noRowsOverlay: {
+                        label: noRowsLabel,
+                        onAction: onNoRowsAction,
+                        actionLabel: noRowsActionLabel
+                    }
                 }}
                 pagination
                 ServerPaginationGrid

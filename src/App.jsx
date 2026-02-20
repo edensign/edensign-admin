@@ -22,6 +22,7 @@ const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
 
 const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
 const AppointmentListingComponent = lazy(() => import("./components/appointments/ListingComponent"));
+const AppointmentFormComponent = lazy(() => import("./components/appointments/FormComponent"));
 
 const ProductFormComponent = lazy(() => import("./components/products/FormComponent"));
 const ProductListingComponent = lazy(() => import("./components/products/ListingComponent"));
@@ -30,7 +31,15 @@ const InventoryListingComponent = lazy(() => import("./components/inventory/List
 const InventoryFormComponent = lazy(() => import("./components/inventory/InventoryFormComponent"));
 
 const SalonInventoryListingComponent = lazy(() => import("./components/salonInventory/SalonInventoryListingComponent"));
+
+
+const SalonInventorySalonListingComponent = lazy(() => import("./components/salonInventory/SalonInventorySalonListingComponent"));
+
+
+const SalonProductInventoryListingComponent = lazy(() => import("./components/salonProductInventory/ListingComponent"));
 const SalonInventoryFormComponent = lazy(() => import("./components/salonInventory/SalonInventoryFormComponent"));
+
+
 
 const CashflowListingComponent = lazy(() => import("./components/cashflow/CashflowListingComponent"));
 const CashflowFormComponent = lazy(() => import("./components/cashflow/CashflowFormComponent"));
@@ -61,7 +70,7 @@ function App() {
   const navigateTo = useNavigate();
   const dispatch = useDispatch();
 
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const { getLocalStorage, getRole, setStorageAndDispatch, verifyToken } = Utility();
 
 
@@ -75,7 +84,7 @@ function App() {
   const switchRole = (userRole) => {
     switch (userRole) {
       case 'admin':
-        navigateTo(pathname);
+        navigateTo(pathname + search);
         break;
       case 'salon':
         setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, true);
@@ -119,6 +128,7 @@ function App() {
                       <Route exact path="/" element={<Dashboard />} />
                       <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
                       <Route exact path="/appointment/listing" element={<AppointmentListingComponent />} />
+                      <Route exact path="/appointment/create" element={<AppointmentFormComponent />} />
 
                       <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
@@ -132,6 +142,7 @@ function App() {
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
 
+                      <Route exact path="/salon-inventory/salons" element={<SalonInventorySalonListingComponent />} />
                       <Route exact path="/salon-inventory/listing" element={<SalonInventoryListingComponent />} />
                       <Route exact path="/salon-inventory/update/:id" element={<SalonInventoryFormComponent />} />
 
@@ -157,12 +168,21 @@ function App() {
                       <Route exact path="/freelancer/create" element={<UserFormComponent />} />
                       <Route exact path="/freelancer/update/:id" element={<UserFormComponent />} />
                       <Route exact path="/freelancer/listing" element={<UserListingComponent />} />
+
                       {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
                   {role === 'salon' &&
                     <>
                       <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
+                      <Route exact path="/appointment/listing" element={<AppointmentListingComponent />} />
+                      <Route exact path="/appointment/create" element={<AppointmentFormComponent />} />
+                      <Route exact path="/salon-inventory/listing" element={<SalonProductInventoryListingComponent />} />
+                      <Route exact path="/salon-inventory/create" element={<SalonInventoryFormComponent />} />
+                      <Route exact path="/salon-inventory/update/:id" element={<SalonInventoryFormComponent />} />
+                      <Route exact path="/salon/cashflow" element={<CashflowListingComponent />} />
+                      <Route exact path="/salon/cashflow/create" element={<CashflowFormComponent />} />
+                      <Route exact path="/salon/cashflow/update/:id" element={<CashflowFormComponent />} />
                     </>}
                   {/* {role === 'freelancer' &&
                     <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}

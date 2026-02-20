@@ -8,27 +8,37 @@
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
+import EmptyOverlayGrid from "../common/EmptyOverlayGrid";
 
 import API from "../../apis";
 import { datagridColumns } from "./AppointmentConfig";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens } from "../../theme";
 import { Utility } from "../utility";
+import KanbanViewDialog from "./KanbanViewDialog";
 
 const ListingComponent = () => {
     const theme = useTheme();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const isMobile = useMediaQuery("(max-width:480px)");
 
     const selected = useSelector(state => state.menuItems.selected);
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [kanbanOpen, setKanbanOpen] = useState(false);
 
-    const { getLocalStorage } = Utility();
+    const { getLocalStorage, getRole } = Utility();
+    const role = getRole();
     const colors = tokens(theme.palette.mode);
+
+    // Resolve salonId for the kanban dialog
+    const salonId = getLocalStorage("salon")?.id || null;
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -42,7 +52,8 @@ const ListingComponent = () => {
     const fetchAppointments = async () => {
         setLoading(true);
         try {
-            const response = await API.AppointmentAPI.getAppointments();
+            const salonId = getLocalStorage("salon")?.id;
+            const response = await API.AppointmentAPI.getAppointments(salonId);
             if (response.data?.status === "Success") {
                 setAppointments(response.data.data.rows || []);
             } else {
@@ -69,7 +80,7 @@ const ListingComponent = () => {
                     height={isMobile ? "16vh" : "7vh"}
                     flexDirection={isMobile ? "column" : "row"}
                     justifyContent={"space-between"}
-                    alignItems={isMobile ? "center" : "normal"}
+                    alignItems={isMobile ? "center" : "center"}
                 >
                     <Typography
                         component="h2"
@@ -79,6 +90,33 @@ const ListingComponent = () => {
                     >
                         {selected || "Appointments"}
                     </Typography>
+
+                    <Box display="flex" gap="10px">
+                        <Button
+                            type="button"
+                            variant="outlined"
+                            startIcon={<CalendarViewWeekIcon />}
+                            onClick={() => setKanbanOpen(true)}
+                            sx={{
+                                color: colors.grey[100],
+                                borderColor: "rgba(255,255,255,0.4)",
+                                "&:hover": {
+                                    borderColor: colors.grey[100],
+                                    backgroundColor: "rgba(255,255,255,0.08)",
+                                },
+                            }}
+                        >
+                            Kanban View
+                        </Button>
+                        <Button
+                            type="button"
+                            color="secondary"
+                            variant="contained"
+                            onClick={() => navigate("/appointment/create")}
+                        >
+                            Create Appointment
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
             <Box
@@ -121,7 +159,7 @@ const ListingComponent = () => {
             >
                 <DataGrid
                     rows={appointments}
-                    columns={datagridColumns()}
+                    columns={datagridColumns(role)}
                     loading={loading}
                     pageSizeOptions={[10, 25, 50]}
                     rowHeight={60}
@@ -129,8 +167,25 @@ const ListingComponent = () => {
                         pagination: { paginationModel: { pageSize: 10 } }
                     }}
                     disableColumnMenu
+                    components={{
+                        noRowsOverlay: EmptyOverlayGrid
+                    }}
+                    componentsProps={{
+                        noRowsOverlay: {
+                            label: "No Appointments Found",
+                            onAction: () => navigate("/appointment/create"),
+                            actionLabel: "Create Appointment"
+                        }
+                    }}
                 />
             </Box>
+
+            {/* ── Kanban View Dialog ── */}
+            <KanbanViewDialog
+                open={kanbanOpen}
+                onClose={() => setKanbanOpen(false)}
+                salonId={salonId}
+            />
         </Box>
     );
 };

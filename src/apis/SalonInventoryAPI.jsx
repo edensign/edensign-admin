@@ -1,9 +1,5 @@
 /**
- * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
- *
- * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use, reproduction, or disclosure of this software is subject to
- * restrictions set forth in your license agreement with Eden Sign.
+ * Copyright © 2026, Eden Sign Inc. ALL RIGHTS RESERVED.
  */
 
 import { api } from "./config/axiosConfig";
@@ -13,35 +9,64 @@ import { Utility } from "../components/utility";
 const { getLocalStorage } = Utility();
 
 export const SalonInventoryAPI = {
-    /** Get salon inventory data from the database with pagination and search
+    /** Get all salon inventory with stats
      */
-    getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false) => {
+    getAll: async (conditionObj = false, page = 0, size = 10, search = false, cancel = false) => {
         const queryParam = conditionObj ? `&${conditionObj.key}=${conditionObj.value}` : '';
         const searchParam = search ? `&search=${search}` : '';
+
         const { data: response } = await api.request({
-            url: `/get-salon-inventory?page=${page}&size=${size}${queryParam}${searchParam}`,
+            url: `/salon-inventory/get-all?page=${page}&size=${size}${queryParam}${searchParam}`,
             headers: {
                 "x-access-token": getLocalStorage("auth")?.token
             },
             method: "GET",
-            signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject["getAll"].handleRequestCancellation().signal : undefined,
         });
         return response;
     },
-    /** Update salon inventory
+
+    /** create product
      */
-    updateSalonInventory: async (fields, cancel = false) => {
+    createProduct: async (data, cancel = false) => {
         return await api.request({
-            url: `/update-salon-inventory`,
+            url: `/salon-inventory/create`,
             headers: {
-                "x-access-token": getLocalStorage("auth").token
+                "x-access-token": getLocalStorage("auth")?.token
+            },
+            method: "POST",
+            data: data,
+            signal: cancel ? cancelApiObject["createProduct"].handleRequestCancellation().signal : undefined,
+        });
+    },
+
+    /** update product
+     */
+    updateProduct: async (data, cancel = false) => {
+        return await api.request({
+            url: `/salon-inventory/update`,
+            headers: {
+                "x-access-token": getLocalStorage("auth")?.token
             },
             method: "PATCH",
-            data: fields,
-            signal: cancel ? cancelApiObject[this.updateSalonInventory.name].handleRequestCancellation().signal : undefined,
+            data: data,
+            signal: cancel ? cancelApiObject["updateProduct"].handleRequestCancellation().signal : undefined,
+        });
+    },
+
+    /** Update stock for a product
+     */
+    updateStock: async (data, cancel = false) => {
+        return await api.request({
+            url: `/salon-inventory/update-stock`,
+            headers: {
+                "x-access-token": getLocalStorage("auth")?.token
+            },
+            method: "PATCH",
+            data: data,
+            signal: cancel ? cancelApiObject["updateStock"].handleRequestCancellation().signal : undefined,
         });
     }
 };
 
-// defining the cancel API object for SalonInventoryAPI
 const cancelApiObject = defineCancelApiObject(SalonInventoryAPI);

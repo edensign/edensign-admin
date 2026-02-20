@@ -27,6 +27,7 @@ import { SkillAPI } from "./SkillAPI";
 import { StateAPI } from "./StateAPI";
 import { UserAPI } from "./UserAPI";
 
+
 export default {
     AddressAPI,
     AmenityAPI,
@@ -42,11 +43,10 @@ export default {
     ProductAPI,
     ProductImageAPI,
     SalonAPI,
-    SalonInventoryAPI,
     SalonEmployeeAPI,
+    SalonInventoryAPI,
     ServiceAPI,
     SkillAPI,
     StateAPI,
     UserAPI
 };
-

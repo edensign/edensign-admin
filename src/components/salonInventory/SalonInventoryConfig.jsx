@@ -6,7 +6,7 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Typography, useTheme, Chip } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -18,9 +18,13 @@ export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
+    const location = useLocation();
+
+    const queryParams = new URLSearchParams(location.search);
+    const salonId = queryParams.get("salon_id");
 
     const handleActionEdit = (id) => {
-        navigateTo(`/salon-inventory/update/${id}`, { state: { id: id } });
+        navigateTo(`/salon-inventory/update/${id}`, { state: { id: id, salonId: salonId } });
     };
 
     const getStockStatus = (stockQuantity, lowStockThreshold) => {
@@ -33,19 +37,6 @@ export const datagridColumns = () => {
     };
 
     const columns = [
-        {
-            field: "salon_code",
-            headerName: "SALON CODE",
-            headerAlign: "center",
-            align: "center",
-            flex: 0.8,
-            minWidth: 100,
-            renderCell: ({ row: { salon_code } }) => (
-                <Typography color={colors.grey[100]} fontFamily="monospace">
-                    {salon_code || "-"}
-                </Typography>
-            )
-        },
         {
             field: "sku",
             headerName: "SKU",
@@ -61,33 +52,15 @@ export const datagridColumns = () => {
         },
         {
             field: "name",
-            headerName: "SALON NAME",
+            headerName: "PRODUCT NAME",
             headerAlign: "center",
             align: "center",
             flex: 1.2,
             minWidth: 150
         },
         {
-            field: "type",
-            headerName: "TYPE",
-            headerAlign: "center",
-            align: "center",
-            flex: 0.6,
-            minWidth: 80,
-            renderCell: ({ row: { type } }) => (
-                <Chip
-                    label={type ? type.toUpperCase() : "-"}
-                    size="small"
-                    sx={{
-                        backgroundColor: colors.blueAccent[700],
-                        color: colors.grey[100]
-                    }}
-                />
-            )
-        },
-        {
-            field: "area",
-            headerName: "AREA",
+            field: "brand",
+            headerName: "BRAND",
             headerAlign: "center",
             align: "center",
             flex: 0.8,
@@ -124,8 +97,26 @@ export const datagridColumns = () => {
             minWidth: 90
         },
         {
-            field: "stockStatus",
+            field: "status",
             headerName: "STATUS",
+            headerAlign: "center",
+            align: "center",
+            flex: 0.8,
+            minWidth: 100,
+            renderCell: ({ row: { status } }) => (
+                <Chip
+                    label={status ? status.toUpperCase() : "-"}
+                    size="small"
+                    sx={{
+                        backgroundColor: status === 'active' ? colors.greenAccent[700] : colors.redAccent[700],
+                        color: colors.grey[100]
+                    }}
+                />
+            )
+        },
+        {
+            field: "stockStatus",
+            headerName: "STOCK STATUS",
             headerAlign: "center",
             align: "center",
             flex: 0.8,

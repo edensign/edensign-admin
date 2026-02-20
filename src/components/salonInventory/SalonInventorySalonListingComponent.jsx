@@ -1,14 +1,10 @@
 /**
- * Copyright © 2023, Eden Sign Inc. ALL RIGHTS RESERVED.
- *
- * This software is the confidential information of Eden Sign Inc., and is licensed as
- * restricted rights software. The use,reproduction, or disclosure of this software is subject to
- * restrictions set forth in your license agreement with Eden Sign.
+ * Copyright © 2026, Eden Sign Inc. ALL RIGHTS RESERVED.
  */
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 
 import { Box, Typography, useMediaQuery, useTheme, Button } from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -18,25 +14,24 @@ import API from "../../apis";
 import Search from "../common/Search";
 import ServerPaginationGrid from '../common/Datagrid';
 
-import { datagridColumns } from "./SalonInventoryConfig";
+import { datagridColumns } from "./SalonInventorySalonConfig";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
-import { setSalonInventory } from "../../redux/actions/SalonInventoryAction";
+import { setSalons } from "../../redux/actions/SalonAction";
 import { tokens } from "../../theme";
 import { useCommon } from "../hooks/common";
 import { Utility } from "../utility";
 
 const pageSizeOptions = [5, 10, 20];
 
-const SalonInventoryListingComponent = () => {
+const SalonInventorySalonListingComponent = () => {
     const theme = useTheme();
-    const dispatch = useDispatch();
     const navigateTo = useNavigate();
-    const location = useLocation();
+    const dispatch = useDispatch();
     const isMobile = useMediaQuery("(max-width:480px)");
     const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
-    const { listData } = useSelector(state => state.allSalonInventory);
+    const { listData, loading } = useSelector(state => state.allSalons);
 
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
     const [oldPagination, setOldPagination] = useState();
@@ -47,19 +42,9 @@ const SalonInventoryListingComponent = () => {
     const colors = tokens(theme.palette.mode);
     const reloadBtn = document.getElementById("reload-btn");
 
-    const columns = datagridColumns();
-
-    // Parse query parameters
-    const queryParams = new URLSearchParams(location.search);
-    const salonId = queryParams.get("salon_id");
-
-    const condition = useMemo(() => {
-        return salonId ? { key: "salonId", value: salonId } : false;
-    }, [salonId]);
-
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
-        dispatch(setMenuItem(selectedMenu?.selected || "Salon Inventory"));
+        dispatch(setMenuItem("Salon Inventory"));
     }, []);
 
     const handleReload = () => {
@@ -94,25 +79,17 @@ const SalonInventoryListingComponent = () => {
                             color={colors.grey[100]}
                             fontWeight="bold"
                         >
-                            {selected || "Salon Inventory"}
+                            {isMobile ? "Select Salon to View Inventory" : "View Inventory"}
                         </Typography>
                     </Box>
                     <Search
-                        action={setSalonInventory}
-                        api={API.SalonInventoryAPI}
+                        action={setSalons}
+                        api={API.SalonAPI}
                         getSearchData={getPaginatedData}
                         setSearchFlag={setSearchFlag}
                         oldPagination={oldPagination}
                         reloadBtn={reloadBtn}
                     />
-                    <Button
-                        type="submit"
-                        color="success"
-                        variant="contained"
-                        onClick={() => { navigateTo("/salon-inventory/create", { state: { salonId } }) }}
-                    >
-                        Create Product
-                    </Button>
                 </Box>
             </Box>
             <Button sx={{
@@ -134,13 +111,13 @@ const SalonInventoryListingComponent = () => {
                 Back
             </Button>
             <ServerPaginationGrid
-                action={setSalonInventory}
-                api={API.SalonInventoryAPI}
+                loading={loading}
+                action={setSalons}
+                api={API.SalonAPI}
                 getQuery={getPaginatedData}
-                condition={condition}
-                columns={columns}
-                rows={listData?.list?.rows || []}
-                count={listData?.list?.count || 0}
+                columns={datagridColumns()}
+                rows={listData?.rows || []}
+                count={listData?.count || 0}
                 pageSizeOptions={pageSizeOptions}
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}
@@ -150,4 +127,4 @@ const SalonInventoryListingComponent = () => {
     );
 };
 
-export default SalonInventoryListingComponent;
+export default SalonInventorySalonListingComponent;
