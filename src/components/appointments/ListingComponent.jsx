@@ -20,7 +20,6 @@ import { datagridColumns } from "./AppointmentConfig";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens } from "../../theme";
 import { Utility } from "../utility";
-import KanbanViewDialog from "./KanbanViewDialog";
 
 const ListingComponent = () => {
     const theme = useTheme();
@@ -31,14 +30,10 @@ const ListingComponent = () => {
     const selected = useSelector(state => state.menuItems.selected);
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [kanbanOpen, setKanbanOpen] = useState(false);
 
     const { getLocalStorage, getRole } = Utility();
     const role = getRole();
     const colors = tokens(theme.palette.mode);
-
-    // Resolve salonId for the kanban dialog
-    const salonId = getLocalStorage("salon")?.id || null;
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -96,7 +91,7 @@ const ListingComponent = () => {
                             type="button"
                             variant="outlined"
                             startIcon={<CalendarViewWeekIcon />}
-                            onClick={() => setKanbanOpen(true)}
+                            onClick={() => navigate("/appointment/slots/kanban")}
                             sx={{
                                 color: colors.grey[100],
                                 borderColor: "rgba(255,255,255,0.4)",
@@ -179,13 +174,6 @@ const ListingComponent = () => {
                     }}
                 />
             </Box>
-
-            {/* ── Kanban View Dialog ── */}
-            <KanbanViewDialog
-                open={kanbanOpen}
-                onClose={() => setKanbanOpen(false)}
-                salonId={salonId}
-            />
         </Box>
     );
 };

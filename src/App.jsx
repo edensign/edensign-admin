@@ -23,6 +23,7 @@ const Dashboard = lazy(() => import("./components/dashboard/Dashboard"));
 const AmenityListingComponent = lazy(() => import("./components/amenities/ListingComponent"));
 const AppointmentListingComponent = lazy(() => import("./components/appointments/ListingComponent"));
 const AppointmentFormComponent = lazy(() => import("./components/appointments/FormComponent"));
+const KanbanCalendarView = lazy(() => import("./components/appointments/KanbanCalendarView"));
 
 const ProductFormComponent = lazy(() => import("./components/products/FormComponent"));
 const ProductListingComponent = lazy(() => import("./components/products/ListingComponent"));
@@ -87,7 +88,7 @@ function App() {
         navigateTo(pathname + search);
         break;
       case 'salon':
-        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, true);
+        setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, pathname);
         break;
       case 'freelancer':
       // navigateTo('/freelancer/update');
@@ -129,6 +130,7 @@ function App() {
                       <Route exact path="/amenity/listing" element={<AmenityListingComponent />} />
                       <Route exact path="/appointment/listing" element={<AppointmentListingComponent />} />
                       <Route exact path="/appointment/create" element={<AppointmentFormComponent />} />
+                      <Route exact path="/appointment/slots/kanban" element={<KanbanCalendarView />} />
 
                       <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
@@ -177,6 +179,7 @@ function App() {
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/appointment/listing" element={<AppointmentListingComponent />} />
                       <Route exact path="/appointment/create" element={<AppointmentFormComponent />} />
+                      <Route exact path="/appointment/slots/kanban" element={<KanbanCalendarView />} />
                       <Route exact path="/salon-inventory/listing" element={<SalonProductInventoryListingComponent />} />
                       <Route exact path="/salon-inventory/create" element={<SalonInventoryFormComponent />} />
                       <Route exact path="/salon-inventory/update/:id" element={<SalonInventoryFormComponent />} />

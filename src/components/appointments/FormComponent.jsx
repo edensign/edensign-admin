@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 
 import {
@@ -45,47 +45,27 @@ const FormComponent = () => {
     const [bookedSlots, setBookedSlots] = useState([]);
     const [salonDetails, setSalonDetails] = useState(null);
 
+    // Read pre-fill query params (from Kanban click)
+    const [searchParams] = useSearchParams();
+    const prefillEmployeeId = searchParams.get("salon_employee");
+    const prefillDate = searchParams.get("date");
+    const prefillTimeSlot = searchParams.get("time_slot");
+
     const [formData, setFormData] = useState({
         customer_name: "",
         customer_contact: "",
         salon_id: role === "salon" ? salon?.id : "",
         salon_employee: "",
         services: "",
-        date: dayjs(),
-        time_slot: "",
+        date: prefillDate ? dayjs(prefillDate) : dayjs(),
+        time_slot: prefillTimeSlot || "",
         booked_for: "self"
     });
 
-    // Generate time slots dynamically from salon opening/closing time (1-hour intervals)
+    // Generate static time slots: 10:00 AM to 10:00 PM (1-hour intervals)
     const generateTimeSlots = () => {
-        console.log("salonDetails for slots:", salonDetails);
-
-        // Check if salon is closed on selected day
-        if (salonDetails?.closed_on) {
-            const currentDay = formData.date.format('dddd').toLowerCase();
-            if (currentDay === salonDetails.closed_on) {
-                return []; // Salon is closed
-            }
-        }
-
-        let startHour = 10; // default 10 AM
-        let endHour = 20;   // default 8 PM
-
-        if (salonDetails?.opening_time && salonDetails?.closing_time) {
-            // opening_time/closing_time are DATETIME stored as UTC in MySQL
-            // Use getUTCHours() to extract the raw hour without timezone conversion
-            const openDt = new Date(salonDetails.opening_time);
-            const closeDt = new Date(salonDetails.closing_time);
-
-            if (!isNaN(openDt.getTime()) && !isNaN(closeDt.getTime())) {
-                startHour = openDt.getUTCHours();
-                endHour = closeDt.getUTCHours();
-                console.log("Salon hours (UTC):", startHour, "-", endHour);
-            }
-        }
-
         const slots = [];
-        for (let hour = startHour; hour <= endHour; hour++) {
+        for (let hour = 10; hour <= 22; hour++) {
             const h = hour % 12 === 0 ? 12 : hour % 12;
             const modifier = hour < 12 ? "AM" : "PM";
             const label = `${String(h).padStart(2, '0')}:00 ${modifier}`;
@@ -116,11 +96,12 @@ const FormComponent = () => {
     // When stylist is selected, filter services based on stylist's service IDs
     useEffect(() => {
         if (formData.salon_employee && stylists.length > 0 && allServices.length > 0) {
-            const selectedStylist = stylists.find(s => s.id === formData.salon_employee);
+            const selectedStylist = stylists.find(s => Number(s.id) === Number(formData.salon_employee));
             if (selectedStylist && selectedStylist.services) {
                 // services field is comma-separated IDs like "2,1" or "10,11"
-                const serviceIds = selectedStylist.services.split(',').map(id => id.trim());
-                const matched = allServices.filter(svc => serviceIds.includes(String(svc.id)));
+                const serviceIds = selectedStylist.services.split(',').map(id => Number(id.trim()));
+                const matched = allServices.filter(svc => serviceIds.includes(Number(svc.id)));
+
                 setStylistServices(matched);
             } else {
                 setStylistServices([]);
@@ -129,6 +110,17 @@ const FormComponent = () => {
             setStylistServices([]);
         }
     }, [formData.salon_employee, stylists, allServices]);
+
+    // Pre-fill salon_employee from query params once stylists are loaded
+    useEffect(() => {
+        if (prefillEmployeeId && stylists.length > 0 && !formData.salon_employee) {
+            const matchId = Number(prefillEmployeeId);
+            const found = stylists.find(s => s.id === matchId);
+            if (found) {
+                setFormData(prev => ({ ...prev, salon_employee: matchId }));
+            }
+        }
+    }, [prefillEmployeeId, stylists]);
 
     // Fetch booked slots when stylist + date are selected
     useEffect(() => {
@@ -162,7 +154,6 @@ const FormComponent = () => {
     const fetchStylists = async (salonId) => {
         try {
             const response = await API.SalonEmployeeAPI.getBySalonId(salonId);
-            console.log("Stylists response:", response);
             if (response.data?.status === "Success") {
                 setStylists(response.data.data || []);
             }
@@ -338,13 +329,19 @@ const FormComponent = () => {
                 {/* Row 3: Service (based on stylist's services) + Booked For */}
                 <Box display="flex" gap="20px" flexDirection={isMobile ? "column" : "row"}>
                     <FormControl fullWidth required>
-                        <InputLabel>Service</InputLabel>
+                        <InputLabel>
+                            {!formData.salon_employee
+                                ? "Service (Select a stylist first)"
+                                : stylistServices.length > 0
+                                    ? `Service (${stylistServices.length} Available)`
+                                    : "Service (None assigned)"}
+                        </InputLabel>
                         <Select
                             name="services"
                             value={formData.services}
                             label="Service"
                             onChange={handleChange}
-                            disabled={!formData.salon_employee}
+                            disabled={!formData.salon_employee || stylistServices.length === 0}
                         >
                             {stylistServices.length > 0 ? (
                                 stylistServices.map(s => (
@@ -352,7 +349,7 @@ const FormComponent = () => {
                                 ))
                             ) : (
                                 <MenuItem disabled value="">
-                                    {formData.salon_employee ? "No services found" : "Select a stylist first"}
+                                    {formData.salon_employee ? "No services assigned to this employee" : "Select a stylist first"}
                                 </MenuItem>
                             )}
                         </Select>
