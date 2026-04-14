@@ -29,11 +29,11 @@ export const datagridColumns = () => {
 
     const getStockStatus = (stockQuantity, lowStockThreshold) => {
         if (stockQuantity === 0 || stockQuantity === null) {
-            return { label: "Out of Stock", color: colors.redAccent[500], bgColor: colors.redAccent[700] };
+            return { label: "Empty", color: colors.redAccent[500], bgColor: colors.redAccent[700] };
         } else if (stockQuantity <= lowStockThreshold) {
-            return { label: "Low Stock", color: colors.yellowAccent?.[500] || "#FFD700", bgColor: colors.yellowAccent?.[700] || "#B8860B" };
+            return { label: "Low Weight", color: colors.yellowAccent?.[500] || "#FFD700", bgColor: colors.yellowAccent?.[700] || "#B8860B" };
         }
-        return { label: "In Stock", color: colors.greenAccent[500], bgColor: colors.greenAccent[700] };
+        return { label: "Available", color: colors.greenAccent[500], bgColor: colors.greenAccent[700] };
     };
 
     const columns = [
@@ -68,7 +68,7 @@ export const datagridColumns = () => {
         },
         {
             field: "stock_quantity",
-            headerName: "STOCK",
+            headerName: "WEIGHT (g/ml)",
             headerAlign: "center",
             align: "center",
             flex: 0.6,
@@ -90,11 +90,30 @@ export const datagridColumns = () => {
         },
         {
             field: "low_stock_threshold",
-            headerName: "THRESHOLD",
+            headerName: "ALERT THRESHOLD",
             headerAlign: "center",
             align: "center",
             flex: 0.6,
             minWidth: 90
+        },
+        {
+            field: "capacity",
+            headerName: "CAPACITY (CLIENTS)",
+            headerAlign: "center",
+            align: "center",
+            flex: 0.8,
+            minWidth: 120,
+            renderCell: ({ row: { stock_quantity, usage_per_client } }) => {
+                const capacity = usage_per_client > 0 ? Math.floor(stock_quantity / usage_per_client) : null;
+                return (
+                    <Typography
+                        fontWeight="bold"
+                        color={capacity === 0 ? colors.redAccent[400] : capacity <= 5 ? "#FFD700" : colors.greenAccent[400]}
+                    >
+                        {capacity !== null ? capacity : "Set usage"}
+                    </Typography>
+                );
+            }
         },
         {
             field: "status",
@@ -116,7 +135,7 @@ export const datagridColumns = () => {
         },
         {
             field: "stockStatus",
-            headerName: "STOCK STATUS",
+            headerName: "WEIGHT STATUS",
             headerAlign: "center",
             align: "center",
             flex: 0.8,

@@ -28,9 +28,12 @@
     "@nivo/line": "^0.83.0",
     "@nivo/pie": "^0.83.0",
     "axios": "^1.4.0",
+    "clsx": "^2.1.1",
     "dayjs": "^1.11.8",
     "formik": "^2.2.9",
+    "framer-motion": "^12.38.0",
     "gh-pages": "^5.0.0",
+    "lucide-react": "^1.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-idle-timer": "^5.6.2",
@@ -39,16 +42,20 @@
     "react-router-dom": "^6.11.1",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
+    "tailwind-merge": "^3.5.0",
     "yup": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.27",
     "eslint": "^8.38.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2",
     "vite": "^4.3.2"
   }
 }

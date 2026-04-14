@@ -31,6 +31,7 @@ const SalonInventoryFormComponent = () => {
     const [brand, setBrand] = useState("");
     const [stockQuantity, setStockQuantity] = useState(0);
     const [lowStockThreshold, setLowStockThreshold] = useState(10);
+    const [usagePerClient, setUsagePerClient] = useState(0);
     const [sku, setSku] = useState("");
     const [status, setStatus] = useState("active");
 
@@ -89,6 +90,7 @@ const SalonInventoryFormComponent = () => {
                 setBrand(data.brand || "");
                 setStockQuantity(data.stock_quantity ?? 0);
                 setLowStockThreshold(data.low_stock_threshold ?? 10);
+                setUsagePerClient(data.usage_per_client ?? 0);
                 setSku(data.sku ?? "");
                 setStatus(data.status || "active");
             }
@@ -107,6 +109,7 @@ const SalonInventoryFormComponent = () => {
                 brand,
                 stock_quantity: stockQuantity,
                 low_stock_threshold: lowStockThreshold,
+                usage_per_client: usagePerClient,
                 sku: sku || null,
                 status,
                 salonId: targetSalonId // Pass the resolved salonId
@@ -204,10 +207,22 @@ const SalonInventoryFormComponent = () => {
                             fullWidth
                             variant="filled"
                             type="number"
-                            label="Low Stock Threshold"
+                            label="Low Weight Alert Threshold (g/ml)"
                             value={lowStockThreshold}
-                            onChange={(e) => { setLowStockThreshold(parseInt(e.target.value) || 0); setDirty(true); }}
-                            InputProps={{ inputProps: { min: 0 } }}
+                            onChange={(e) => { setLowStockThreshold(parseFloat(e.target.value) || 0); setDirty(true); }}
+                            InputProps={{ inputProps: { min: 0, step: "any" } }}
+                        />
+                    </Box>
+                    <Box sx={{ gridColumn: "span 6" }}>
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="number"
+                            label="Avg. Usage per Client (g/ml)"
+                            value={usagePerClient}
+                            onChange={(e) => { setUsagePerClient(parseFloat(e.target.value) || 0); setDirty(true); }}
+                            InputProps={{ inputProps: { min: 0, step: "any" } }}
+                            helperText="Used to calculate how many clients can be served"
                         />
                     </Box>
                 </Box>
@@ -216,24 +231,24 @@ const SalonInventoryFormComponent = () => {
 
                 {/* Inventory Section */}
                 <Typography variant="h5" color={colors.greenAccent[400]} mb={2} fontWeight="bold">
-                    Stock Management
+                    Weight Management
                 </Typography>
 
                 <Box display="grid" gap={2} gridTemplateColumns="repeat(12, 1fr)">
                     <Box sx={{ gridColumn: "span 12" }}>
                         <Typography variant="h6" color={colors.grey[100]} mb={2}>
-                            Current Stock
+                            Current Weight (g/ml)
                         </Typography>
 
                         <Box display="flex" alignItems="center" gap={2}>
                             <IconButton
-                                onClick={() => handleQuickAdjust(-10)}
+                                onClick={() => handleQuickAdjust(-100)}
                                 sx={{
                                     backgroundColor: colors.redAccent[700],
                                     '&:hover': { backgroundColor: colors.redAccent[600] }
                                 }}
                             >
-                                <Typography color={colors.grey[100]}>-10</Typography>
+                                <Typography color={colors.grey[100]}>-100</Typography>
                             </IconButton>
                             <IconButton
                                 onClick={() => handleQuickAdjust(-1)}
@@ -249,9 +264,9 @@ const SalonInventoryFormComponent = () => {
                                 variant="filled"
                                 type="number"
                                 value={stockQuantity}
-                                onChange={(e) => { setStockQuantity(parseInt(e.target.value) || 0); setDirty(true); }}
+                                onChange={(e) => { setStockQuantity(parseFloat(e.target.value) || 0); setDirty(true); }}
                                 InputProps={{
-                                    inputProps: { min: 0, style: { textAlign: 'center', fontSize: '1.5rem' } }
+                                    inputProps: { min: 0, step: "any", style: { textAlign: 'center', fontSize: '1.5rem' } }
                                 }}
                                 sx={{ width: 150 }}
                             />
@@ -266,24 +281,24 @@ const SalonInventoryFormComponent = () => {
                                 <AddIcon />
                             </IconButton>
                             <IconButton
-                                onClick={() => handleQuickAdjust(10)}
+                                onClick={() => handleQuickAdjust(100)}
                                 sx={{
                                     backgroundColor: colors.greenAccent[700],
                                     '&:hover': { backgroundColor: colors.greenAccent[600] }
                                 }}
                             >
-                                <Typography color={colors.grey[100]}>+10</Typography>
+                                <Typography color={colors.grey[100]}>+100</Typography>
                             </IconButton>
                         </Box>
 
                         {stockQuantity <= lowStockThreshold && stockQuantity > 0 && (
                             <Typography color="#FFD700" mt={1}>
-                                ⚠️ Stock is below threshold!
+                                ⚠️ Weight is below alert threshold!
                             </Typography>
                         )}
                         {stockQuantity === 0 && (
                             <Typography color={colors.redAccent[400]} mt={1}>
-                                ⚠️ Out of stock!
+                                ⚠️ Empty / Out of stock!
                             </Typography>
                         )}
                     </Box>
