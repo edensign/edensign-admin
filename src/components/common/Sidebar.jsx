@@ -163,7 +163,7 @@ const Sidebar = ({ role }) => {
               />
               <SidebarItem
                 title="Salon Inventory"
-                to="/salon/inventory"
+                to="/salon-inventory/salons"
                 icon={<ReceiptLongIcon />}
                 selected={selected}
               />
@@ -264,8 +264,14 @@ const Sidebar = ({ role }) => {
               />
               <SidebarItem
                 title="Salon Inventory"
-                to="/salon/inventory"
+                to="/salon-inventory/listing"
                 icon={<ReceiptLongIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Appointments"
+                to="/appointment/listing"
+                icon={<ReceiptOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem

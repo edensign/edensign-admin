@@ -17,6 +17,8 @@ import { setInventoryReducer } from "./InventoryReducer";
 import { setJobSeekerReducer } from "./JobSeekerReducer";
 import { setProductReducer } from "./ProductReducer";
 import { setSalonReducer } from "./SalonReducer";
+import { setSalonInventoryReducer } from "./SalonInventoryReducer";
+import { setCashflowReducer } from "./CashflowReducer";
 import { setServiceReducer } from "./ServiceReducer";
 import { setSkillReducer } from "./SkillReducer";
 import { setUserReducer } from "./UserReducers";
@@ -29,6 +31,8 @@ const reducers = combineReducers({
     allJobSeekers: setJobSeekerReducer,
     allProducts: setProductReducer,
     allSalons: setSalonReducer,
+    allSalonInventory: setSalonInventoryReducer,
+    allCashflow: setCashflowReducer,
     allServices: setServiceReducer,
     allSkills: setSkillReducer,
     allUsers: setUserReducer,

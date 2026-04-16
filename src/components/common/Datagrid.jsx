@@ -27,7 +27,11 @@ export default function ServerPaginationGrid({
     pageSizeOptions,
     searchFlag,
     setOldPagination,
-    setSearchFlag
+    setSearchFlag,
+    loading = null,
+    noRowsLabel,
+    onNoRowsAction,
+    noRowsActionLabel
 }) {
     const initialState = {
         page: 0,
@@ -41,6 +45,8 @@ export default function ServerPaginationGrid({
     const productLoading = useSelector(state => state.allProducts.loading);
     const productInventoryLoading = useSelector(state => state.allInventory.loading);
     const salonLoading = useSelector(state => state.allSalons.loading);
+    const salonInventoryLoading = useSelector(state => state.allSalonInventory.loading);
+    const cashflowLoading = useSelector(state => state.allCashflow.loading);
     const serviceLoading = useSelector(state => state.allServices.loading);
     const skillLoading = useSelector(state => state.allSkills.loading);
     const userLoading = useSelector(state => state.allUsers.loading);
@@ -129,14 +135,22 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
-                    selected === "Service" ? serviceLoading : selected === 'Job Seeker' ? jobSeekerLoading :
-                        selected === 'Product Detail' ? productLoading : selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : userLoading}
+                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
+                    selected === 'Salon Inventory' ? salonInventoryLoading : selected === 'Salon Cashflow' ? cashflowLoading : selected === "Service" ? serviceLoading :
+                        selected === 'Job Seeker' ? jobSeekerLoading : selected === 'Product Detail' ? productLoading :
+                            selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : userLoading)}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,
                     LoadingOverlay: multipleSkeletons,
                     noRowsOverlay: EmptyOverlayGrid
+                }}
+                componentsProps={{
+                    noRowsOverlay: {
+                        label: noRowsLabel,
+                        onAction: onNoRowsAction,
+                        actionLabel: noRowsActionLabel
+                    }
                 }}
                 pagination
                 ServerPaginationGrid

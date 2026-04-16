@@ -122,7 +122,7 @@ export const Utility = () => {
     };
     /** make an API call, set localStorage and dispatch an action
      */
-    const setStorageAndDispatch = (navigate, api, dispatch, menuAction, agreementAction) => {
+    const setStorageAndDispatch = (navigate, api, dispatch, menuAction, agreementAction, currentPath = null) => {
         api.SalonAPI.getSalonByUserId({ id: getLocalStorage("auth")?.id })
             .then(({ data: salon }) => {
                 setLocalStorage("menu", { "selected": "Salon Detail" });
@@ -138,7 +138,10 @@ export const Utility = () => {
                         throw err;
                     });
                 const path = salon.status === "Success" ? `/salon/detail/update/${salon.data?.id}` : `/salon/detail/create`;
-                navigate(path, { state: { id: salon.data?.id } });
+                // Only navigate if we are at root or login, otherwise stay on current page
+                if (!currentPath || currentPath === '/' || currentPath === '/login') {
+                    navigate(path, { state: { id: salon.data?.id } });
+                }
             })
             .catch(err => {
                 throw err;

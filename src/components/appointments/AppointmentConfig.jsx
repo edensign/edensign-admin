@@ -8,12 +8,19 @@
 
 import dayjs from "dayjs";
 
-export const datagridColumns = () => {
-    return [
+export const datagridColumns = (role) => {
+    const columns = [
         {
             field: "id",
             headerName: "ID",
             width: 60
+        },
+        {
+            field: "employee_name",
+            headerName: "Stylist", // Stylist Name
+            flex: 1,
+            minWidth: 120,
+            renderCell: (params) => params.row.employee_name || "N/A"
         },
         {
             field: "customer_name",
@@ -29,20 +36,7 @@ export const datagridColumns = () => {
             minWidth: 120,
             renderCell: (params) => params.row.customer_contact || "N/A"
         },
-        {
-            field: "salon_name",
-            headerName: "Salon",
-            flex: 1,
-            minWidth: 150,
-            renderCell: (params) => params.row.salon_name || "N/A"
-        },
-        {
-            field: "employee_name",
-            headerName: "Stylist",
-            flex: 1,
-            minWidth: 120,
-            renderCell: (params) => params.row.employee_name || "N/A"
-        },
+
         {
             field: "date",
             headerName: "Date",
@@ -71,4 +65,16 @@ export const datagridColumns = () => {
         },
 
     ];
+
+    if (role !== 'salon') {
+        columns.splice(3, 0, {
+            field: "salon_name",
+            headerName: "Salon",
+            flex: 1,
+            minWidth: 150,
+            renderCell: (params) => params.row.salon_name || "N/A"
+        });
+    }
+
+    return columns;
 };
