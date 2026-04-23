@@ -64,9 +64,6 @@ const FormComponent = () => {
         console.log(formData)
         if (formData.jobSeekerData?.values?.resume) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
-            console.log("Uploading...");
-        if (formData.jobSeekerData?.values?.resume) {
-            let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
             formData.jobSeekerData.values.resume = formattedResumeName;
         }
         const dataFields = [
