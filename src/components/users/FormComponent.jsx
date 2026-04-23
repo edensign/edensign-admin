@@ -58,7 +58,7 @@ const FormComponent = () => {
         dispatch(setMenuItem(selectedMenu.selected));
     }, []);
 
-    const updateUserAndAddress = useCallback(formData => {
+    const updateUserAndAddress = useCallback(async formData => {
         const dataFields = [
             { ...formData.userData.values },
             { ...formData.addressData.values }
@@ -66,29 +66,29 @@ const FormComponent = () => {
         const paths = ["/update-user", "/update-address"];
         setLoading(true);
 
-        if (!formData.userData.password) {
+        if (formData.userData && !formData.userData.password) {
             delete formData.userData.password;
         };
-        API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
-            .then(responses => {
-                let status = true;
-                responses.forEach(response => {
-                    if (response.data.status !== "Success") {
-                        status = false;
-                    };
-                });
-                if (status) {
-                    setLoading(false);
-                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/${selected.toLowerCase()}/listing`);
+
+        try {
+            const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
+            let status = true;
+            responses.forEach(response => {
+                if (response.data.status !== "Success") {
+                    status = false;
                 };
-                setLoading(false);
-            })
-            .catch(err => {
-                setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
-                throw err;
             });
-    }, [formData]);
+            if (status) {
+                setLoading(false);
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/${selected.toLowerCase()}/listing`);
+            };
+            setLoading(false);
+        } catch (err) {
+            setLoading(false);
+            toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred");
+            throw err;
+        }
+    }, [formData, selected, dispatch, navigateTo, toastAndNavigate]);
 
     const populateUserData = (id) => {
         setLoading(true);

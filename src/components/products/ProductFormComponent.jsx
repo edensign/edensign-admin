@@ -53,6 +53,10 @@ const ProductFormComponent = ({
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
             await formik.submitForm();
+            return {
+                values: formik.values,
+                validated: Object.keys(formik.errors).length === 0
+            };
         }
     }));
 

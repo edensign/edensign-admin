@@ -60,6 +60,7 @@ const FormComponent = () => {
     // const employeeFormRef = useRef();
     const imageFormRef = useRef();
     const bannerImageFormRef = useRef();
+    const [salesExecutives, setSalesExecutives] = useState([]);
 
     // let employeeFormRef;
     // for (let i = 1; i < 4; i++) {
@@ -111,8 +112,7 @@ const FormComponent = () => {
         }
         return true;
     };
-
-    const updateSalonAndAddress = useCallback(formData => {
+    const updateSalonAndAddress = useCallback(async (formData) => {
         setLoading(true);
 
         const paths = ["/update-salon", "/update-address"];
@@ -120,136 +120,121 @@ const FormComponent = () => {
             {
                 ...formData.salonData.values,
                 services: getSelectedServices(formData.salonData.values.services),
-                amenities: getSelectedAmenities(formData.salonData.values.amenities)
+                amenities: getSelectedAmenities(formData.salonData.values.amenities),
+                referral_by: formData.salonData.values.referral_by || null,
+                created_by: formData.salonData.values.created_by || formData.salonData.values.userId // Preserve or set
             },
-            { ...formData.addressData.values },
+            { 
+                ...formData.addressData.values,
+                parent: 'salon',
+                parent_id: id
+            },
             { ...formData.employeeData.values },
             { ...formData.imageData.values },
             { ...formData.bannerImageData.values }
         ];
-        console.log("Datafields in update=>", dataFields)
-        console.log("formdatas in update=>", formData)
 
-        // delete the selected (removed) images from Azure which are in deletedImage state
-        // if (deletedImage.length) {
-        //     deletedImage.forEach(image => {
-        //         deleteFileFromAzure("salon", image);
-        //         console.log("Deleted normal image from azure");
-        //     });
-        // }
-        // delete the selected (removed) images from Azure which are in deletedBannerImage state
-        // if (deletedBannerImage.length) {
-        //     deletedBannerImage.forEach(image => {
-        //         deleteFileFromAzure("salon/banner", image);
-        //         console.log("Deleted  banner image from azure");
-        //     });
-        // }
-
-        // delete all images from db on every update and later insert new and old again
-        API.ImageAPI.deleteImage({
-            parent: "salon",
-            parent_id: id
-        });
-        console.log(`Deleted all images of id ${id} from db`)
-
-        API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
-            .then(responses => {
-                let status = null;
-                let formattedName;
-                if (responses) {
-                    if (!isEmpty(dataFields[2])) {
-                        console.log("Inside datafields[2]")
-                        Object.values(formData.employeeData.values).forEach(employee => {
-                            // Array from creates an array from an iterable, which does not work on plain objects, using Object.values()
-                            employee.services = getSelectedServices(employee.services);
-                            console.log("Update loop=>", employee)
-                            API.SalonEmployeeAPI.updateSalonEmployee({
-                                ...employee
-                            })
-                        });
-                        console.log("Updated salon employee")
-                        status = true;
-                    }
-                    if (!isEmpty(dataFields[3])) {
-                        // upload new images normal to azure and insert in db
-                        if (formData.imageData.values?.Normal) {
-                            Array.from(formData.imageData.values.Normal).map(image => {
-                                formattedName = formatImageName(image.name);
-                                API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
-                                API.ImageAPI.createImage({
-                                    image_src: formattedName,
-                                    parent_id: formData.salonData.values.id,
-                                    parent: 'salon',
-                                    type: 'normal'
-                                })
-                            });
-                            status = true;
-                        }
-                        // insert old images normal only in db & not on azure
-                        if (formData.imageData?.values) {
-
-                            formData.imageData.values.map(image => {
-                                API.ImageAPI.createImage({
-                                    image_src: image.image_src,
-                                    parent_id: image.parent_id,
-                                    parent: image.parent,
-                                    type: image.type
-                                })
-                            });
-                            console.log("Created old normal image only in db")
-                            status = true;
-                        }
-                    }
-                    if (!isEmpty(dataFields[4])) {
-                        // upload new banner images to azure and insert in db
-                        if (formData.bannerImageData.values?.Banner) {
-
-                            Array.from(formData.bannerImageData.values?.Banner).map(async (image) => {
-                                let formattedName = formatImageName(image.name);
-                                API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
-                                API.ImageAPI.createImage({
-                                    image_src: formattedName,
-                                    parent_id: formData.salonData.values.id,
-                                    parent: 'salon',
-                                    type: 'banner'
-                                })
-                            });
-                            status = true;
-                        }
-                        // insert old images banner only in db & not on azure
-                        if (formData.bannerImageData?.values) {
-                            formData.bannerImageData.values.map(image => {
-                                API.ImageAPI.createImage({
-                                    image_src: image.image_src,
-                                    parent_id: image.parent_id,
-                                    parent: image.parent,
-                                    type: image.type
-                                })
-                            });
-                            console.log("Created old banner image only in db")
-                            status = true;
-                        }
-                    } else {
-                        status = true;      //ye hai isempty datafields[3]
-                    }
-                    if (status) {
-                        setLoading(false);
-                        if (role === "admin") {
-                            console.log("I have ended updating all fields")
-                            toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/detail/listing");
-                            // if (pathname === `/salon/detail/update/${id}`) navigateTo("/salon/detail/listing");    //to hide Autocomplete error
-                        } else {
-                            toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, 0);
-                        }
-                    }
-                }
-            })
-            .catch(err => {
-                setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, 0);
-                throw err;
+        try {
+            // delete all images from db on every update and later insert new and old again
+            await API.ImageAPI.deleteImage({
+                parent: "salon",
+                parent_id: id
             });
-    }, [formData]);
+            console.log(`Deleted all images of id ${id} from db`)
+
+            const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
+            let formattedName;
+            
+            // 1. Update Salon Employees
+            if (formData.employeeData.values && Object.keys(formData.employeeData.values).length > 0) {
+                const employeePromises = Object.values(formData.employeeData.values).map(async employee => {
+                    employee.services = getSelectedServices(employee.services);
+                    return API.SalonEmployeeAPI.updateSalonEmployee({ ...employee });
+                });
+                await Promise.all(employeePromises);
+                console.log("Updated salon employees");
+            }
+
+            // 2. Handle Normal Images
+            if (formData.imageData.values?.Normal) {
+                const images = Array.from(formData.imageData.values.Normal);
+                
+                // Upload NEW normal images
+                const newImagePromises = images
+                    .filter(image => image instanceof File)
+                    .map(async image => {
+                        formattedName = formatImageName(image.name);
+                        await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
+                        return API.ImageAPI.createImage({
+                            image_src: formattedName,
+                            parent_id: id,
+                            parent: 'salon',
+                            type: 'normal'
+                        });
+                    });
+
+                // Re-insert OLD normal images
+                const oldImagePromises = images
+                    .filter(image => !(image instanceof File) && image.image_src)
+                    .map(async image => {
+                        return API.ImageAPI.createImage({
+                            image_src: image.image_src,
+                            parent_id: id,
+                            parent: 'salon',
+                            type: 'normal'
+                        });
+                    });
+
+                await Promise.all([...newImagePromises, ...oldImagePromises]);
+                console.log("Processed all normal images");
+            }
+
+            // 3. Handle Banner Images
+            if (formData.bannerImageData.values?.Banner) {
+                const bannerImages = Array.from(formData.bannerImageData.values.Banner);
+                
+                // Upload new banner images
+                const newBannerPromises = bannerImages
+                    .filter(image => image instanceof File)
+                    .map(async image => {
+                        formattedName = formatImageName(image.name);
+                        await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
+                        return API.ImageAPI.createImage({
+                            image_src: formattedName,
+                            parent_id: id,
+                            parent: 'salon',
+                            type: 'banner'
+                        });
+                    });
+
+                // Re-insert old banner images
+                const oldBannerPromises = bannerImages
+                    .filter(image => !(image instanceof File) && image.image_src)
+                    .map(async image => {
+                        return API.ImageAPI.createImage({
+                            image_src: image.image_src,
+                            parent_id: id,
+                            parent: 'salon',
+                            type: 'banner'
+                        });
+                    });
+
+                await Promise.all([...newBannerPromises, ...oldBannerPromises]);
+                console.log("Processed all banner images");
+            }
+
+            setLoading(false);
+            if (role === "admin") {
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/salon/detail/listing");
+            } else {
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, 0);
+            }
+        } catch (err) {
+            setLoading(false);
+            toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred", navigateTo, 0);
+            throw err;
+        }
+    }, [id, role, dispatch, navigateTo, toastAndNavigate, formatImageName]);
 
     const getSelectedAmenitiesByName = (dataObj) => {
         const objId = dataObj?.split(",");
@@ -316,104 +301,85 @@ const FormComponent = () => {
         return amenityId.toString();
     };
 
-    const createSalon = () => {
-        let promises;       //multiple images so multiple async operations will run, we get them in promises
-        let bannerPromises;
-        let employeePromises;
+    const createSalon = async (formData) => {
         setLoading(true);
 
-        formData.salonData.values = {
+        const salonValues = {
             ...formData.salonData.values,
             user_id: getLocalStorage("auth").id,
             salon_code: createSalonCode(formData.salonData.values.name),
             services: getSelectedServices(formData.salonData.values?.services),
-            amenities: getSelectedAmenities(formData.salonData.values?.amenities)
+            amenities: getSelectedAmenities(formData.salonData.values?.amenities),
+            referral_by: formData.salonData.values?.referral_by || null,
+            // If admin, they might have selected a creator. If Sales Executive, it's auto-handled by backend but good to be explicit.
+            created_by: role === 'sales_executive' ? id : (formData.salonData.values?.created_by || id)
         };
 
-        API.SalonAPI.createSalon({ ...formData.salonData.values })
-            .then(({ data: salon }) => {
-                if (salon?.status === 'Success') {
-                    API.AddressAPI.createAddress({
-                        ...formData.addressData.values,
-                        parent_id: salon.data.id,
-                        parent: 'salon',
-                    })
-                        .then(address => {
+        try {
+            const { data: salon } = await API.SalonAPI.createSalon({ ...salonValues });
+            if (salon?.status === 'Success') {
+                await API.AddressAPI.createAddress({
+                    ...formData.addressData.values,
+                    parent_id: salon.data.id,
+                    parent: 'salon',
+                });
 
-                            console.log("Salon employee data=>", formData);
+                console.log("Salon employee data=>", formData);
 
-                            employeePromises = Object.values(formData.employeeData.values).map(employee => {
-                                // Array from creates an array from an iterable, which does not work on plain objects, using Object.values()
-                                employee.services = getSelectedServices(employee.services);
-                                API.SalonEmployeeAPI.createSalonEmployee({
-                                    ...employee,
-                                    salon_id: salon.data.id
-                                })
+                const employeePromises = Object.values(formData.employeeData.values).map(async employee => {
+                    employee.services = getSelectedServices(employee.services);
+                    return API.SalonEmployeeAPI.createSalonEmployee({
+                        ...employee,
+                        salon_id: salon.data.id
+                    });
+                });
+
+                let imagePromises = [];
+                if (formData.imageData.values.Normal) {
+                    imagePromises = Array.from(formData.imageData.values.Normal)
+                        .filter(image => image instanceof File)
+                        .map(async (image) => {
+                            let formattedName = formatImageName(image.name);
+                            await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
+                            return API.ImageAPI.createImage({
+                                image_src: formattedName,
+                                parent_id: salon.data.id,
+                                parent: 'salon',
+                                type: 'normal'
                             });
-
-                            if (formData.imageData.values.Normal?.length) {
-                                promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
-                                    let formattedName = formatImageName(image.name);
-                                    API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
-                                    API.ImageAPI.createImage({
-                                        image_src: formattedName,
-                                        parent_id: salon.data.id,
-                                        parent: 'salon',
-                                        type: 'normal'
-                                    })
-                                });
-
-                                if (formData.bannerImageData.values.Banner?.length) {
-                                    bannerPromises = Array.from(formData.bannerImageData.values.Banner).map(async (image) => {
-                                        let formattedName = formatImageName(image.name);
-                                        API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
-                                        API.ImageAPI.createImage({
-                                            image_src: formattedName,
-                                            parent_id: salon.data.id,
-                                            parent: 'salon',
-                                            type: 'banner'
-                                        })
-                                    });
-
-                                    return Promise.all([employeePromises, promises, bannerPromises])
-                                        .then(data => {
-                                            setLoading(false);
-                                            if (role === 'admin') {
-                                                toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
-                                            } else {
-                                                toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
-                                            }
-                                        })
-                                        .catch(err => {
-                                            setLoading(false);
-                                            toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
-                                            throw err;
-                                        });
-                                }
-                            }       //run when there are no images submitted
-                            else {
-                                setLoading(false);
-                                if (role === 'admin') {
-                                    console.log("Form submitted without images")
-                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
-                                } else {
-                                    console.log("Form submitted without images")
-                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
-                                }
-                            }
-                        })
-                        .catch(err => {
-                            setLoading(false);
-                            toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
-                            throw err;
                         });
                 }
-            })
-            .catch(err => {
+
+                let bannerPromises = [];
+                if (formData.bannerImageData.values.Banner) {
+                    bannerPromises = Array.from(formData.bannerImageData.values.Banner)
+                        .filter(image => image instanceof File)
+                        .map(async (image) => {
+                            let formattedName = formatImageName(image.name);
+                            await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
+                            return API.ImageAPI.createImage({
+                                image_src: formattedName,
+                                parent_id: salon.data.id,
+                                parent: 'salon',
+                                type: 'banner'
+                            });
+                        });
+                }
+
+                await Promise.all([...employeePromises, ...imagePromises, ...bannerPromises]);
+
                 setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg, navigateTo, 0);
-                throw err;
-            });
+                if (role === 'admin') {
+                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/salon/detail/listing");
+                } else {
+                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
+                }
+            }
+        } catch (err) {
+            setLoading(false);
+            toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred", navigateTo, 0);
+            throw err;
+        }
     };
 
     //get all services from service table stored in db before populating data
@@ -452,46 +418,67 @@ const FormComponent = () => {
         getAmenities();
     }, []);
 
-
-    //Create/Update/Populate salon
+    // Get all sales executives for the dropdown
     useEffect(() => {
-        if (id && !submitted && services && amenities) {
+        const getSalesExecutives = () => {
+            API.UserAPI.getAll({ key: 'type', value: 'sales_executive' }, 0, 100)
+                .then(res => {
+                    if (res.status === 'Success') {
+                        setSalesExecutives(res.data.rows);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching sales executives:", err);
+                });
+        };
+        getSalesExecutives();
+    }, []);
+
+
+    //Initialize/Populate salon
+    useEffect(() => {
+        if (id && services && amenities) {
             setTitle("Update");
             populateSalonData(id);
         }
-        if (formData.salonData.validated && formData.addressData.validated) {
-            //fill salonEmployee state values into formData
-            formData ? formData.employeeData.values = salonEmployeeData : null;
-            formData.salonData.values?.id ? updateSalonAndAddress(formData) : createSalon();
-        } else {
-            setSubmitted(false);
-        }
-    }, [id, submitted, services, amenities]);
+    }, [id, services, amenities]);
 
     const handleSubmit = async () => {
-        await salonFormRef.current.Submit();
-        await addressFormRef.current.Submit();
-        await imageFormRef.current.Submit();
-        await bannerImageFormRef.current.Submit();
+        const salonRes = await salonFormRef.current.Submit();
+        const addressRes = await addressFormRef.current.Submit();
+        const imageRes = await imageFormRef.current.Submit();
+        const bannerRes = await bannerImageFormRef.current.Submit();
 
-        setSubmitted(true);
-        setDirty(false);
+        const gatheredData = {
+            salonData: salonRes,
+            addressData: addressRes,
+            imageData: imageRes,
+            bannerImageData: bannerRes,
+            employeeData: { values: salonEmployeeData }
+        };
+
+        if (salonRes.validated && addressRes.validated) {
+            id ? updateSalonAndAddress(gatheredData) : createSalon(gatheredData);
+            setDirty(false);
+        }
     };
 
     const handleFormChange = (data, form) => {
-        if (form === 'salon') {
-            setFormData({ ...formData, salonData: data });
-        } else if (form === 'address') {
-            setFormData({ ...formData, addressData: data });
-        } else if (form === `employee`) {
-            console.log("Employee details....)")
-            // handleEmployeeFormChange(data, index);
-            // setFormCount(prevCount => prevCount + 1);
-        } else if (form === 'image') {
-            setFormData({ ...formData, imageData: data })
-        } else if (form === 'banner') {
-            setFormData({ ...formData, bannerImageData: data })
-        }
+        setFormData(prev => {
+            if (form === 'salon') {
+                return { ...prev, salonData: data };
+            } else if (form === 'address') {
+                return { ...prev, addressData: data };
+            } else if (form === 'employee') {
+                console.log("Employee details....)");
+                return prev; // keep existing logic
+            } else if (form === 'image') {
+                return { ...prev, imageData: data };
+            } else if (form === 'banner') {
+                return { ...prev, bannerImageData: data };
+            }
+            return prev;
+        });
     };
 
     const handleSubmitDialog = (folderName, fileName, blobName) => {
@@ -524,6 +511,8 @@ const FormComponent = () => {
                 updatedValues={updatedValues?.salonData}
                 amenities={amenities}
                 services={services}
+                salesExecutives={salesExecutives}
+                role={role}
             />
             <AddressFormComponent
                 onChange={data => {
@@ -583,7 +572,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
-                azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/normal`}
+                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_SALON}/normal`}
                 ENV={ENV}
             />
             <ImagePicker
@@ -599,7 +588,7 @@ const FormComponent = () => {
                 deletedImage={deletedBannerImage}
                 setDeletedImage={setDeletedBannerImage}
                 imageType="Banner"
-                azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_SALON}/banner`}
+                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_SALON}/banner`}
                 ENV={ENV}
             />
 

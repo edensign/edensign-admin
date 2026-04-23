@@ -24,6 +24,7 @@ import ApiIcon from '@mui/icons-material/Api';
 import AssistantIcon from '@mui/icons-material/Assistant';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import { Api, TuneOutlined } from '@mui/icons-material';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 
 import { tokens } from "../../theme";
 import { SidebarItem } from "./SidebarItem";
@@ -141,6 +142,12 @@ const Sidebar = ({ role }) => {
                 icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
+              <SidebarItem
+                title="Sales Executive"
+                to="/Sales Executive/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
 
               <Typography
                 variant="h6"
@@ -191,6 +198,12 @@ const Sidebar = ({ role }) => {
                 title="Product Inventory"
                 to="/inventory/listing"
                 icon={<ContactsOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Product Ads"
+                to="/product-ads/listing"
+                icon={<ReceiptOutlinedIcon />}
                 selected={selected}
               />
 
@@ -244,6 +257,12 @@ const Sidebar = ({ role }) => {
                 icon={<LoyaltyIcon />}
                 selected={selected}
               />
+              <SidebarItem
+                title="Academy"
+                to="/academy/listing"
+                icon={<SchoolOutlinedIcon />}
+                selected={selected}
+              />
 
             </Box>
           </>}
@@ -278,6 +297,35 @@ const Sidebar = ({ role }) => {
                 title="Salon Cashflow"
                 to="/salon/cashflow"
                 icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+            </>}
+          {role === 'sales_executive' &&
+            <>
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Sales Dashboard
+              </Typography>
+              <SidebarItem
+                title="Dashboard"
+                to="/"
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+              />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                My Salons
+              </Typography>
+              <SidebarItem
+                title="My Salons"
+                to="/salon/detail/listing"
+                icon={<FormatListBulletedIcon />}
                 selected={selected}
               />
             </>}

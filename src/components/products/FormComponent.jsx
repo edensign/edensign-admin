@@ -84,16 +84,18 @@ const FormComponent = () => {
         }
         return true;
     };
-
-    const updateProductAndAddress = useCallback(formData => {
+    const updateProductAndAddress = useCallback(async (formData) => {
         setLoading(true);
-        const paths = ["/update-product", "/update-address"];
         const dataFields = [
             { ...formData.productData.values },
-            { ...formData.addressData.values },
+            { 
+                ...formData.addressData.values,
+                parent: 'product',
+                parent_id: id
+            },
             { ...formData.imageData.values }
         ];
-        console.log('datafieds', dataFields);
+        
         // delete the selected (removed) images from Azure which are in deletedImage state
         if (deletedImage.length) {
             deletedImage.forEach(image => {
@@ -101,62 +103,64 @@ const FormComponent = () => {
                 console.log("Deleted normal image from azure");
             });
         }
-        // delete all images from db on every update and later insert new and old again
-        API.ProductImageAPI.deleteProductImage({
-            parent_id: id
-        });
-
-        API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
-            .then(responses => {
-                let status = null;
-                let formattedName;
-                if (!isEmpty(dataFields[2])) {
-                    // upload new images normal to azure and insert in db
-                    if (formData.imageData.values?.Normal) {
-                        Array.from(formData.imageData.values.Normal).map(image => {
-                            formattedName = formatImageName(image.name);
-                            // API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
-                            API.ProductImageAPI.createProductImage({
-                                image_src: formattedName,
-                                parent_id: formData.productData.values.id,
-                                type: 'normal'
-                            })
-                        });
-                        console.log("Created new normal image")
-                        status = true;
-                    }
-                    // insert old images normal only in db & not on azure
-                    if (formData.imageData?.values) {
-                        formData.imageData.values.map(image => {
-                            API.ProductImageAPI.createProductImage({
-                                image_src: image.image_src,
-                                parent_id: image.parent_id,
-                                type: image.type
-                            })
-                        });
-                        console.log("Created old normal image only in db")
-                        status = true;
-                    }
-                } else {
-                    status = true;
-                }
-                if (status) {
-                    setLoading(false);
-                    if (role === "admin") {
-                        console.log("I have ended updating all fields")
-                        toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/product/detail/listing");
-                        // if (pathname === `/product/detail/update/${id}`) navigateTo("/product/detail/listing");    //to hide Autocomplete error
-                    } else {
-                        toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, 0);
-                    }
-                }
-            })
-            .catch(err => {
-                setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
-                throw err;
+        
+        try {
+            // delete all images from db on every update and later insert new and old again
+            await API.ProductImageAPI.deleteProductImage({
+                parent_id: id
             });
-    }, [formData]);
+            console.log("Deleted old images from db");
+
+            const paths = ["/update-product", "/update-address"];
+            const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
+            let formattedName;
+
+            // Handle images
+            if (formData.imageData.values?.Normal) {
+                const images = Array.from(formData.imageData.values.Normal);
+                
+                // 1. Upload NEW images and create records
+                const newImagePromises = images
+                    .filter(image => image instanceof File)
+                    .map(async image => {
+                        const formattedName = formatImageName(image.name);
+                        await API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
+                        return API.ProductImageAPI.createProductImage({
+                            image_src: formattedName,
+                            parent_id: id,
+                            type: 'normal'
+                        });
+                    });
+
+                // 2. Re-insert OLD images (already in Supabase)
+                const oldImagePromises = images
+                    .filter(image => !(image instanceof File) && image.image_src)
+                    .map(async image => {
+                        return API.ProductImageAPI.createProductImage({
+                            image_src: image.image_src,
+                            parent_id: id,
+                            type: 'normal'
+                        });
+                    });
+
+                await Promise.all([...newImagePromises, ...oldImagePromises]);
+                console.log("Processed all normal images");
+            }
+
+            setLoading(false);
+            if (role === "admin") {
+                console.log("Successfully updated all fields");
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/product/detail/listing");
+            } else {
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, 0);
+            }
+        } catch (err) {
+            setLoading(false);
+            console.error("updateProductAndAddress error:", err);
+            toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred");
+            throw err;
+        }
+    }, [deletedImage, id, role, dispatch, navigateTo, toastAndNavigate, formatImageName]);
 
     const populateProductData = (id) => {
         setLoading(true);
@@ -179,7 +183,7 @@ const FormComponent = () => {
             });
     };
 
-    const createProduct = () => {
+    const createProduct = (formData) => {
         let promises;       //multiple images so multiple async operations will run, we get them in promises
         setLoading(true);
 
@@ -192,16 +196,18 @@ const FormComponent = () => {
                         parent: 'product',
                     })
                         .then(address => {
-                            if (formData.imageData.values.Normal?.length) {
-                                promises = Array.from(formData.imageData.values.Normal).map(async (image) => {
-                                    let formattedName = formatImageName(image.name);
-                                    // API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
-                                    API.ProductImageAPI.createProductImage({
-                                        image_src: formattedName,
-                                        parent_id: product.data.id,
-                                        type: 'normal'
-                                    })
-                                });
+                            if (formData.imageData.values.Normal) {
+                                promises = Array.from(formData.imageData.values.Normal)
+                                    .filter(image => image instanceof File)
+                                    .map(async (image) => {
+                                        let formattedName = formatImageName(image.name);
+                                        await API.ProductImageAPI.uploadProductImage({ folder: 'product', file: image, name: formattedName });
+                                        await API.ProductImageAPI.createProductImage({
+                                            image_src: formattedName,
+                                            parent_id: product.data.id,
+                                            type: 'normal'
+                                        });
+                                    });
                                 return Promise.all(promises)
                                     .then(data => {
                                         setLoading(false);
@@ -216,6 +222,13 @@ const FormComponent = () => {
                                         toastAndNavigate(dispatch, true, "error", err ? err?.response?.data?.msg : "An Error Occurred", navigateTo, 0);
                                         throw err;
                                     });
+                            } else {
+                                setLoading(false);
+                                if (role === 'admin') {
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/product/detail/listing");
+                                } else {
+                                    toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
+                                }
                             }
                         })
                         .catch(err => {
@@ -233,31 +246,37 @@ const FormComponent = () => {
     };
 
 
-    //Create/Update/Populate product
+    //Initialize/Populate product
     useEffect(() => {
-        if (id && !submitted) {
+        if (id) {
             setTitle("Update");
             populateProductData(id);
         }
-        if (formData.productData.validated && formData.addressData.validated) {
-            formData.productData.values?.id ? updateProductAndAddress(formData) : createProduct();
-        } else {
-            setSubmitted(false);
-        }
-    }, [id, submitted]);
+    }, [id]);
 
     const handleSubmit = async () => {
-        await productFormRef.current.Submit();
-        await addressFormRef.current.Submit();
-        await imageFormRef.current.Submit();
-        setSubmitted(true);
-        setDirty(false);
+        const productRes = await productFormRef.current.Submit();
+        const addressRes = await addressFormRef.current.Submit();
+        const imageRes = await imageFormRef.current.Submit();
+
+        const gatheredData = {
+            productData: productRes,
+            addressData: addressRes,
+            imageData: imageRes
+        };
+
+        if (productRes.validated && addressRes.validated) {
+            id ? updateProductAndAddress(gatheredData) : createProduct(gatheredData);
+            setDirty(false);
+        }
     };
 
     const handleFormChange = (data, form) => {
-        form === 'product' ? setFormData({ ...formData, productData: data }) :
-            form === 'image' ? setFormData({ ...formData, imageData: data }) :
-                setFormData({ ...formData, addressData: data });
+        setFormData(prev =>
+            form === 'product' ? { ...prev, productData: data } :
+            form === 'image'   ? { ...prev, imageData: data }   :
+                                 { ...prev, addressData: data }
+        );
     };
 
 
@@ -308,7 +327,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
-                azurePath={`${ENV.VITE_SAS_URL}/${ENV.VITE_PARENT_PRODUCT}`}
+                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_PRODUCT}`}
                 ENV={ENV}
             />
 

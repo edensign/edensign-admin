@@ -18,6 +18,7 @@ import { ImageAPI } from "./ImageAPI";
 import { InventoryAPI } from "./InventoryAPI";
 import { JobSeekerAPI } from "./JobSeekerAPI";
 import { ProductAPI } from "./ProductAPI";
+import { ProductAdAPI } from "./ProductAdAPI";
 import { ProductImageAPI } from "./ProductImageAPI";
 import { SalonAPI } from "./SalonAPI";
 import { SalonInventoryAPI } from "./SalonInventoryAPI";
@@ -26,6 +27,7 @@ import { ServiceAPI } from "./ServiceAPI";
 import { SkillAPI } from "./SkillAPI";
 import { StateAPI } from "./StateAPI";
 import { UserAPI } from "./UserAPI";
+import { AcademyAPI } from "./AcademyAPI";
 
 
 export default {
@@ -41,6 +43,7 @@ export default {
     InventoryAPI,
     JobSeekerAPI,
     ProductAPI,
+    ProductAdAPI,
     ProductImageAPI,
     SalonAPI,
     SalonEmployeeAPI,
@@ -48,5 +51,6 @@ export default {
     ServiceAPI,
     SkillAPI,
     StateAPI,
-    UserAPI
+    UserAPI,
+    AcademyAPI
 };

@@ -12,11 +12,18 @@ import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
 
 import { tokens } from "../../../theme";
+import { Utility } from "../../utility";
+import { Chip } from "@mui/material";
 
 export const datagridColumns = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const navigateTo = useNavigate();
+    const { getLocalStorage } = Utility();
+    
+    const auth = getLocalStorage("auth");
+    const role = auth?.type;
+    const userId = auth?.id;
 
     const handleActionEdit = (id) => {
         navigateTo(`/salon/detail/update/${id}`, { state: { id: id } });
@@ -46,7 +53,54 @@ export const datagridColumns = () => {
             align: "center",
             flex: 1,
             minWidth: 200
-        },
+        }
+    ];
+
+    if (role === 'admin') {
+        columns.push(
+            {
+                field: "Creator",
+                headerName: "CREATED BY",
+                headerAlign: "center",
+                align: "center",
+                flex: 1,
+                minWidth: 120,
+                valueGetter: (params) => params.row.Creator?.username || 'N/A'
+            },
+            {
+                field: "Referrer",
+                headerName: "REFERRAL BY",
+                headerAlign: "center",
+                align: "center",
+                flex: 1,
+                minWidth: 120,
+                valueGetter: (params) => params.row.Referrer?.username || 'N/A'
+            }
+        );
+    }
+
+    if (role === 'sales_executive') {
+        columns.push({
+            field: "relation",
+            headerName: "MY RELATION",
+            headerAlign: "center",
+            align: "center",
+            flex: 1,
+            minWidth: 150,
+            renderCell: ({ row }) => {
+                const isCreator = row.created_by === userId;
+                const isReferrer = row.referral_by === userId;
+                return (
+                    <Box display="flex" gap="5px">
+                        {isCreator && <Chip label="Created By Me" size="small" color="primary" />}
+                        {isReferrer && <Chip label="Referred By Me" size="small" color="secondary" />}
+                    </Box>
+                );
+            }
+        });
+    }
+
+    columns.push(
         {
             field: "updated_at",
             headerName: "UPDATED AT",
@@ -54,7 +108,7 @@ export const datagridColumns = () => {
             align: "center",
             flex: 1,
             minWidth: 100,
-            valueFormatter: params => params?.value.substring(0, 10)
+            valueFormatter: params => params?.value ? params?.value.substring(0, 10) : ''
         },
         {
             field: "status",
@@ -74,9 +128,7 @@ export const datagridColumns = () => {
                         backgroundColor={
                             status === "active"
                                 ? colors.greenAccent[600]
-                                : status === "inactive"
-                                    ? colors.redAccent[700]
-                                    : colors.redAccent[700]
+                                : colors.redAccent[700]
                         }
                         borderRadius="4px"
                     >
@@ -94,23 +146,28 @@ export const datagridColumns = () => {
             align: "center",
             flex: 1,
             minWidth: 75,
-            renderCell: ({ row: { id } }) => {
+            renderCell: ({ row }) => {
+                // If Sales Executive, can edit if they are creator OR referrer
+                const canEdit = role === 'admin' || (role === 'sales_executive' && (row.created_by === userId || row.referral_by === userId));
+                
                 return (
                     <Box width="30%"
                         m="0 auto"
                         p="5px"
                         display="flex"
                         justifyContent="center">
-                        <Button color="info" variant="contained"
-                            onClick={() => handleActionEdit(id)}
-                            sx={{ minWidth: "50px" }}
-                        >
-                            <DriveFileRenameOutlineOutlinedIcon />
-                        </Button>
+                        {canEdit && (
+                            <Button color="info" variant="contained"
+                                onClick={() => handleActionEdit(row.id)}
+                                sx={{ minWidth: "50px" }}
+                            >
+                                <DriveFileRenameOutlineOutlinedIcon />
+                            </Button>
+                        )}
                     </Box>
                 );
             },
         }
-    ];
+    );
     return columns;
 }
