@@ -47,6 +47,10 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
             await formik.submitForm();
+            return {
+                values: formik.values,
+                validated: Object.keys(formik.errors).length === 0
+            };
         }
     }));
 

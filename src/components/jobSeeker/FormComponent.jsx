@@ -60,12 +60,10 @@ const FormComponent = () => {
         dispatch(setMenuItem(selectedMenu.selected));
     }, []);
 
-    const updateJobSeekerAndAddress = useCallback(formData => {
+    const updateJobSeekerAndAddress = useCallback(async formData => {
         console.log(formData)
         if (formData.jobSeekerData?.values?.resume) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
-            console.log("Uploading...");
-            // uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
             formData.jobSeekerData.values.resume = formattedResumeName;
         }
         const dataFields = [
@@ -77,31 +75,28 @@ const FormComponent = () => {
         ];
         const paths = ["/update-job-seeker", "/update-address"];
         setLoading(true);
-        console.log('jobseeker datafields=', dataFields)
 
-        API.CommonAPI.multipleAPICall("PATCH", paths, dataFields)
-            .then(responses => {
-                console.log('jobseeker respomses=', responses)
-                let status = true;
-                responses.forEach(response => {
-                    if (response.data.status !== "Success") {
-                        status = false;
-                    }
-                });
-                if (status) {
-                    setLoading(false);
-                    toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/job/seeker/listing`);
-                } else {
-                    setLoading(false);
-                    toastAndNavigate(dispatch, true, "error", "An Error Occurred. Please Try Again", navigateTo, 0);
+        try {
+            const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
+            let status = true;
+            responses.forEach(response => {
+                if (response.data.status !== "Success") {
+                    status = false;
                 }
-            })
-            .catch(err => {
-                setLoading(false);
-                toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg);
-                throw err;
             });
-    }, [formData]);
+            if (status) {
+                setLoading(false);
+                toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, `/job/seeker/listing`);
+            } else {
+                setLoading(false);
+                toastAndNavigate(dispatch, true, "error", "An Error Occurred. Please Try Again", navigateTo, 0);
+            }
+        } catch (err) {
+            setLoading(false);
+            toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred");
+            throw err;
+        }
+    }, [formData, filename, dispatch, navigateTo, toastAndNavigate]);
 
 
     const getSelectedSkillsByName = (dataObj) => {

@@ -27,6 +27,7 @@ const KanbanCalendarView = lazy(() => import("./components/appointments/KanbanCa
 
 const ProductFormComponent = lazy(() => import("./components/products/FormComponent"));
 const ProductListingComponent = lazy(() => import("./components/products/ListingComponent"));
+const ProductAds = lazy(() => import("./components/productAds/ProductAds"));
 
 const InventoryListingComponent = lazy(() => import("./components/inventory/ListingComponent"));
 const InventoryFormComponent = lazy(() => import("./components/inventory/InventoryFormComponent"));
@@ -58,6 +59,8 @@ const ContactListingComponent = lazy(() => import("./components/contactUs/Listin
 
 const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
+const AcademyListingComponent = lazy(() => import("./components/academy/ListingComponent"));
+const AcademyFormComponent = lazy(() => import("./components/academy/FormComponent"));
 
 import API from "./apis";
 import { Utility } from "./components/utility";
@@ -89,6 +92,9 @@ function App() {
         break;
       case 'salon':
         setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, pathname);
+        break;
+      case 'sales_executive':
+        navigateTo(pathname + search);
         break;
       case 'freelancer':
       // navigateTo('/freelancer/update');
@@ -135,6 +141,7 @@ function App() {
                       <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
                       <Route exact path="/product/detail/listing" element={<ProductListingComponent />} />
+                      <Route exact path="/product-ads/listing" element={<ProductAds />} />
 
                       <Route exact path="/inventory/listing" element={<InventoryListingComponent />} />
                       <Route exact path="/inventory/create" element={<InventoryFormComponent />} />
@@ -171,6 +178,14 @@ function App() {
                       <Route exact path="/freelancer/update/:id" element={<UserFormComponent />} />
                       <Route exact path="/freelancer/listing" element={<UserListingComponent />} />
 
+                      <Route exact path="/Sales Executive/create" element={<UserFormComponent />} />
+                      <Route exact path="/sales executive/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/Sales Executive/listing" element={<UserListingComponent />} />
+
+                      <Route exact path="/academy/listing" element={<AcademyListingComponent />} />
+                      <Route exact path="/academy/create" element={<AcademyFormComponent />} />
+                      <Route exact path="/academy/update/:id" element={<AcademyFormComponent />} />
+
                       {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
                   {role === 'salon' &&
@@ -186,6 +201,13 @@ function App() {
                       <Route exact path="/salon/cashflow" element={<CashflowListingComponent />} />
                       <Route exact path="/salon/cashflow/create" element={<CashflowFormComponent />} />
                       <Route exact path="/salon/cashflow/update/:id" element={<CashflowFormComponent />} />
+                    </>}
+                  {role === 'sales_executive' &&
+                    <>
+                      <Route exact path="/" element={<Dashboard />} />
+                      <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
+                      <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
                     </>}
                   {/* {role === 'freelancer' &&
                     <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}

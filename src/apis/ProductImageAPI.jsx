@@ -65,17 +65,23 @@ export const ProductImageAPI = {
             signal: cancel ? cancelApiObject[this.deleteProductImage.name].handleRequestCancellation().signal : undefined,
         });
     },
-    /** Upload product image to the backend from where it is uploaded to azure storage
+    /** Upload product image to the backend from where it is uploaded to supabase storage
      */
     uploadProductImage: async (data, cancel = false) => {
+        const formData = new FormData();
+        formData.append('folder', data.folder);
+        formData.append('name', data.name);
+        formData.append('file', data.file);
+
         return await api.request({
             url: `/upload-product-image`,
             headers: {
-                "Content-Type": "multipart/form-data",
+                // Do NOT set Content-Type here - axios sets it automatically with
+                // the correct multipart boundary when FormData is used
                 "x-access-token": getLocalStorage("auth").token
             },
             method: "POST",
-            data: data,
+            data: formData,
             signal: cancel ? cancelApiObject[this.uploadProductImage.name].handleRequestCancellation().signal : undefined,
         });
     }

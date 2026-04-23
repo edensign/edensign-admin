@@ -135,10 +135,11 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : selected === 'Salon Detail' ? salonLoading :
+                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : (selected === 'Salon Detail' || selected === 'My Salons') ? salonLoading :
                     selected === 'Salon Inventory' ? salonInventoryLoading : selected === 'Salon Cashflow' ? cashflowLoading : selected === "Service" ? serviceLoading :
                         selected === 'Job Seeker' ? jobSeekerLoading : selected === 'Product Detail' ? productLoading :
-                            selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : userLoading)}
+                            selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : 
+                                (selected === 'Employee' || selected === 'Salon' || selected === 'Freelancer' || selected === 'Sales Executive') ? userLoading : userLoading)}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,

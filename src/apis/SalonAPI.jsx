@@ -66,6 +66,19 @@ export const SalonAPI = {
             data: id,
             signal: cancel ? cancelApiObject[this.getSalonByUserId.name].handleRequestCancellation().signal : undefined,
         });
+    },
+
+    /** Get salon stats for dashboard
+     */
+    getSalonStats: async (cancel = false) => {
+        return await api.request({
+            url: `/get-salon-stats`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "GET",
+            signal: cancel ? cancelApiObject[this.getSalonStats.name].handleRequestCancellation().signal : undefined,
+        });
     }
 };
 

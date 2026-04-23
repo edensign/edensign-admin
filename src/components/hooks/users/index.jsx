@@ -26,6 +26,9 @@ export const useUser = () => {
             case "Freelancer":
                 query = "freelancer";
                 break;
+            case "Sales Executive":
+                query = "sales_executive";
+                break;
             default:
                 query;
                 break;

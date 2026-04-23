@@ -22,7 +22,7 @@ import salonValidation from "./Validation";
 
 
 const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
-    showSalonFields, services, amenities, updatedValues = null }) => {
+    showSalonFields, services, amenities, salesExecutives = [], role, updatedValues = null }) => {
 
     const checkboxLabel = { inputProps: { 'aria-label': 'Checkboxes' } };
     const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -54,7 +54,9 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
         closed_on: "",
         opening_time: dayjs(updatedValues?.closing_time) || null,
         closing_time: dayjs(updatedValues?.closing_time) || null,
-        estd_on: dayjs(updatedValues?.estd_on) || null
+        estd_on: dayjs(updatedValues?.estd_on) || null,
+        created_by: "",
+        referral_by: ""
     };
 
     const [initialState, setInitialState] = useState(initialValues);
@@ -69,6 +71,10 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
             await formik.submitForm();
+            return {
+                values: formik.values,
+                validated: Object.keys(formik.errors).length === 0
+            };
         }
     }));
 
@@ -511,6 +517,45 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                         helperText={formik.touched.priority && formik.errors.priority}
                         sx={{ gridColumn: "span 2" }}
                     />}
+
+                    {(role === 'admin' || role === 'sales_executive') && (
+                        <>
+                            {role === 'admin' && (
+                                <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                                    <InputLabel id="createdByField">Created By (Sales Executive)</InputLabel>
+                                    <Select
+                                        variant="filled"
+                                        labelId="createdByField"
+                                        label="Created By"
+                                        name="created_by"
+                                        onChange={formik.handleChange}
+                                        value={formik.values.created_by}
+                                    >
+                                        <MenuItem value=""><em>None</em></MenuItem>
+                                        {salesExecutives.map(exec => (
+                                            <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                            <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                                <InputLabel id="referralByField">Referral By (Sales Executive)</InputLabel>
+                                <Select
+                                    variant="filled"
+                                    labelId="referralByField"
+                                    label="Referral By"
+                                    name="referral_by"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.referral_by}
+                                >
+                                    <MenuItem value=""><em>None</em></MenuItem>
+                                    {salesExecutives.map(exec => (
+                                        <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </>
+                    )}
                 </Box>
             </form >
         </Box >
