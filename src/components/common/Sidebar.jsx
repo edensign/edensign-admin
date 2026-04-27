@@ -180,6 +180,12 @@ const Sidebar = ({ role }) => {
                 icon={<ReceiptOutlinedIcon />}
                 selected={selected}
               />
+              <SidebarItem
+                title="Offer Cards"
+                to="/offer-cards/listing"
+                icon={<LoyaltyIcon />}
+                selected={selected}
+              />
 
               <Typography
                 variant="h6"
@@ -297,6 +303,12 @@ const Sidebar = ({ role }) => {
                 title="Salon Cashflow"
                 to="/salon/cashflow"
                 icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Offer Cards"
+                to="/offer-cards/listing"
+                icon={<LoyaltyIcon />}
                 selected={selected}
               />
             </>}
