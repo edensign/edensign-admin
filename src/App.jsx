@@ -62,6 +62,9 @@ const UserListingComponent = lazy(() => import("./components/users/ListingCompon
 const AcademyListingComponent = lazy(() => import("./components/academy/ListingComponent"));
 const AcademyFormComponent = lazy(() => import("./components/academy/FormComponent"));
 
+const OfferCardListingComponent = lazy(() => import("./components/offerCards/ListingComponent"));
+const OfferCardFormComponent = lazy(() => import("./components/offerCards/FormComponent"));
+
 import API from "./apis";
 import { Utility } from "./components/utility";
 import { setMenuItem } from "./redux/actions/NavigationAction";
@@ -186,6 +189,10 @@ function App() {
                       <Route exact path="/academy/create" element={<AcademyFormComponent />} />
                       <Route exact path="/academy/update/:id" element={<AcademyFormComponent />} />
 
+                      <Route exact path="/offer-cards/listing" element={<OfferCardListingComponent />} />
+                      <Route exact path="/offer-cards/create" element={<OfferCardFormComponent />} />
+                      <Route exact path="/offer-cards/update/:id" element={<OfferCardFormComponent />} />
+
                       {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
                   {role === 'salon' &&
@@ -201,6 +208,10 @@ function App() {
                       <Route exact path="/salon/cashflow" element={<CashflowListingComponent />} />
                       <Route exact path="/salon/cashflow/create" element={<CashflowFormComponent />} />
                       <Route exact path="/salon/cashflow/update/:id" element={<CashflowFormComponent />} />
+
+                      <Route exact path="/offer-cards/listing" element={<OfferCardListingComponent />} />
+                      <Route exact path="/offer-cards/create" element={<OfferCardFormComponent />} />
+                      <Route exact path="/offer-cards/update/:id" element={<OfferCardFormComponent />} />
                     </>}
                   {role === 'sales_executive' &&
                     <>
