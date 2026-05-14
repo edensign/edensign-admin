@@ -49,6 +49,8 @@ export default function ServerPaginationGrid({
     const cashflowLoading = useSelector(state => state.allCashflow.loading);
     const serviceLoading = useSelector(state => state.allServices.loading);
     const skillLoading = useSelector(state => state.allSkills.loading);
+    const stateLoading = useSelector(state => state.allStates?.loading);
+    const cityLoading = useSelector(state => state.allCities?.loading);
     const userLoading = useSelector(state => state.allUsers.loading);
     const selected = useSelector(state => state.menuItems.selected);
 
@@ -135,7 +137,7 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : (selected === 'Salon Detail' || selected === 'My Salons') ? salonLoading :
+                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : selected === "State" ? stateLoading : selected === "City" ? cityLoading : (selected === 'Salon Detail' || selected === 'My Salons') ? salonLoading :
                     selected === 'Salon Inventory' ? salonInventoryLoading : selected === 'Salon Cashflow' ? cashflowLoading : selected === "Service" ? serviceLoading :
                         selected === 'Job Seeker' ? jobSeekerLoading : selected === 'Product Detail' ? productLoading :
                             selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : 

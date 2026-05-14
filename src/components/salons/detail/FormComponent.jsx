@@ -115,14 +115,24 @@ const FormComponent = () => {
     const updateSalonAndAddress = useCallback(async (formData) => {
         setLoading(true);
 
+        let salonFormValues = { ...formData.salonData.values };
+        // Only convert specific dropdown fields to null to prevent DB check constraint violations
+        // while allowing other fields to remain as empty strings to satisfy NOT NULL constraints.
+        const fieldsToNullifyIfEmpty = ['category', 'type', 'status', 'closed_on', 'created_by', 'referral_by'];
+        fieldsToNullifyIfEmpty.forEach(key => {
+            if (salonFormValues[key] === "") {
+                salonFormValues[key] = null;
+            }
+        });
+
         const paths = ["/update-salon", "/update-address"];
         const dataFields = [
             {
-                ...formData.salonData.values,
-                services: getSelectedServices(formData.salonData.values.services),
-                amenities: getSelectedAmenities(formData.salonData.values.amenities),
-                referral_by: formData.salonData.values.referral_by || null,
-                created_by: formData.salonData.values.created_by || formData.salonData.values.userId // Preserve or set
+                ...salonFormValues,
+                services: getSelectedServices(salonFormValues.services),
+                amenities: getSelectedAmenities(salonFormValues.amenities),
+                referral_by: salonFormValues.referral_by || null,
+                created_by: salonFormValues.created_by || salonFormValues.userId // Preserve or set
             },
             { 
                 ...formData.addressData.values,
@@ -304,15 +314,25 @@ const FormComponent = () => {
     const createSalon = async (formData) => {
         setLoading(true);
 
+        let salonFormValues = { ...formData.salonData.values };
+        // Only convert specific dropdown fields to null to prevent DB check constraint violations
+        // while allowing other fields to remain as empty strings to satisfy NOT NULL constraints.
+        const fieldsToNullifyIfEmpty = ['category', 'type', 'status', 'closed_on', 'created_by', 'referral_by'];
+        fieldsToNullifyIfEmpty.forEach(key => {
+            if (salonFormValues[key] === "") {
+                salonFormValues[key] = null;
+            }
+        });
+
         const salonValues = {
-            ...formData.salonData.values,
+            ...salonFormValues,
             user_id: getLocalStorage("auth").id,
-            salon_code: createSalonCode(formData.salonData.values.name),
-            services: getSelectedServices(formData.salonData.values?.services),
-            amenities: getSelectedAmenities(formData.salonData.values?.amenities),
-            referral_by: formData.salonData.values?.referral_by || null,
+            salon_code: createSalonCode(salonFormValues.name),
+            services: getSelectedServices(salonFormValues.services),
+            amenities: getSelectedAmenities(salonFormValues.amenities),
+            referral_by: salonFormValues.referral_by || null,
             // If admin, they might have selected a creator. If Sales Executive, it's auto-handled by backend but good to be explicit.
-            created_by: role === 'sales_executive' ? id : (formData.salonData.values?.created_by || id)
+            created_by: role === 'sales_executive' ? id : (salonFormValues.created_by || id)
         };
 
         try {

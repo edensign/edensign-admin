@@ -17,8 +17,7 @@ const checkoutSchema = yup.object().shape({
         .max(50, 'Name is Too Long!')
         .required("This Field is Required"),
     email: yup.string()
-        .matches(emailRegExp, "Email Address is Not Valid")
-        .required("This Field is Required"),
+        .matches(emailRegExp, "Email Address is Not Valid"),
     address: yup.string(),
     contact_no: yup.string()
         .matches(phoneRegExp, "Phone Number Is Not Valid")
