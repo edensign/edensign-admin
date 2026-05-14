@@ -54,9 +54,12 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
         closed_on: "",
         opening_time: dayjs(updatedValues?.closing_time) || null,
         closing_time: dayjs(updatedValues?.closing_time) || null,
-        estd_on: dayjs(updatedValues?.estd_on) || null,
         created_by: "",
-        referral_by: ""
+        referral_by: "",
+        instagram_link: "",
+        website_link: "",
+        facebook_link: "",
+        youtube_link: ""
     };
 
     const [initialState, setInitialState] = useState(initialValues);
@@ -147,7 +150,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                         fullWidth
                         variant="filled"
                         type="text"
-                        label="Email*"
+                        label="Email"
                         name="email"
                         autoComplete="new-email"
                         onBlur={formik.handleBlur}
@@ -464,17 +467,6 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                             value={dayjs(initialState.closing_time)}
                             onChange={newClosingTime => formik.setFieldValue("closing_time", newClosingTime)}
                         />
-                        <DatePicker
-                            format="DD MMMM YYYY"            //ex - 25 July 2023
-                            views={['day', "month", "year"]}
-                            label="Established On.."
-                            name="estd_on"
-                            value={initialState.estd_on}
-                            onChange={newEstdOn => {
-                                console.log("Date=>", newEstdOn)
-                                formik.setFieldValue("estd_on", newEstdOn)
-                            }}
-                        />
                     </LocalizationProvider>
                     <TextField
                         fullWidth
@@ -517,45 +509,97 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                         helperText={formik.touched.priority && formik.errors.priority}
                         sx={{ gridColumn: "span 2" }}
                     />}
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="instagram_link"
+                        label="Instagram Link"
+                        autoComplete="new-instagram_link"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.instagram_link}
+                        error={!!formik.touched.instagram_link && !!formik.errors.instagram_link}
+                        helperText={formik.touched.instagram_link && formik.errors.instagram_link}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="website_link"
+                        label="Website Link"
+                        autoComplete="new-website_link"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.website_link}
+                        error={!!formik.touched.website_link && !!formik.errors.website_link}
+                        helperText={formik.touched.website_link && formik.errors.website_link}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="facebook_link"
+                        label="Facebook Link"
+                        autoComplete="new-facebook_link"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.facebook_link}
+                        error={!!formik.touched.facebook_link && !!formik.errors.facebook_link}
+                        helperText={formik.touched.facebook_link && formik.errors.facebook_link}
+                        sx={{ gridColumn: "span 2" }}
+                    />
+                    <TextField
+                        fullWidth
+                        variant="filled"
+                        type="text"
+                        name="youtube_link"
+                        label="Youtube Link"
+                        autoComplete="new-youtube_link"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        value={formik.values.youtube_link}
+                        error={!!formik.touched.youtube_link && !!formik.errors.youtube_link}
+                        helperText={formik.touched.youtube_link && formik.errors.youtube_link}
+                        sx={{ gridColumn: "span 2" }}
+                    />
 
-                    {(role === 'admin' || role === 'sales_executive') && (
-                        <>
-                            {role === 'admin' && (
-                                <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
-                                    <InputLabel id="createdByField">Created By (Sales Executive)</InputLabel>
-                                    <Select
-                                        variant="filled"
-                                        labelId="createdByField"
-                                        label="Created By"
-                                        name="created_by"
-                                        onChange={formik.handleChange}
-                                        value={formik.values.created_by}
-                                    >
-                                        <MenuItem value=""><em>None</em></MenuItem>
-                                        {salesExecutives.map(exec => (
-                                            <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            )}
-                            <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
-                                <InputLabel id="referralByField">Referral By (Sales Executive)</InputLabel>
-                                <Select
-                                    variant="filled"
-                                    labelId="referralByField"
-                                    label="Referral By"
-                                    name="referral_by"
-                                    onChange={formik.handleChange}
-                                    value={formik.values.referral_by}
-                                >
-                                    <MenuItem value=""><em>None</em></MenuItem>
-                                    {salesExecutives.map(exec => (
-                                        <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </>
+                    {role === 'admin' && (
+                        <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                            <InputLabel id="createdByField">Created By (Sales Executive)</InputLabel>
+                            <Select
+                                variant="filled"
+                                labelId="createdByField"
+                                label="Created By"
+                                name="created_by"
+                                onChange={formik.handleChange}
+                                value={formik.values.created_by}
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                {salesExecutives.map(exec => (
+                                    <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     )}
+                    <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                        <InputLabel id="referralByField">Referral By (Sales Executive)</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="referralByField"
+                            label="Referral By"
+                            name="referral_by"
+                            onChange={formik.handleChange}
+                            value={formik.values.referral_by}
+                        >
+                            <MenuItem value=""><em>None</em></MenuItem>
+                            {salesExecutives.map(exec => (
+                                <MenuItem key={exec.id} value={exec.id}>{exec.username}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </Box>
             </form >
         </Box >

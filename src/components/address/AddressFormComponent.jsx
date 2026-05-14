@@ -262,8 +262,8 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                     >
                         <InputLabel id="stateField">--Select State*--</InputLabel>
                         <Select
+                            displayEmpty
                             autoComplete="new-state"
-                            defaultValue={null}
                             name="state"
                             variant="filled"
                             value={formik.values.state}
@@ -271,10 +271,12 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                                 const getStateId = event.target.value;
                                 setStateId(getStateId);
                                 formik.setFieldValue("state", event.target.value);
+                                formik.setFieldValue("city", 0);
                             }}
                         >
+                            <MenuItem value={0}><em>None</em></MenuItem>
                             {states.map(item => (
-                                <MenuItem value={item.id} name={item.name} key={item.name}>
+                                <MenuItem value={item.id} name={item.name} key={item.id}>
                                     {item.name}
                                 </MenuItem>
                             ))}
@@ -286,19 +288,18 @@ const AddressFormComponent = ({ onChange, refId, update, setDirty, reset, setRes
                     >
                         <InputLabel id="cityField">--Select City*--</InputLabel>
                         <Select
+                            displayEmpty
                             autoComplete="new-city"
-                            defaultValue=""
                             name="city"
                             variant="filled"
                             value={formik.values.city}
                             onChange={event => {
-                                const getCityId = event.target.value;
-                                setCityId(getCityId);
                                 formik.setFieldValue("city", event.target.value);
                             }}
                         >
+                            <MenuItem value={0}><em>None</em></MenuItem>
                             {cities.map(item => (
-                                <MenuItem value={item.id} key={item.name} name={item.name}>
+                                <MenuItem value={item.id} name={item.name} key={item.id}>
                                     {item.name}
                                 </MenuItem>
                             ))}

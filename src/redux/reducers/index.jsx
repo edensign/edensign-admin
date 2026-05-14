@@ -21,6 +21,8 @@ import { setSalonInventoryReducer } from "./SalonInventoryReducer";
 import { setCashflowReducer } from "./CashflowReducer";
 import { setServiceReducer } from "./ServiceReducer";
 import { setSkillReducer } from "./SkillReducer";
+import { setStateReducer } from "./StateReducer";
+import { setCityReducer } from "./CityReducer";
 import { setUserReducer } from "./UserReducers";
 
 const reducers = combineReducers({
@@ -35,6 +37,8 @@ const reducers = combineReducers({
     allCashflow: setCashflowReducer,
     allServices: setServiceReducer,
     allSkills: setSkillReducer,
+    allStates: setStateReducer,
+    allCities: setCityReducer,
     allUsers: setUserReducer,
     menuItems: menuItemReducer,
     toastInfo: displayToastReducer,

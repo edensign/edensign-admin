@@ -234,6 +234,18 @@ const Sidebar = ({ role }) => {
                 Pages
               </Typography>
               <SidebarItem
+                title="State"
+                to="/state/listing"
+                icon={<ApiIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="City"
+                to="/city/listing"
+                icon={<ApiIcon />}
+                selected={selected}
+              />
+              <SidebarItem
                 title="Amenity"
                 to="/amenity/listing"
                 icon={<ApiIcon />}

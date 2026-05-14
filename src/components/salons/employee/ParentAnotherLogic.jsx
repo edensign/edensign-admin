@@ -7,14 +7,15 @@
 */
 
 import React, { useState, useEffect } from "react";
-import { Box, Divider, Chip, useMediaQuery } from "@mui/material";
+import { Box, Divider, Chip, useMediaQuery, Button } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import ChildEmployeeFormComponent from "./ChildAnotherLogic";
 
 
 const ParentEmployeeFormComponent = ({ masterValues, setMasterValues, services, updatedValues = [] }) => {
 
-    const [defaultEmployeeCount, setDefaultEmployeeCount] = useState([1, 2, 3]);
+    const [defaultEmployeeCount, setDefaultEmployeeCount] = useState([1]);
     const isNonMobile = useMediaQuery("(min-width:600px)");
     let ordinal;
 
@@ -50,13 +51,33 @@ const ParentEmployeeFormComponent = ({ masterValues, setMasterValues, services, 
                     masterValues={masterValues}
                     setMasterValues={setMasterValues}
                 />
+                {id > 1 && (
+                    <Box display="flex" justifyContent="flex-end" px={2} mb={2}>
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            onClick={() => {
+                                const newCount = defaultEmployeeCount.filter(empId => empId !== id);
+                                setDefaultEmployeeCount(newCount);
+                                const newMasterValues = { ...masterValues };
+                                delete newMasterValues[id];
+                                setMasterValues(newMasterValues);
+                            }}
+                        >
+                            Delete Employee
+                        </Button>
+                    </Box>
+                )}
                 <Divider sx={{ width: "99%" }}>
                     <Chip color="info" label={`${canAddEmployee ? `Click Here To Add More Salon Employees` : `${ordinal.toString().replace(/,/g, "")} Employee Details`} `}
-                        onClick={canAddEmployee ? () =>
+                        onClick={canAddEmployee ? () => {
+                            const newId = Math.max(...defaultEmployeeCount) + 1;
                             setDefaultEmployeeCount([
                                 ...defaultEmployeeCount,
-                                id + 1
+                                newId
                             ])
+                        }
                             : null}
                         sx={{
                             fontSize: "13px", fontWeight: "600", letterSpacing: "0.2em", padding: "12px",

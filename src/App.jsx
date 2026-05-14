@@ -62,6 +62,9 @@ const UserListingComponent = lazy(() => import("./components/users/ListingCompon
 const AcademyListingComponent = lazy(() => import("./components/academy/ListingComponent"));
 const AcademyFormComponent = lazy(() => import("./components/academy/FormComponent"));
 
+const StateListingComponent = lazy(() => import("./components/state/ListingComponent"));
+const CityListingComponent = lazy(() => import("./components/city/ListingComponent"));
+
 const OfferCardListingComponent = lazy(() => import("./components/offerCards/ListingComponent"));
 const OfferCardFormComponent = lazy(() => import("./components/offerCards/FormComponent"));
 
@@ -188,6 +191,9 @@ function App() {
                       <Route exact path="/academy/listing" element={<AcademyListingComponent />} />
                       <Route exact path="/academy/create" element={<AcademyFormComponent />} />
                       <Route exact path="/academy/update/:id" element={<AcademyFormComponent />} />
+
+                      <Route exact path="/state/listing" element={<StateListingComponent />} />
+                      <Route exact path="/city/listing" element={<CityListingComponent />} />
 
                       <Route exact path="/offer-cards/listing" element={<OfferCardListingComponent />} />
                       <Route exact path="/offer-cards/create" element={<OfferCardFormComponent />} />
