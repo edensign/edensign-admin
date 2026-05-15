@@ -277,20 +277,17 @@ const FormComponent = () => {
             />
 
             <Box display="flex" justifyContent="end" m="20px">
-                {   //hide reset button on user update
-                    title === "Update" ? null :
-                        <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}
-                            disabled={!dirty || submitted}
-                            onClick={() => {
-                                if (window.confirm("Do You Really Want To Reset?")) {
-                                    setReset(true);
-                                    location.reload();
-                                };
-                            }}
-                        >
-                            Reset
-                        </Button>
-                }
+                <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}
+                    disabled={!dirty || submitted}
+                    onClick={() => {
+                        if (window.confirm("Do You Really Want To Reset?")) {
+                            setReset(true);
+                            location.reload();
+                        };
+                    }}
+                >
+                    Reset
+                </Button>
                 <Button color="error" variant="contained" sx={{ mr: 3 }}
                     onClick={() => navigateTo(`/job/seeker/listing`)}>
                     Cancel
