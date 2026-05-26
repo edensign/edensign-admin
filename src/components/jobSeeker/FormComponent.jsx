@@ -62,9 +62,11 @@ const FormComponent = () => {
 
     const updateJobSeekerAndAddress = useCallback(async formData => {
         console.log(formData)
-        if (formData.jobSeekerData?.values?.resume) {
+        if (formData.jobSeekerData?.values?.resume instanceof File && filename) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
             formData.jobSeekerData.values.resume = formattedResumeName;
+        } else if (Array.isArray(formData.jobSeekerData?.values?.resume) || !formData.jobSeekerData?.values?.resume) {
+            formData.jobSeekerData.values.resume = "";
         }
         const dataFields = [
             {
@@ -142,7 +144,7 @@ const FormComponent = () => {
 
     const formatResumeName = (name, file) => {
         let formattedName;
-        if (name) {
+        if (name && file) {
             formattedName = Math.ceil(Math.random() * 100) + name
                 .toLowerCase()
                 .trim()
@@ -158,11 +160,13 @@ const FormComponent = () => {
 
     const createJobSeeker = () => {
         setLoading(true);
-        if (formData.jobSeekerData?.values?.resume) {
+        if (formData.jobSeekerData?.values?.resume instanceof File && filename) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
             console.log("Uploading...");
             // uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
             formData.jobSeekerData.values.resume = formattedResumeName;
+        } else {
+            formData.jobSeekerData.values.resume = "";
         }
         formData.jobSeekerData.values = {
             ...formData.jobSeekerData.values,

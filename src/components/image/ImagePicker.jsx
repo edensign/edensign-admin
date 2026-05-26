@@ -28,7 +28,9 @@ const ImagePicker = ({
     setDeletedImage,
     imageType,
     azurePath,
-    ENV
+    ENV,
+    maxFiles = 5,
+    acceptTypes = "image/*, application/pdf"
 }) => {
     const initialValues = {};
     let newCount;
@@ -103,9 +105,9 @@ const ImagePicker = ({
         <Box m="10px">
             <form ref={refId} encType="multipart/form-data">
                 <TextField
-                    accept="image/*, application/pdf"
+                    accept={acceptTypes}
                     name={imageType}
-                    label={`Upload ${imageType} Image`}
+                    label={`Upload ${imageType} Image (Max: ${maxFiles})`}
                     value={undefined}
                     size="small"
                     onBlur={formik.handleBlur}
@@ -118,16 +120,20 @@ const ImagePicker = ({
                                     hidden
                                     multiple
                                     type="file"
+                                    accept={acceptTypes}
                                     name="file"
                                     onChange={(event) => {
-                                        console.log(`Onchange picker ${imageType} files=>`, event.target.files)
-                                        //keeping old image files also in formik while inserting new files, so
-                                        formik.values[`${imageType}`] ?     //we do not need to manual merge in
-                                            formik.setFieldValue(`${imageType}`,        //previewImage
-                                                [
-                                                    ...formik.values[`${imageType}`],
-                                                    ...event.target.files
-                                                ]) : formik.setFieldValue(`${imageType}`, event.target.files);
+                                        console.log(`Onchange picker ${imageType} files=>`, event.target.files);
+                                        const newFiles = Array.from(event.target.files);
+                                        const currentFiles = formik.values[`${imageType}`] || [];
+                                        const totalFiles = currentFiles.length + newFiles.length;
+                                        
+                                        if (totalFiles > maxFiles) {
+                                            alert(`You can only upload a maximum of ${maxFiles} files for ${imageType}.`);
+                                            return;
+                                        }
+
+                                        formik.setFieldValue(`${imageType}`, [...currentFiles, ...newFiles]);
                                         setDirty(true);
                                     }}
                                 />
@@ -136,7 +142,7 @@ const ImagePicker = ({
                     }}
                     error={formik.touched[`${imageType}`] && Boolean(formik.errors[`${imageType}`])}
                     helperText={formik.touched[`${imageType}`] && formik.errors[`${imageType}`]}
-                    sx={{ m: 1, outline: "none", width: "15%" }}
+                    sx={{ m: 1, outline: "none", width: "15%", minWidth: "180px" }}
                 />
             </form>
             {formik.values[`${imageType}`] || updatedValues?.length ?

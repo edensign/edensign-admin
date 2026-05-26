@@ -93,7 +93,7 @@ const JobSeekerFormComponent = ({
             setInitialState(updatedValues);
 
             //we are modifying our formatted resume name to only contain the filename
-            if (updatedValues.resume.startsWith(updatedValues.name.replace(/\s+/g, "_").toLowerCase(), 2)) {
+            if (updatedValues.resume && updatedValues.resume.startsWith(updatedValues.name.replace(/\s+/g, "_").toLowerCase(), 2)) {
                 setFilename(updatedValues.resume.split("").splice(2).join(""));
             }
         }
@@ -152,19 +152,27 @@ const JobSeekerFormComponent = ({
                         error={!!formik.touched.contact_no && !!formik.errors.contact_no}
                         helperText={formik.touched.contact_no && formik.errors.contact_no}
                     />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        label="Designation"
-                        name="designation"
-                        autoComplete="new-designation"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.designation}
+                    <FormControl variant="filled"
                         error={!!formik.touched.designation && !!formik.errors.designation}
-                        helperText={formik.touched.designation && formik.errors.designation}
-                    />
+                    >
+                        <InputLabel id="designationField">Designation</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="designationField"
+                            label="Designation"
+                            name="designation"
+                            autoComplete="new-designation"
+                            value={formik.values.designation}
+                            onChange={formik.handleChange}
+                        >
+                            <MenuItem value="Hair Stylist">Hair Stylist</MenuItem>
+                            <MenuItem value="Makeup Artist">Makeup Artist</MenuItem>
+                            <MenuItem value="Nail Tech">Nail Tech</MenuItem>
+                            <MenuItem value="Receptionist">Receptionist</MenuItem>
+                            <MenuItem value="Bridal Artist">Bridal Artist</MenuItem>
+                        </Select>
+                        <FormHelperText>{formik.touched.designation && formik.errors.designation}</FormHelperText>
+                    </FormControl>
                     <TextField
                         fullWidth
                         variant="filled"

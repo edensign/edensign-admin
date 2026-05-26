@@ -48,10 +48,18 @@ const ListingComponent = () => {
     const { getLocalStorage } = Utility();
     const reloadBtn = document.getElementById("reload-btn");
 
+    const auth = getLocalStorage("auth");
+    const role = auth?.type;
+
     let condition = getQueryParam() ? {
         key: 'type',
         value: getQueryParam()
     } : false;
+
+    // Sales Executive: when viewing Salon Owners, filter by their own ID as created_by
+    const createdByFilter = (role === 'sales_executive' && getQueryParam() === 'salon')
+        ? auth?.id
+        : false;
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -105,7 +113,14 @@ const ListingComponent = () => {
                         type="submit"
                         color="success"
                         variant="contained"
-                        onClick={() => { navigateTo(`/${selected}/create`) }}
+                        onClick={() => {
+                            // Sales Executive creates salon owners via /salon/create
+                            if (role === 'sales_executive' && getQueryParam() === 'salon') {
+                                navigateTo('/salon/create');
+                            } else {
+                                navigateTo(`/${selected}/create`);
+                            }
+                        }}
                         sx={{ height: isTab ? "4vh" : "auto" }}
                     >
                         Create New {selected}
@@ -134,6 +149,7 @@ const ListingComponent = () => {
                 action={setUsers}
                 api={API.UserAPI}
                 condition={condition}
+                createdBy={createdByFilter}
                 getQuery={getPaginatedData}
                 columns={datagridColumns()}
                 rows={listData.rows}

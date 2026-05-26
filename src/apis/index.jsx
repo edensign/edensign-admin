@@ -29,6 +29,7 @@ import { StateAPI } from "./StateAPI";
 import { UserAPI } from "./UserAPI";
 import { AcademyAPI } from "./AcademyAPI";
 import { DigitalOfferAPI } from "./DigitalOfferAPI";
+import { DashboardAPI } from "./DashboardAPI";
 
 export default {
     AddressAPI,
@@ -53,5 +54,6 @@ export default {
     StateAPI,
     UserAPI,
     AcademyAPI,
-    DigitalOfferAPI
+    DigitalOfferAPI,
+    DashboardAPI
 };

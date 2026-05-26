@@ -18,9 +18,9 @@ export const useCommon = () => {
 
     /** Get data for pagination according to given parameters to be used in API call
      */
-    const getPaginatedData = useCallback((page = 0, size, action, api, condition = false, search = false) => {
+    const getPaginatedData = useCallback((page = 0, size, action, api, condition = false, search = false, createdBy = false) => {
         const authInfo = getLocalStorage("auth");
-        api.getAll(condition, page, size, search, authInfo)
+        api.getAll(condition, page, size, search, authInfo, false, createdBy)
             .then(res => {
                 if (res.status === 'Success') {
                     dispatch(action({ listData: res.data, loading: false }));

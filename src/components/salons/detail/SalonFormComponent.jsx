@@ -49,7 +49,7 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
         is_selfowned: false,
         is_subscribed: false,
         type: "",
-        category: "",
+        category: "A",
         status: "inactive",
         closed_on: "",
         opening_time: dayjs(updatedValues?.closing_time) || null,
@@ -193,23 +193,24 @@ const SalonFormComponent = ({ onChange, refId, setDirty, reset, setReset,
                             </Select>
                             <FormHelperText>{formik.touched.category && formik.errors.category}</FormHelperText>
                         </FormControl>
-                        <FormControl variant="filled" sx={{ minWidth: 120 }}>
-                            <InputLabel id="statusField">Status</InputLabel>
-                            <Select
-                                variant="filled"
-                                labelId="statusField"
-                                label="Status"
-                                name="status"
-                                autoComplete="new-status"
-                                onChange={formik.handleChange}
-                                value={formik.values.status}
-                                error={!!formik.touched.status && !!formik.errors.status}
-                            >
-                                <MenuItem value="active">Active</MenuItem>
-                                <MenuItem value="inactive">Inactive</MenuItem>
-                            </Select>
-                        </FormControl>
                     </>}
+
+                    <FormControl variant="filled" sx={{ gridColumn: "span 2" }}>
+                        <InputLabel id="statusField">Status</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="statusField"
+                            label="Status"
+                            name="status"
+                            autoComplete="new-status"
+                            onChange={formik.handleChange}
+                            value={formik.values.status}
+                            error={!!formik.touched.status && !!formik.errors.status}
+                        >
+                            <MenuItem value="active">Active</MenuItem>
+                            <MenuItem value="inactive">Inactive</MenuItem>
+                        </Select>
+                    </FormControl>
 
                     <TextField
                         fullWidth

@@ -21,6 +21,7 @@ export default function ServerPaginationGrid({
     api,
     getQuery,
     condition = false,
+    createdBy = false,
     columns,
     rows,
     count,
@@ -57,10 +58,10 @@ export default function ServerPaginationGrid({
     useEffect(() => {
         //TO BE REFACTORED
         if (!searchFlag.search && !searchFlag.searching) {
-            getQuery(paginationModel.page, paginationModel.pageSize, action, api, condition);
+            getQuery(paginationModel.page, paginationModel.pageSize, action, api, condition, false, createdBy);
             setOldPagination(paginationModel);
         } else if (searchFlag.oldPagination && !searchFlag.searching) {
-            getQuery(searchFlag.oldPagination.page, searchFlag.oldPagination.pageSize, action, api, condition);
+            getQuery(searchFlag.oldPagination.page, searchFlag.oldPagination.pageSize, action, api, condition, false, createdBy);
             setPaginationModel({
                 page: searchFlag.oldPagination.page,
                 pageSize: searchFlag.oldPagination.pageSize

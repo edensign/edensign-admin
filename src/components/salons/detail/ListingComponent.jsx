@@ -46,6 +46,9 @@ const ListingComponent = () => {
     const colors = tokens(theme.palette.mode);
     const reloadBtn = document.getElementById("reload-btn");
 
+    const auth = getLocalStorage("auth");
+    const role = auth?.type;
+
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
         dispatch(setMenuItem(selectedMenu.selected));
@@ -92,14 +95,17 @@ const ListingComponent = () => {
                         oldPagination={oldPagination}
                         reloadBtn={reloadBtn}
                     />
-                    <Button
-                        type="submit"
-                        color="success"
-                        variant="contained"
-                        onClick={() => { navigateTo("/salon/detail/create") }}
-                    >
-                        Create New {selected}
-                    </Button>
+                    {/* Only admin can create salons directly */}
+                    {role === 'admin' && (
+                        <Button
+                            type="submit"
+                            color="success"
+                            variant="contained"
+                            onClick={() => { navigateTo("/salon/detail/create") }}
+                        >
+                            Create New {selected}
+                        </Button>
+                    )}
                 </Box>
             </Box>
             <Button sx={{

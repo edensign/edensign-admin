@@ -222,7 +222,11 @@ function App() {
                   {role === 'sales_executive' &&
                     <>
                       <Route exact path="/" element={<Dashboard />} />
-                      <Route exact path="/salon/detail/create" element={<SalonFormComponent />} />
+                      {/* Salon Owners: sales_executive can create/list salon-type users */}
+                      <Route exact path="/salon/create" element={<UserFormComponent />} />
+                      <Route exact path="/salon/update/:id" element={<UserFormComponent />} />
+                      <Route exact path="/salon/listing" element={<UserListingComponent />} />
+                      {/* My Salons: sales_executive can view & edit salons they referred — no create */}
                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
                     </>}

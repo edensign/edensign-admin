@@ -38,11 +38,12 @@ export const UserAPI = {
   },
   /** Get users from the database that meets the specified query parameters
    */
-  getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false) => {
+  getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false, createdBy = false) => {
     const queryParam = conditionObj ? `&${conditionObj.key}=${conditionObj.value}` : '';
     const searchParam = search ? `&search=${search}` : '';
+    const createdByParam = createdBy ? `&created_by=${createdBy}` : '';
     const { data: response } = await api.request({
-      url: `/get-users?page=${page}&size=${size}${queryParam}${searchParam}`,
+      url: `/get-users?page=${page}&size=${size}${queryParam}${searchParam}${createdByParam}`,
       headers: {
         "x-access-token": getLocalStorage("auth")?.token
       },
