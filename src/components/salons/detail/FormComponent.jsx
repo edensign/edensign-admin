@@ -36,16 +36,13 @@ const FormComponent = () => {
         salonData: { values: null, validated: false },
         addressData: { values: null, validated: false },
         employeeData: { values: null, validated: true },
-        imageData: { values: null, validated: true },
-        bannerImageData: { values: null, validated: true }
+        mediaData: {}
     });
-    const [salonEmployeeData, setSalonEmployeeData] = useState();   //this will get all salon employee data
+    const [salonEmployeeData, setSalonEmployeeData] = useState();
 
     const [updatedValues, setUpdatedValues] = useState(null);
-    const [deletedImage, setDeletedImage] = useState([]);
-    const [preview, setPreview] = useState([]);
-    const [deletedBannerImage, setDeletedBannerImage] = useState([]);
-    const [previewBanner, setPreviewBanner] = useState([]);
+    const [mediaPreviews, setMediaPreviews] = useState({});
+    const [mediaDeleted, setMediaDeleted] = useState({});
 
     const [dirty, setDirty] = useState(false);
     const [reset, setReset] = useState(false);
@@ -57,10 +54,31 @@ const FormComponent = () => {
 
     const salonFormRef = useRef();
     const addressFormRef = useRef();
-    // const employeeFormRef = useRef();
-    const imageFormRef = useRef();
-    const bannerImageFormRef = useRef();
+    const frontRef = useRef();
+    const receptionRef = useRef();
+    const serviceChairRef = useRef();
+    const shampooChairRef = useRef();
+    const pediChairRef = useRef();
+    const selfiePointRef = useRef();
+    const productDisplayRef = useRef();
+    const lastFullSalonRef = useRef();
+    const otherServiceCustomerRef = useRef();
+    const videosRef = useRef();
+
     const [salesExecutives, setSalesExecutives] = useState([]);
+
+    const mediaConfig = [
+        { type: 'front', label: 'Front pic', max: 2, accept: 'image/*', ref: frontRef },
+        { type: 'reception', label: 'Reception', max: 2, accept: 'image/*', ref: receptionRef },
+        { type: 'service_chair', label: 'Service chair male & female', max: 4, accept: 'image/*', ref: serviceChairRef },
+        { type: 'shampoo_chair', label: 'Shampoo chair', max: 2, accept: 'image/*', ref: shampooChairRef },
+        { type: 'pedi_chair', label: 'Pedi chair', max: 2, accept: 'image/*', ref: pediChairRef },
+        { type: 'selfie_point', label: 'Selfie point', max: 4, accept: 'image/*', ref: selfiePointRef },
+        { type: 'product_display', label: 'Product Display', max: 4, accept: 'image/*', ref: productDisplayRef },
+        { type: 'last_full_salon', label: 'Last full salon pic', max: 5, accept: 'image/*', ref: lastFullSalonRef },
+        { type: 'other_service_customer', label: 'Other Service customer', max: 5, accept: 'image/*', ref: otherServiceCustomerRef },
+        { type: 'videos', label: 'Videos', max: 2, accept: 'video/*', ref: videosRef }
+    ];
 
     // let employeeFormRef;
     // for (let i = 1; i < 4; i++) {
@@ -140,8 +158,7 @@ const FormComponent = () => {
                 parent_id: id
             },
             { ...formData.employeeData.values },
-            { ...formData.imageData.values },
-            { ...formData.bannerImageData.values }
+            { ...formData.mediaData }
         ];
 
         try {
@@ -165,73 +182,43 @@ const FormComponent = () => {
                 console.log("Updated salon employees");
             }
 
-            // 2. Handle Normal Images
-            if (formData.imageData.values?.Normal) {
-                const images = Array.from(formData.imageData.values.Normal);
+            // 2. Handle Media Images & Videos
+            const processMedia = async (mediaType, filesObj) => {
+                if (!filesObj || !filesObj.values || !filesObj.values[mediaType]) return;
+                const items = Array.from(filesObj.values[mediaType]);
                 
-                // Upload NEW normal images
-                const newImagePromises = images
-                    .filter(image => image instanceof File)
-                    .map(async image => {
-                        formattedName = formatImageName(image.name);
-                        await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
+                // Upload NEW media
+                const newPromises = items
+                    .filter(item => item instanceof File)
+                    .map(async item => {
+                        let formattedName = formatImageName(item.name);
+                        await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/${mediaType}/${formattedName}`, document: item });
                         return API.ImageAPI.createImage({
                             image_src: formattedName,
                             parent_id: id,
                             parent: 'salon',
-                            type: 'normal'
+                            type: mediaType
                         });
                     });
 
-                // Re-insert OLD normal images
-                const oldImagePromises = images
-                    .filter(image => !(image instanceof File) && image.image_src)
-                    .map(async image => {
+                // Re-insert OLD media
+                const oldPromises = items
+                    .filter(item => !(item instanceof File) && item.image_src)
+                    .map(async item => {
                         return API.ImageAPI.createImage({
-                            image_src: image.image_src,
+                            image_src: item.image_src,
                             parent_id: id,
                             parent: 'salon',
-                            type: 'normal'
+                            type: mediaType
                         });
                     });
 
-                await Promise.all([...newImagePromises, ...oldImagePromises]);
-                console.log("Processed all normal images");
-            }
+                await Promise.all([...newPromises, ...oldPromises]);
+            };
 
-            // 3. Handle Banner Images
-            if (formData.bannerImageData.values?.Banner) {
-                const bannerImages = Array.from(formData.bannerImageData.values.Banner);
-                
-                // Upload new banner images
-                const newBannerPromises = bannerImages
-                    .filter(image => image instanceof File)
-                    .map(async image => {
-                        formattedName = formatImageName(image.name);
-                        await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
-                        return API.ImageAPI.createImage({
-                            image_src: formattedName,
-                            parent_id: id,
-                            parent: 'salon',
-                            type: 'banner'
-                        });
-                    });
-
-                // Re-insert old banner images
-                const oldBannerPromises = bannerImages
-                    .filter(image => !(image instanceof File) && image.image_src)
-                    .map(async image => {
-                        return API.ImageAPI.createImage({
-                            image_src: image.image_src,
-                            parent_id: id,
-                            parent: 'salon',
-                            type: 'banner'
-                        });
-                    });
-
-                await Promise.all([...newBannerPromises, ...oldBannerPromises]);
-                console.log("Processed all banner images");
-            }
+            const mediaPromises = mediaConfig.map(config => processMedia(config.type, formData.mediaData[config.type]));
+            await Promise.all(mediaPromises);
+            console.log("Processed all media");
 
             setLoading(false);
             if (role === "admin") {
@@ -279,7 +266,7 @@ const FormComponent = () => {
                 const dataObj = {
                     salonData: responses[0].data.data,
                     addressData: responses[1]?.data?.data,
-                    imageData: responses[2]?.data?.data,
+                    imageData: responses[2]?.data?.data, // Used to filter below
                     employeeData: responses[3]?.data?.data
                 };
                 setLoading(false);
@@ -354,39 +341,25 @@ const FormComponent = () => {
                     });
                 });
 
-                let imagePromises = [];
-                if (formData.imageData.values.Normal) {
-                    imagePromises = Array.from(formData.imageData.values.Normal)
-                        .filter(image => image instanceof File)
-                        .map(async (image) => {
-                            let formattedName = formatImageName(image.name);
-                            await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/normal/${formattedName}`, document: image });
+                const processMediaCreate = async (mediaType, filesObj) => {
+                    if (!filesObj || !filesObj.values || !filesObj.values[mediaType]) return [];
+                    const items = Array.from(filesObj.values[mediaType])
+                        .filter(item => item instanceof File)
+                        .map(async (item) => {
+                            let formattedName = formatImageName(item.name);
+                            await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/${mediaType}/${formattedName}`, document: item });
                             return API.ImageAPI.createImage({
                                 image_src: formattedName,
                                 parent_id: salon.data.id,
                                 parent: 'salon',
-                                type: 'normal'
+                                type: mediaType
                             });
                         });
-                }
+                    return Promise.all(items);
+                };
 
-                let bannerPromises = [];
-                if (formData.bannerImageData.values.Banner) {
-                    bannerPromises = Array.from(formData.bannerImageData.values.Banner)
-                        .filter(image => image instanceof File)
-                        .map(async (image) => {
-                            let formattedName = formatImageName(image.name);
-                            await API.ImageAPI.uploadImage({ folder: `eden-sign/salon/banner/${formattedName}`, document: image });
-                            return API.ImageAPI.createImage({
-                                image_src: formattedName,
-                                parent_id: salon.data.id,
-                                parent: 'salon',
-                                type: 'banner'
-                            });
-                        });
-                }
-
-                await Promise.all([...employeePromises, ...imagePromises, ...bannerPromises]);
+                const mediaCreatePromises = mediaConfig.map(config => processMediaCreate(config.type, formData.mediaData[config.type]));
+                await Promise.all([...employeePromises, ...mediaCreatePromises]);
 
                 setLoading(false);
                 if (role === 'admin') {
@@ -466,14 +439,16 @@ const FormComponent = () => {
     const handleSubmit = async () => {
         const salonRes = await salonFormRef.current.Submit();
         const addressRes = await addressFormRef.current.Submit();
-        const imageRes = await imageFormRef.current.Submit();
-        const bannerRes = await bannerImageFormRef.current.Submit();
+        
+        const mediaRes = {};
+        for (const config of mediaConfig) {
+            mediaRes[config.type] = await config.ref.current.Submit();
+        }
 
         const gatheredData = {
             salonData: salonRes,
             addressData: addressRes,
-            imageData: imageRes,
-            bannerImageData: bannerRes,
+            mediaData: mediaRes,
             employeeData: { values: salonEmployeeData }
         };
 
@@ -492,10 +467,9 @@ const FormComponent = () => {
             } else if (form === 'employee') {
                 console.log("Employee details....)");
                 return prev; // keep existing logic
-            } else if (form === 'image') {
-                return { ...prev, imageData: data };
-            } else if (form === 'banner') {
-                return { ...prev, bannerImageData: data };
+            } else if (form.startsWith('media_')) {
+                const type = form.replace('media_', '');
+                return { ...prev, mediaData: { ...prev.mediaData, [type]: data } };
             }
             return prev;
         });
@@ -579,38 +553,28 @@ const FormComponent = () => {
             />
 
 
-            <ImagePicker
-                key="image"
-                onChange={data => handleFormChange(data, 'image')}
-                refId={imageFormRef}
-                reset={reset}
-                setReset={setReset}
-                setDirty={setDirty}
-                preview={preview}
-                setPreview={setPreview}
-                updatedValues={updatedValues?.imageData.filter(img => img.type === "normal")}
-                deletedImage={deletedImage}
-                setDeletedImage={setDeletedImage}
-                imageType="Normal"
-                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_SALON}/normal`}
-                ENV={ENV}
-            />
-            <ImagePicker
-                key="banner"
-                onChange={data => handleFormChange(data, 'banner')}
-                refId={bannerImageFormRef}
-                reset={reset}
-                setReset={setReset}
-                setDirty={setDirty}
-                preview={previewBanner}
-                setPreview={setPreviewBanner}
-                updatedValues={updatedValues?.imageData.filter(img => img.type === "banner")}
-                deletedImage={deletedBannerImage}
-                setDeletedImage={setDeletedBannerImage}
-                imageType="Banner"
-                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_SALON}/banner`}
-                ENV={ENV}
-            />
+            <Box display="flex" flexWrap="wrap" gap="20px" m="10px">
+                {mediaConfig.map(config => (
+                    <ImagePicker
+                        key={config.type}
+                        onChange={data => handleFormChange(data, `media_${config.type}`)}
+                        refId={config.ref}
+                        reset={reset}
+                        setReset={setReset}
+                        setDirty={setDirty}
+                        preview={mediaPreviews[config.type] || []}
+                        setPreview={(val) => setMediaPreviews(prev => ({ ...prev, [config.type]: val }))}
+                        updatedValues={updatedValues?.imageData?.filter(img => img.type === config.type) || []}
+                        deletedImage={mediaDeleted[config.type] || []}
+                        setDeletedImage={(val) => setMediaDeleted(prev => ({ ...prev, [config.type]: val }))}
+                        imageType={config.type}
+                        maxFiles={config.max}
+                        acceptTypes={config.accept}
+                        azurePath={`https://edensign1.blob.core.windows.net/image-storage/eden-sign/salon/${config.type}`} // Kept for reference but mostly AWS will be full URL in actual usage
+                        ENV={ENV}
+                    />
+                ))}
+            </Box>
 
             <Box display="flex" justifyContent="end" m="20px">
                 <Button type="reset" color="warning" variant="contained" sx={{ mr: 3 }}

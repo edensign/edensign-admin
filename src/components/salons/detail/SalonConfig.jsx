@@ -88,11 +88,9 @@ export const datagridColumns = () => {
             flex: 1,
             minWidth: 150,
             renderCell: ({ row }) => {
-                const isCreator = row.created_by === userId;
                 const isReferrer = row.referral_by === userId;
                 return (
                     <Box display="flex" gap="5px">
-                        {isCreator && <Chip label="Created By Me" size="small" color="primary" />}
                         {isReferrer && <Chip label="Referred By Me" size="small" color="secondary" />}
                     </Box>
                 );
@@ -147,8 +145,8 @@ export const datagridColumns = () => {
             flex: 1,
             minWidth: 75,
             renderCell: ({ row }) => {
-                // If Sales Executive, can edit if they are creator OR referrer
-                const canEdit = role === 'admin' || (role === 'sales_executive' && (row.created_by === userId || row.referral_by === userId));
+                // Sales Executive can only edit salons where they are the referrer
+                const canEdit = role === 'admin' || (role === 'sales_executive' && row.referral_by === userId);
                 
                 return (
                     <Box width="30%"

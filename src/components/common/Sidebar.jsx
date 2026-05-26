@@ -344,6 +344,19 @@ const Sidebar = ({ role }) => {
                 color={colors.grey[300]}
                 sx={{ m: "15px 0 5px 10px" }}
               >
+                Salon Owners
+              </Typography>
+              <SidebarItem
+                title="Salon"
+                to="/salon/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
                 My Salons
               </Typography>
               <SidebarItem
