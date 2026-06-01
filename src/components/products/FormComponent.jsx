@@ -327,7 +327,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
-                azurePath={`https://oaqyonnkveufkkamswzv.supabase.co/storage/v1/object/public/photos/${ENV.VITE_PARENT_PRODUCT}`}
+                azurePath={`${ENV.VITE_S3_BASE_URL?.replace(/"/g, "")}/product`}
                 ENV={ENV}
             />
 
