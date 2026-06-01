@@ -162,15 +162,7 @@ const FormComponent = () => {
         ];
 
         try {
-            // delete all images from db on every update and later insert new and old again
-            await API.ImageAPI.deleteImage({
-                parent: "salon",
-                parent_id: id
-            });
-            console.log(`Deleted all images of id ${id} from db`)
-
             const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
-            let formattedName;
             
             // 1. Update Salon Employees
             if (formData.employeeData.values && Object.keys(formData.employeeData.values).length > 0) {
@@ -182,12 +174,21 @@ const FormComponent = () => {
                 console.log("Updated salon employees");
             }
 
-            // 2. Handle Media Images & Videos
+            // 2. Handle Media Images & Videos — only process types that have actual data
             const processMedia = async (mediaType, filesObj) => {
+                // If no data was touched for this type, leave existing images alone
                 if (!filesObj || !filesObj.values || !filesObj.values[mediaType]) return;
                 const items = Array.from(filesObj.values[mediaType]);
-                
-                // Upload NEW media
+
+                // Delete only THIS type's images from db before re-inserting
+                await API.ImageAPI.deleteImageByType({
+                    parent: "salon",
+                    parent_id: id,
+                    type: mediaType
+                });
+                console.log(`Deleted existing images of type "${mediaType}" for salon ${id}`);
+
+                // Upload NEW media files
                 const newPromises = items
                     .filter(item => item instanceof File)
                     .map(async item => {
@@ -201,7 +202,7 @@ const FormComponent = () => {
                         });
                     });
 
-                // Re-insert OLD media
+                // Re-insert OLD media (existing DB records kept by user)
                 const oldPromises = items
                     .filter(item => !(item instanceof File) && item.image_src)
                     .map(async item => {
@@ -570,7 +571,7 @@ const FormComponent = () => {
                         imageType={config.type}
                         maxFiles={config.max}
                         acceptTypes={config.accept}
-                        azurePath={`https://edensign1.blob.core.windows.net/image-storage/eden-sign/salon/${config.type}`} // Kept for reference but mostly AWS will be full URL in actual usage
+                        azurePath={`${ENV.VITE_S3_BASE_URL?.replace(/"/g, "")}/eden-sign/salon/${config.type}`}
                         ENV={ENV}
                     />
                 ))}

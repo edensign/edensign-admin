@@ -141,18 +141,21 @@ const PreviewImage = ({
                             />
                         </Tooltip>
                     </IconButton>
-                    <img
-                        src={item}
-                        alt="This image is not available"
-                        loading="lazy"
-                        style={{
-                            objectFit: "cover",
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: isMobile ? "6px" : "12px",
-                            boxShadow: "2px 2px 4px hsl(0, 0%, 30%)"
-                        }}
-                    />
+                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                        <img
+                            src={item}
+                            alt="This image is not available"
+                            loading="lazy"
+                            style={{
+                                objectFit: "cover",
+                                height: "80%",
+                                width: "100%",
+                                borderRadius: isMobile ? "6px" : "12px",
+                                boxShadow: "2px 2px 4px hsl(0, 0%, 30%)"
+                            }}
+                        />
+
+                    </div>
                 </ImageListItem>
             )) : <Loader />}
         </ImageList>

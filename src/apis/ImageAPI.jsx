@@ -83,6 +83,18 @@ export const ImageAPI = {
             data: formData,
             signal: cancel ? cancelApiObject[this.uploadImage.name].handleRequestCancellation().signal : undefined,
         });
+    },
+    /** Delete images of a specific type for a parent (e.g. only 'front' images for salon 103) */
+    deleteImageByType: async (fields, cancel = false) => {
+        return await api.request({
+            url: `/delete-image-by-type`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "DELETE",
+            data: fields,
+            signal: cancel ? cancelApiObject[this.deleteImageByType.name].handleRequestCancellation().signal : undefined,
+        });
     }
 };
 
