@@ -31,6 +31,9 @@ const initialValues = {
     previous_employer: "",
     skills: [],
     hobbies: "",
+    seeker_type: "fresher",
+    experienceYears: "",
+    trainingTime: "",
     experience: "",
     resume: []
 };
@@ -66,8 +69,23 @@ const JobSeekerFormComponent = ({
 
     const watchForm = () => {
         if (onChange) {
+            let expValue = "fresher";
+            if (formik.values.seeker_type === "experience") {
+                expValue = formik.values.experienceYears ? formik.values.experienceYears.toString() : "0";
+            } else if (formik.values.seeker_type === "trainer") {
+                expValue = `trainer:${formik.values.trainingTime || ''}`;
+            }
+
+            const formattedValues = {
+                ...formik.values,
+                experience: expValue
+            };
+            delete formattedValues.seeker_type;
+            delete formattedValues.experienceYears;
+            delete formattedValues.trainingTime;
+
             onChange({
-                values: formik.values,
+                values: formattedValues,
                 validated: formik.isSubmitting
                     ? Object.keys(formik.errors).length === 0
                     : false
@@ -90,7 +108,28 @@ const JobSeekerFormComponent = ({
 
     useEffect(() => {
         if (updatedValues) {
-            setInitialState(updatedValues);
+            const exp = (updatedValues.experience || '').trim();
+            let seeker_type = "fresher";
+            let experienceYears = "";
+            let trainingTime = "";
+
+            if (exp === "fresher" || exp === "0" || exp === "") {
+                seeker_type = "fresher";
+            } else if (exp.startsWith("trainer:")) {
+                seeker_type = "trainer";
+                trainingTime = exp.substring(8);
+            } else {
+                seeker_type = "experience";
+                experienceYears = exp;
+            }
+
+            setInitialState({
+                ...updatedValues,
+                seeker_type,
+                experienceYears,
+                trainingTime,
+                age: updatedValues.age || 0
+            });
 
             //we are modifying our formatted resume name to only contain the filename
             if (updatedValues.resume && updatedValues.resume.startsWith(updatedValues.name.replace(/\s+/g, "_").toLowerCase(), 2)) {
@@ -213,19 +252,60 @@ const JobSeekerFormComponent = ({
                         error={!!formik.touched.hobbies && !!formik.errors.hobbies}
                         helperText={formik.touched.hobbies && formik.errors.hobbies}
                     />
-                    <TextField
-                        fullWidth
-                        variant="filled"
-                        type="text"
-                        name="experience"
-                        label="Experience"
-                        autoComplete="new-experience"
-                        onBlur={formik.handleBlur}
-                        onChange={formik.handleChange}
-                        value={formik.values.experience}
-                        error={!!formik.touched.experience && !!formik.errors.experience}
-                        helperText={formik.touched.experience && formik.errors.experience}
-                    />
+                    <FormControl variant="filled" sx={{ minWidth: 120 }}
+                        error={!!formik.touched.seeker_type && !!formik.errors.seeker_type}
+                    >
+                        <InputLabel id="seekerTypeField">Profile Type*</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="seekerTypeField"
+                            label="Profile Type*"
+                            name="seeker_type"
+                            value={formik.values.seeker_type || "fresher"}
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                formik.setFieldValue("experienceYears", "");
+                                formik.setFieldValue("trainingTime", "");
+                            }}
+                        >
+                            <MenuItem value="fresher">Fresher</MenuItem>
+                            <MenuItem value="experience">Experienced</MenuItem>
+                            <MenuItem value="trainer">Trainer</MenuItem>
+                        </Select>
+                        <FormHelperText>{formik.touched.seeker_type && formik.errors.seeker_type}</FormHelperText>
+                    </FormControl>
+
+                    {formik.values.seeker_type === "experience" && (
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="experienceYears"
+                            label="Experience (Years)*"
+                            autoComplete="new-experienceYears"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.experienceYears}
+                            error={!!formik.touched.experienceYears && !!formik.errors.experienceYears}
+                            helperText={formik.touched.experienceYears && formik.errors.experienceYears}
+                        />
+                    )}
+
+                    {formik.values.seeker_type === "trainer" && (
+                        <TextField
+                            fullWidth
+                            variant="filled"
+                            type="text"
+                            name="trainingTime"
+                            label="Time to Train (e.g. 2 Years)*"
+                            autoComplete="new-trainingTime"
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
+                            value={formik.values.trainingTime}
+                            error={!!formik.touched.trainingTime && !!formik.errors.trainingTime}
+                            helperText={formik.touched.trainingTime && formik.errors.trainingTime}
+                        />
+                    )}
 
                     <Autocomplete
                         multiple

@@ -48,6 +48,24 @@ export const datagridColumns = () => {
             minWidth: 200
         },
         {
+            field: "experience",
+            headerName: "EXPERIENCE / TYPE",
+            headerAlign: "center",
+            align: "center",
+            flex: 1,
+            minWidth: 150,
+            valueGetter: (params) => {
+                const exp = params?.value || '';
+                if (!exp || exp === 'fresher' || exp === '0') {
+                    return 'Fresher';
+                } else if (exp.startsWith('trainer:')) {
+                    return `Trainer (${exp.substring(8)})`;
+                } else {
+                    return `${exp} Years Exp`;
+                }
+            }
+        },
+        {
             field: "updated_at",
             headerName: "UPDATED AT",
             headerAlign: "center",

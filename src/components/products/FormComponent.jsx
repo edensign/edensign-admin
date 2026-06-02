@@ -25,6 +25,7 @@ import { tokens, themeSettings } from "../../theme";
 import { Utility } from "../utility";
 
 const ENV = import.meta.env;
+const s3BaseUrl = (ENV.VITE_S3_BASE_URL || "https://salon-s3.s3.us-east-1.amazonaws.com").replace(/"/g, "");
 
 const FormComponent = () => {
     const [title, setTitle] = useState("Create");
@@ -96,11 +97,15 @@ const FormComponent = () => {
             { ...formData.imageData.values }
         ];
         
-        // delete the selected (removed) images from Azure which are in deletedImage state
+        // delete the selected (removed) images from AWS S3 which are in deletedImage state
         if (deletedImage.length) {
-            deletedImage.forEach(image => {
-                // deleteFileFromAzure("product", image);
-                console.log("Deleted normal image from azure");
+            deletedImage.forEach(async (image) => {
+                try {
+                    console.log(`Deleting image key product/${image} from S3...`);
+                    await API.ImageAPI.deleteS3File(`product/${image}`);
+                } catch (err) {
+                    console.error("Failed to delete product image from S3:", err);
+                }
             });
         }
         
@@ -327,7 +332,7 @@ const FormComponent = () => {
                 deletedImage={deletedImage}
                 setDeletedImage={setDeletedImage}
                 imageType="Normal"
-                azurePath={`${ENV.VITE_S3_BASE_URL?.replace(/"/g, "")}/product`}
+                azurePath={`${s3BaseUrl}/product`}
                 ENV={ENV}
             />
 
