@@ -27,7 +27,18 @@ const checkoutSchema = yup.object().shape({
         .integer("Age can't include a decimal point")
         .typeError("That doesn't look like an age"),
     gender: yup.string(),
-    status: yup.string()
+    status: yup.string(),
+    seeker_type: yup.string().required("This Field is Required"),
+    experienceYears: yup.number().when('seeker_type', {
+        is: 'experience',
+        then: (schema) => schema.typeError("Experience must be a number").min(0, "Cannot be negative").required("This Field is Required"),
+        otherwise: (schema) => schema.notRequired()
+    }),
+    trainingTime: yup.string().when('seeker_type', {
+        is: 'trainer',
+        then: (schema) => schema.required("This Field is Required"),
+        otherwise: (schema) => schema.notRequired()
+    })
 });
 
 export default checkoutSchema;

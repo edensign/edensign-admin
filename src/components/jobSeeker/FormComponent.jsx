@@ -64,6 +64,16 @@ const FormComponent = () => {
         console.log(formData)
         if (formData.jobSeekerData?.values?.resume instanceof File && filename) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
+            try {
+                console.log("Uploading resume to S3...");
+                await API.ImageAPI.uploadImage({
+                    folder: `job-seeker/${formattedResumeName}`,
+                    document: formData.jobSeekerData.values.resume
+                });
+                console.log("Upload successful!");
+            } catch (err) {
+                console.error("Resume upload failed:", err);
+            }
             formData.jobSeekerData.values.resume = formattedResumeName;
         } else if (Array.isArray(formData.jobSeekerData?.values?.resume) || !formData.jobSeekerData?.values?.resume) {
             formData.jobSeekerData.values.resume = "";
@@ -158,12 +168,20 @@ const FormComponent = () => {
         return formattedName;
     };
 
-    const createJobSeeker = () => {
+    const createJobSeeker = async () => {
         setLoading(true);
         if (formData.jobSeekerData?.values?.resume instanceof File && filename) {
             let formattedResumeName = formatResumeName(formData.jobSeekerData?.values?.name, filename);
-            console.log("Uploading...");
-            // uploadResumeToAzure("job-seeker", formattedResumeName, formData.jobSeekerData?.values?.resume);
+            try {
+                console.log("Uploading resume to S3...");
+                await API.ImageAPI.uploadImage({
+                    folder: `job-seeker/${formattedResumeName}`,
+                    document: formData.jobSeekerData.values.resume
+                });
+                console.log("Upload successful!");
+            } catch (err) {
+                console.error("Resume upload failed:", err);
+            }
             formData.jobSeekerData.values.resume = formattedResumeName;
         } else {
             formData.jobSeekerData.values.resume = "";

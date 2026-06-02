@@ -28,6 +28,7 @@ import { deleteFileFromAzure, uploadDocumentToAzure } from "../../azure/AzureSto
 import { tokens, themeSettings } from "../../../theme";
 
 const ENV = import.meta.env;
+const s3BaseUrl = (ENV.VITE_S3_BASE_URL || "https://salon-s3.s3.us-east-1.amazonaws.com").replace(/"/g, "");
 
 const FormComponent = () => {
     const [title, setTitle] = useState("Create");
@@ -161,6 +162,23 @@ const FormComponent = () => {
             { ...formData.mediaData }
         ];
 
+        // delete the selected (removed) media files from AWS S3 which are in mediaDeleted state
+        if (mediaDeleted && Object.keys(mediaDeleted).length > 0) {
+            Object.entries(mediaDeleted).forEach(([mediaType, images]) => {
+                if (images && images.length > 0) {
+                    images.forEach(async (image) => {
+                        try {
+                            const key = `eden-sign/salon/${mediaType}/${image}`;
+                            console.log(`Deleting media key ${key} from S3...`);
+                            await API.ImageAPI.deleteS3File(key);
+                        } catch (err) {
+                            console.error(`Failed to delete S3 file ${key}:`, err);
+                        }
+                    });
+                }
+            });
+        }
+
         try {
             const responses = await API.CommonAPI.multipleAPICall("PATCH", paths, dataFields);
             
@@ -232,7 +250,7 @@ const FormComponent = () => {
             toastAndNavigate(dispatch, true, "error", err?.response?.data?.msg || "An Error Occurred", navigateTo, 0);
             throw err;
         }
-    }, [id, role, dispatch, navigateTo, toastAndNavigate, formatImageName]);
+    }, [id, role, dispatch, navigateTo, toastAndNavigate, formatImageName, mediaDeleted]);
 
     const getSelectedAmenitiesByName = (dataObj) => {
         const objId = dataObj?.split(",");
@@ -571,7 +589,7 @@ const FormComponent = () => {
                         imageType={config.type}
                         maxFiles={config.max}
                         acceptTypes={config.accept}
-                        azurePath={`${ENV.VITE_S3_BASE_URL?.replace(/"/g, "")}/eden-sign/salon/${config.type}`}
+                        azurePath={`${s3BaseUrl}/eden-sign/salon/${config.type}`}
                         ENV={ENV}
                     />
                 ))}

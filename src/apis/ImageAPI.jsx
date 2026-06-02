@@ -95,6 +95,17 @@ export const ImageAPI = {
             data: fields,
             signal: cancel ? cancelApiObject[this.deleteImageByType.name].handleRequestCancellation().signal : undefined,
         });
+    },
+    /** Delete a file from AWS S3 storage */
+    deleteS3File: async (key) => {
+        return await api.request({
+            url: `/delete-s3-file`,
+            headers: {
+                "x-access-token": getLocalStorage("auth").token
+            },
+            method: "DELETE",
+            data: { key }
+        });
     }
 };
 
