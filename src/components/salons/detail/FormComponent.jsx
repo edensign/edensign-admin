@@ -60,6 +60,8 @@ const FormComponent = () => {
     const serviceChairRef = useRef();
     const shampooChairRef = useRef();
     const pediChairRef = useRef();
+    const nailArtRef = useRef();
+    const facialBedRef = useRef();
     const selfiePointRef = useRef();
     const productDisplayRef = useRef();
     const lastFullSalonRef = useRef();
@@ -71,13 +73,15 @@ const FormComponent = () => {
     const mediaConfig = [
         { type: 'front', label: 'Front pic', max: 2, accept: 'image/*', ref: frontRef },
         { type: 'reception', label: 'Reception', max: 2, accept: 'image/*', ref: receptionRef },
-        { type: 'service_chair', label: 'Service chair male & female', max: 4, accept: 'image/*', ref: serviceChairRef },
+        { type: 'service_chair', label: 'Service chair', max: 4, accept: 'image/*', ref: serviceChairRef },
         { type: 'shampoo_chair', label: 'Shampoo chair', max: 2, accept: 'image/*', ref: shampooChairRef },
         { type: 'pedi_chair', label: 'Pedi chair', max: 2, accept: 'image/*', ref: pediChairRef },
-        { type: 'selfie_point', label: 'Selfie point', max: 4, accept: 'image/*', ref: selfiePointRef },
+        { type: 'nail_art', label: 'Nail Art', max: 4, accept: 'image/*', ref: nailArtRef },
+        { type: 'facial_bed', label: 'Facial Bed', max: 4, accept: 'image/*', ref: facialBedRef },
         { type: 'product_display', label: 'Product Display', max: 4, accept: 'image/*', ref: productDisplayRef },
-        { type: 'last_full_salon', label: 'Last full salon pic', max: 5, accept: 'image/*', ref: lastFullSalonRef },
-        { type: 'other_service_customer', label: 'Other Service customer', max: 5, accept: 'image/*', ref: otherServiceCustomerRef },
+        { type: 'selfie_point', label: 'Selfi', max: 4, accept: 'image/*', ref: selfiePointRef },
+        { type: 'last_full_salon', label: 'Full Salon Pic', max: 5, accept: 'image/*', ref: lastFullSalonRef },
+        { type: 'other_service_customer', label: 'Other Pic', max: 5, accept: 'image/*', ref: otherServiceCustomerRef },
         { type: 'videos', label: 'Videos', max: 2, accept: 'video/*', ref: videosRef }
     ];
 

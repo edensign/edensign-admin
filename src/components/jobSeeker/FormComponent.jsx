@@ -78,11 +78,22 @@ const FormComponent = () => {
         } else if (Array.isArray(formData.jobSeekerData?.values?.resume) || !formData.jobSeekerData?.values?.resume) {
             formData.jobSeekerData.values.resume = "";
         }
+        const finalJobSeekerData = {
+            ...formData.jobSeekerData.values,
+            skills: getSelectedSkills(formData.jobSeekerData.values.skills),
+        };
+        if (finalJobSeekerData.job_location_preference === 'his_city') {
+            finalJobSeekerData.pref_city_id = formData.addressData.values.city;
+            finalJobSeekerData.pref_state_id = formData.addressData.values.state;
+        } else if (finalJobSeekerData.job_location_preference === 'specific_state') {
+            finalJobSeekerData.pref_city_id = null;
+        } else if (finalJobSeekerData.job_location_preference === 'anywhere') {
+            finalJobSeekerData.pref_city_id = null;
+            finalJobSeekerData.pref_state_id = null;
+        }
+
         const dataFields = [
-            {
-                ...formData.jobSeekerData.values,
-                skills: getSelectedSkills(formData.jobSeekerData.values.skills),
-            },
+            finalJobSeekerData,
             { ...formData.addressData.values }
         ];
         const paths = ["/update-job-seeker", "/update-address"];
@@ -186,12 +197,21 @@ const FormComponent = () => {
         } else {
             formData.jobSeekerData.values.resume = "";
         }
-        formData.jobSeekerData.values = {
+        const finalJobSeekerData = {
             ...formData.jobSeekerData.values,
             skills: getSelectedSkills(formData.jobSeekerData.values?.skills),
+        };
+        if (finalJobSeekerData.job_location_preference === 'his_city') {
+            finalJobSeekerData.pref_city_id = formData.addressData.values.city;
+            finalJobSeekerData.pref_state_id = formData.addressData.values.state;
+        } else if (finalJobSeekerData.job_location_preference === 'specific_state') {
+            finalJobSeekerData.pref_city_id = null;
+        } else if (finalJobSeekerData.job_location_preference === 'anywhere') {
+            finalJobSeekerData.pref_city_id = null;
+            finalJobSeekerData.pref_state_id = null;
         }
 
-        API.JobSeekerAPI.createJobSeeker({ ...formData.jobSeekerData.values })
+        API.JobSeekerAPI.createJobSeeker(finalJobSeekerData)
             .then(({ data: jobSeeker }) => {
                 if (jobSeeker?.status === 'Success') {
                     API.AddressAPI.createAddress({

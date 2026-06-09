@@ -15,6 +15,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 // import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import jobSeekerValidation from "./Validation";
+import API from "../../apis";
 
 const initialValues = {
     name: "",
@@ -35,7 +36,10 @@ const initialValues = {
     experienceYears: "",
     trainingTime: "",
     experience: "",
-    resume: []
+    resume: [],
+    job_location_preference: "anywhere",
+    pref_state_id: 0,
+    pref_city_id: 0
 };
 
 const JobSeekerFormComponent = ({
@@ -50,6 +54,42 @@ const JobSeekerFormComponent = ({
     updatedValues = null }) => {
 
     const [initialState, setInitialState] = useState(initialValues);
+    const [countries, setCountries] = useState([]);
+    const [countryId, setCountryId] = useState(null);
+    const [statesList, setStatesList] = useState([]);
+    const [stateId, setStateId] = useState(null);
+    const [citiesList, setCitiesList] = useState([]);
+
+    useEffect(() => {
+        const getCountry = () => {
+            API.CountryAPI.getCountries()
+                .then(country => {
+                    if (country?.status === 'Success') {
+                        setCountries(country.data.list);
+                    }
+                })
+                .catch(err => { console.error(err); });
+        };
+        getCountry();
+    }, []);
+
+    useEffect(() => {
+        const getStates = () => {
+            const cid = countryId || 1; // Default to India (ID 1)
+            API.StateAPI.getStates(cid)
+                .then(data => {
+                    if (data?.status === 'Success') {
+                        setStatesList(data.data.list);
+                        setCitiesList([]);
+                    } else {
+                        setStatesList([]);
+                        setCitiesList([]);
+                    }
+                })
+                .catch(err => { console.error(err); });
+        };
+        getStates();
+    }, [countryId]);
 
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const isMobile = useMediaQuery("(max-width:480px)");
@@ -60,6 +100,26 @@ const JobSeekerFormComponent = ({
         enableReinitialize: true,
         onSubmit: () => watchForm()
     });
+
+    // Load cities whenever the selected state changes (stateId driven)
+    useEffect(() => {
+        const getCities = () => {
+            if (stateId) {
+                API.CityAPI.getCities(stateId)
+                    .then(res => {
+                        if (res?.status === 'Success') {
+                            setCitiesList(res.data.list);
+                        } else {
+                            setCitiesList([]);
+                        }
+                    })
+                    .catch(err => { console.error(err); setCitiesList([]); });
+            } else {
+                setCitiesList([]);
+            }
+        };
+        getCities();
+    }, [stateId]);
 
     React.useImperativeHandle(refId, () => ({
         Submit: async () => {
@@ -128,8 +188,15 @@ const JobSeekerFormComponent = ({
                 seeker_type,
                 experienceYears,
                 trainingTime,
-                age: updatedValues.age || 0
+                age: updatedValues.age || 0,
+                job_location_preference: updatedValues.job_location_preference || "anywhere",
+                pref_state_id: updatedValues.pref_state_id || 0,
+                pref_city_id: updatedValues.pref_city_id || 0
             });
+
+            if (updatedValues.pref_state_id) {
+                setStateId(updatedValues.pref_state_id);
+            }
 
             //we are modifying our formatted resume name to only contain the filename
             if (updatedValues.resume && updatedValues.resume.startsWith(updatedValues.name.replace(/\s+/g, "_").toLowerCase(), 2)) {
@@ -431,6 +498,78 @@ const JobSeekerFormComponent = ({
                         error={!!formik.touched.hired_in && !!formik.errors.hired_in}
                         helperText={formik.touched.hired_in && formik.errors.hired_in}
                     />
+
+                    <FormControl variant="filled" sx={{ gridColumn: "span 2" }}
+                        error={!!formik.touched.job_location_preference && !!formik.errors.job_location_preference}
+                    >
+                        <InputLabel id="jobLocationPrefField">Job Location Preference*</InputLabel>
+                        <Select
+                            variant="filled"
+                            labelId="jobLocationPrefField"
+                            name="job_location_preference"
+                            value={formik.values.job_location_preference || "anywhere"}
+                            onChange={(e) => {
+                                formik.handleChange(e);
+                                formik.setFieldValue("pref_state_id", 0);
+                                formik.setFieldValue("pref_city_id", 0);
+                                setStateId(null);
+                            }}
+                        >
+                            <MenuItem value="anywhere">Anywhere</MenuItem>
+                            <MenuItem value="his_city">Only His City</MenuItem>
+                            <MenuItem value="specific_state">Specific State</MenuItem>
+                            <MenuItem value="specific_city">Specific City</MenuItem>
+                        </Select>
+                        <FormHelperText>{formik.touched.job_location_preference && formik.errors.job_location_preference}</FormHelperText>
+                    </FormControl>
+
+                    {(formik.values.job_location_preference === "specific_state" || formik.values.job_location_preference === "specific_city") && (
+                        <FormControl variant="filled"
+                            error={!!formik.touched.pref_state_id && !!formik.errors.pref_state_id}
+                        >
+                            <InputLabel id="prefStateField">Preferred State*</InputLabel>
+                            <Select
+                                labelId="prefStateField"
+                                name="pref_state_id"
+                                value={formik.values.pref_state_id || 0}
+                                onChange={(e) => {
+                                    formik.handleChange(e);
+                                    formik.setFieldValue("pref_city_id", 0);
+                                    setStateId(e.target.value);
+                                }}
+                            >
+                                <MenuItem value={0}><em>None</em></MenuItem>
+                                {statesList.map(item => (
+                                    <MenuItem value={item.id} key={item.id}>
+                                        {item.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            <FormHelperText>{formik.touched.pref_state_id && formik.errors.pref_state_id}</FormHelperText>
+                        </FormControl>
+                    )}
+
+                    {formik.values.job_location_preference === "specific_city" && (
+                        <FormControl variant="filled"
+                            error={!!formik.touched.pref_city_id && !!formik.errors.pref_city_id}
+                        >
+                            <InputLabel id="prefCityField">Preferred City*</InputLabel>
+                            <Select
+                                labelId="prefCityField"
+                                name="pref_city_id"
+                                value={formik.values.pref_city_id || 0}
+                                onChange={formik.handleChange}
+                            >
+                                <MenuItem value={0}><em>None</em></MenuItem>
+                                {citiesList.map(item => (
+                                    <MenuItem value={item.id} key={item.id}>
+                                        {item.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            <FormHelperText>{formik.touched.pref_city_id && formik.errors.pref_city_id}</FormHelperText>
+                        </FormControl>
+                    )}
 
                     <TextField
                         name="resume"

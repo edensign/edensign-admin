@@ -75,6 +75,22 @@ export const datagridColumns = () => {
             valueFormatter: params => params?.value.substring(0, 10)
         },
         {
+            field: "job_location_preference",
+            headerName: "PREFERENCE",
+            headerAlign: "center",
+            align: "center",
+            flex: 1,
+            minWidth: 150,
+            valueGetter: (params) => {
+                const pref = params?.row?.job_location_preference || 'anywhere';
+                if (pref === 'anywhere') return 'Anywhere';
+                if (pref === 'his_city') return 'Only His City';
+                if (pref === 'specific_state') return 'Specific State';
+                if (pref === 'specific_city') return 'Specific City';
+                return pref;
+            }
+        },
+        {
             field: "status",
             headerName: "STATUS",
             headerAlign: "center",

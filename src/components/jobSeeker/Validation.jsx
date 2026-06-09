@@ -38,6 +38,17 @@ const checkoutSchema = yup.object().shape({
         is: 'trainer',
         then: (schema) => schema.required("This Field is Required"),
         otherwise: (schema) => schema.notRequired()
+    }),
+    job_location_preference: yup.string().required("This Field is Required"),
+    pref_state_id: yup.number().when('job_location_preference', {
+        is: (val) => val === 'specific_state' || val === 'specific_city',
+        then: (schema) => schema.typeError("Please select a state").min(1, "Please select a state").required("This Field is Required"),
+        otherwise: (schema) => schema.notRequired()
+    }),
+    pref_city_id: yup.number().when('job_location_preference', {
+        is: 'specific_city',
+        then: (schema) => schema.typeError("Please select a city").min(1, "Please select a city").required("This Field is Required"),
+        otherwise: (schema) => schema.notRequired()
     })
 });
 
