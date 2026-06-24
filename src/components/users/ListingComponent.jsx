@@ -63,7 +63,7 @@ const ListingComponent = () => {
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
-        dispatch(setMenuItem(selectedMenu.selected));
+        dispatch(setMenuItem(selectedMenu?.selected || "Employee"));
     }, []);
 
     const handleReload = () => {

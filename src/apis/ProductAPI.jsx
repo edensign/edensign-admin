@@ -15,16 +15,17 @@ const { getLocalStorage } = Utility();
 export const ProductAPI = {
     /** Get products from the database that meets the specified query parameters
      */
-    getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false) => {
+    getAll: async (conditionObj = false, page = 0, size = 5, search = false, authInfo, cancel = false, createdBy = false) => {
         const queryParam = conditionObj ? `&${conditionObj.key}=${conditionObj.value}` : '';
         const searchParam = search ? `&search=${search}` : '';
+        const createdByParam = createdBy ? `&created_by=${createdBy}` : '';
         const { data: response } = await api.request({
-            url: `/get-products?page=${page}&size=${size}${queryParam}${searchParam}`,
+            url: `/get-products?page=${page}&size=${size}${queryParam}${searchParam}${createdByParam}`,
             headers: {
                 "x-access-token": getLocalStorage("auth")?.token
             },
             method: "GET",
-            signal: cancel ? cancelApiObject[this.getAll.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject.getAll.handleRequestCancellation().signal : undefined,
         });
         return response;
     },
@@ -38,7 +39,7 @@ export const ProductAPI = {
             },
             method: "POST",
             data: product,
-            signal: cancel ? cancelApiObject[this.createProduct.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject.createProduct.handleRequestCancellation().signal : undefined,
         });
     },
     /** Update product in the database
@@ -51,7 +52,7 @@ export const ProductAPI = {
             },
             method: "PATCH",
             data: fields,
-            signal: cancel ? cancelApiObject[this.updateProduct.name].handleRequestCancellation().signal : undefined,
+            signal: cancel ? cancelApiObject.updateProduct.handleRequestCancellation().signal : undefined,
         });
     }
 };

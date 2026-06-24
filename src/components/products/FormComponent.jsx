@@ -66,7 +66,7 @@ const FormComponent = () => {
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
-        dispatch(setMenuItem(selectedMenu.selected));
+        dispatch(setMenuItem(selectedMenu?.selected || "Product Detail"));
 
         //these are latitude & longitude fields which only salon needs to enter
         if (pathname === "/salon/detail/create" || pathname === "/salon/detail/update") {
@@ -153,7 +153,7 @@ const FormComponent = () => {
             }
 
             setLoading(false);
-            if (role === "admin") {
+            if (role === "admin" || role === "distributor") {
                 console.log("Successfully updated all fields");
                 toastAndNavigate(dispatch, true, "info", "Successfully Updated", navigateTo, "/product/detail/listing");
             } else {
@@ -216,7 +216,7 @@ const FormComponent = () => {
                                 return Promise.all(promises)
                                     .then(data => {
                                         setLoading(false);
-                                        if (role === 'admin') {
+                                        if (role === 'admin' || role === 'distributor') {
                                             toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/product/detail/listing");
                                         } else {
                                             toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
@@ -229,7 +229,7 @@ const FormComponent = () => {
                                     });
                             } else {
                                 setLoading(false);
-                                if (role === 'admin') {
+                                if (role === 'admin' || role === 'distributor') {
                                     toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, "/product/detail/listing");
                                 } else {
                                     toastAndNavigate(dispatch, true, "success", "Successfully Created", navigateTo, 0);
