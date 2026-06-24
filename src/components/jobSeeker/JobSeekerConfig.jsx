@@ -72,7 +72,7 @@ export const datagridColumns = () => {
             align: "center",
             flex: 1,
             minWidth: 100,
-            valueFormatter: params => params?.value.substring(0, 10)
+            valueFormatter: params => params?.value ? params.value.substring(0, 10) : ''
         },
         {
             field: "job_location_preference",

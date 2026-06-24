@@ -49,7 +49,7 @@ const ListingComponent = () => {
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
-        dispatch(setMenuItem(selectedMenu.selected));
+        dispatch(setMenuItem(selectedMenu?.selected || "Skill"));
     }, []);
 
     const handleReload = () => {

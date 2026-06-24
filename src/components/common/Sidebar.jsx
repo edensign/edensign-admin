@@ -206,10 +206,30 @@ const Sidebar = ({ role }) => {
                 icon={<ContactsOutlinedIcon />}
                 selected={selected}
               />
-              <SidebarItem
+               <SidebarItem
                 title="Product Ads"
                 to="/product-ads/listing"
                 icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Companies
+              </Typography>
+              <SidebarItem
+                title="Category & Company"
+                to="/category/listing"
+                icon={<FormatListBulletedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Distributors"
+                to="/distributor/listing"
+                icon={<PeopleOutlinedIcon />}
                 selected={selected}
               />
 
@@ -363,6 +383,62 @@ const Sidebar = ({ role }) => {
                 title="My Salons"
                 to="/salon/detail/listing"
                 icon={<FormatListBulletedIcon />}
+                selected={selected}
+              />
+            </>}
+          {role === 'company' &&
+            <>
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                My Company
+              </Typography>
+              <SidebarItem
+                title="My Profile"
+                to="/company/profile/view"
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Distributor Chain"
+                to="/company/distributors/listing"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Create Distributor"
+                to="/company/distributors/create"
+                icon={<PeopleOutlinedIcon />}
+                selected={selected}
+              />
+            </>}
+          {role === 'distributor' &&
+            <>
+              <Typography
+                variant="h6"
+                color={colors.grey[300]}
+                sx={{ m: "15px 0 5px 10px" }}
+              >
+                Distributor Panel
+              </Typography>
+              <SidebarItem
+                title="My Products"
+                to="/product/detail/listing"
+                icon={<ReceiptOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Product Inventory"
+                to="/inventory/listing"
+                icon={<ContactsOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Product Offers"
+                to="/product-ads/listing"
+                icon={<LoyaltyIcon />}
                 selected={selected}
               />
             </>}

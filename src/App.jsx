@@ -68,6 +68,14 @@ const CityListingComponent = lazy(() => import("./components/city/ListingCompone
 const OfferCardListingComponent = lazy(() => import("./components/offerCards/ListingComponent"));
 const OfferCardFormComponent = lazy(() => import("./components/offerCards/FormComponent"));
 
+const CategoryListingComponent = lazy(() => import("./components/category/CategoryListingComponent"));
+const CompanyListingComponent = lazy(() => import("./components/company/CompanyListingComponent"));
+const CompanyFormComponent = lazy(() => import("./components/company/CompanyFormComponent"));
+const CompanyProfileComponent = lazy(() => import("./components/company/CompanyProfileComponent"));
+const DistributorChainComponent = lazy(() => import("./components/company/DistributorChainComponent"));
+const DistributorListingComponent = lazy(() => import("./components/distributor/DistributorListingComponent"));
+const DistributorFormComponent = lazy(() => import("./components/distributor/DistributorFormComponent"));
+
 import API from "./apis";
 import { Utility } from "./components/utility";
 import { setMenuItem } from "./redux/actions/NavigationAction";
@@ -94,17 +102,30 @@ function App() {
   const switchRole = (userRole) => {
     switch (userRole) {
       case 'admin':
-        navigateTo(pathname + search);
+      case 'sales_executive':
+        if (pathname === '/' || pathname === '/login') {
+          navigateTo('/');
+        } else {
+          navigateTo(pathname + search);
+        }
+        break;
+      case 'company':
+        if (pathname === '/' || pathname === '/login') {
+          navigateTo('/company/profile/view');
+        } else {
+          navigateTo(pathname + search);
+        }
+        break;
+      case 'distributor':
+        if (pathname === '/' || pathname === '/login') {
+          navigateTo('/product/detail/listing');
+        } else {
+          navigateTo(pathname + search);
+        }
         break;
       case 'salon':
         setStorageAndDispatch(navigateTo, API, dispatch, setMenuItem, setAgreementSigned, pathname);
         break;
-      case 'sales_executive':
-        navigateTo(pathname + search);
-        break;
-      case 'freelancer':
-      // navigateTo('/freelancer/update');
-      // break;
       default:
         navigateTo('/login');
         break;
@@ -195,11 +216,20 @@ function App() {
                       <Route exact path="/state/listing" element={<StateListingComponent />} />
                       <Route exact path="/city/listing" element={<CityListingComponent />} />
 
-                      <Route exact path="/offer-cards/listing" element={<OfferCardListingComponent />} />
-                      <Route exact path="/offer-cards/create" element={<OfferCardFormComponent />} />
-                      <Route exact path="/offer-cards/update/:id" element={<OfferCardFormComponent />} />
+                       <Route exact path="/offer-cards/listing" element={<OfferCardListingComponent />} />
+                       <Route exact path="/offer-cards/create" element={<OfferCardFormComponent />} />
+                       <Route exact path="/offer-cards/update/:id" element={<OfferCardFormComponent />} />
 
-                      {/* <Route exact path="/calendar" element={<Calendar />} /> */}
+                       <Route exact path="/category/listing" element={<CategoryListingComponent />} />
+                       <Route exact path="/company/listing" element={<CompanyListingComponent />} />
+                       <Route exact path="/company/create" element={<CompanyFormComponent />} />
+                       <Route exact path="/company/update/:id" element={<CompanyFormComponent />} />
+                       <Route exact path="/company/distributors/:companyId" element={<DistributorChainComponent />} />
+                       <Route exact path="/distributor/listing" element={<DistributorListingComponent />} />
+                       <Route exact path="/distributor/create" element={<DistributorFormComponent />} />
+                       <Route exact path="/distributor/update/:id" element={<DistributorFormComponent />} />
+
+                       {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
                   {role === 'salon' &&
                     <>
@@ -227,12 +257,29 @@ function App() {
                       <Route exact path="/salon/update/:id" element={<UserFormComponent />} />
                       <Route exact path="/salon/listing" element={<UserListingComponent />} />
                       {/* My Salons: sales_executive can view & edit salons they referred — no create */}
-                      <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
-                      <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
-                    </>}
-                  {/* {role === 'freelancer' &&
-                    <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}
-                </Routes>
+                       <Route exact path="/salon/detail/update/:id" element={<SalonFormComponent />} />
+                       <Route exact path="/salon/detail/listing" element={<SalonListingComponent />} />
+                     </>}
+                   {role === 'company' &&
+                     <>
+                       <Route exact path="/" element={<Dashboard />} />
+                       <Route exact path="/company/profile/view" element={<CompanyProfileComponent />} />
+                       <Route exact path="/company/distributors/listing" element={<DistributorChainComponent />} />
+                       <Route exact path="/company/distributors/create" element={<DistributorFormComponent />} />
+                       <Route exact path="/company/distributors/update/:id" element={<DistributorFormComponent />} />
+                     </>}
+                   {role === 'distributor' &&
+                     <>
+                       <Route exact path="/" element={<Dashboard />} />
+                       <Route exact path="/product/detail/listing" element={<ProductListingComponent />} />
+                       <Route exact path="/product/detail/create" element={<ProductFormComponent />} />
+                       <Route exact path="/product/detail/update/:id" element={<ProductFormComponent />} />
+                       <Route exact path="/inventory/listing" element={<InventoryListingComponent />} />
+                       <Route exact path="/product-ads/listing" element={<ProductAds />} />
+                     </>}
+                   {/* {role === 'freelancer' &&
+                     <Route exact path="/freelancer/update" element={<SalonFormComponent />} />} */}
+                 </Routes>
               </main>
             </Suspense>}
           <Routes>

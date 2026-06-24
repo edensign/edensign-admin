@@ -24,6 +24,8 @@ import { setSkillReducer } from "./SkillReducer";
 import { setStateReducer } from "./StateReducer";
 import { setCityReducer } from "./CityReducer";
 import { setUserReducer } from "./UserReducers";
+import { setCompanyReducer } from "./CompanyReducer";
+import { setDistributorReducer } from "./DistributorReducer";
 
 const reducers = combineReducers({
     auth: authReducer,
@@ -40,6 +42,8 @@ const reducers = combineReducers({
     allStates: setStateReducer,
     allCities: setCityReducer,
     allUsers: setUserReducer,
+    allCompanies: setCompanyReducer,
+    allDistributors: setDistributorReducer,
     menuItems: menuItemReducer,
     toastInfo: displayToastReducer,
 });

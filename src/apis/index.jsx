@@ -30,6 +30,9 @@ import { UserAPI } from "./UserAPI";
 import { AcademyAPI } from "./AcademyAPI";
 import { DigitalOfferAPI } from "./DigitalOfferAPI";
 import { DashboardAPI } from "./DashboardAPI";
+import { CategoryAPI } from "./CategoryAPI";
+import { CompanyAPI } from "./CompanyAPI";
+import { DistributorAPI } from "./DistributorAPI";
 
 export default {
     AddressAPI,
@@ -55,5 +58,8 @@ export default {
     UserAPI,
     AcademyAPI,
     DigitalOfferAPI,
-    DashboardAPI
+    DashboardAPI,
+    CategoryAPI,
+    CompanyAPI,
+    DistributorAPI
 };

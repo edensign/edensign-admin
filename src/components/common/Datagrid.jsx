@@ -53,6 +53,8 @@ export default function ServerPaginationGrid({
     const stateLoading = useSelector(state => state.allStates?.loading);
     const cityLoading = useSelector(state => state.allCities?.loading);
     const userLoading = useSelector(state => state.allUsers.loading);
+    const companyLoading = useSelector(state => state.allCompanies?.loading);
+    const distributorLoading = useSelector(state => state.allDistributors?.loading);
     const selected = useSelector(state => state.menuItems.selected);
 
     useEffect(() => {
@@ -138,11 +140,12 @@ export default function ServerPaginationGrid({
                 columns={columns}
                 // count={count}
                 // page={count + 1}
-                loading={loading !== null ? loading : (selected === "Amenity" ? amenityLoading : selected === "State" ? stateLoading : selected === "City" ? cityLoading : (selected === 'Salon Detail' || selected === 'My Salons') ? salonLoading :
+                loading={loading !== null && loading !== undefined ? loading : (selected === "Amenity" ? amenityLoading : selected === "State" ? stateLoading : selected === "City" ? cityLoading : (selected === 'Salon Detail' || selected === 'My Salons') ? salonLoading :
                     selected === 'Salon Inventory' ? salonInventoryLoading : selected === 'Salon Cashflow' ? cashflowLoading : selected === "Service" ? serviceLoading :
                         selected === 'Job Seeker' ? jobSeekerLoading : selected === 'Product Detail' ? productLoading :
                             selected === 'Product Inventory' ? productInventoryLoading : selected === 'Skill' ? skillLoading : 
-                                (selected === 'Employee' || selected === 'Salon' || selected === 'Freelancer' || selected === 'Sales Executive') ? userLoading : userLoading)}
+                                selected === 'Company Profile' ? companyLoading : selected === 'Distributors' ? distributorLoading :
+                                    (selected === 'Employee' || selected === 'Salon' || selected === 'Freelancer' || selected === 'Sales Executive') ? userLoading : userLoading)}
                 rowCount={rowCountState}
                 components={{
                     Toolbar: GridToolbar,
