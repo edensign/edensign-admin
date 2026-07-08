@@ -151,7 +151,7 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className="app">
+        <div className="app" style={{ backgroundColor: theme.palette.background.default }}>
           {getLocalStorage("auth")?.token &&
             <Suspense fallback={<Loader />}>
               <Sidebar role={role} />

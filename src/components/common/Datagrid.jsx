@@ -91,11 +91,13 @@ export default function ServerPaginationGrid({
         <Box
             m="24px 0 0 0"
             sx={{
+                backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
                 boxShadow: theme.palette.mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(92,107,192,0.06)",
                 borderRadius: "12px",
                 overflow: "hidden",
                 border: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)"}`,
                 "& .MuiDataGrid-root": {
+                    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
                     border: "none",
                     fontSize: "0.875rem",
                     fontFamily: "'Inter', sans-serif"
@@ -146,6 +148,10 @@ export default function ServerPaginationGrid({
                 },
                 "& .MuiCheckbox-root": {
                     color: `${colors.greenAccent[500]} !important`
+                },
+                "& .MuiDataGrid-toolbarContainer": {
+                    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
+                    borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`
                 },
                 "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
                     color: `${theme.palette.mode === "dark" ? "#94a3b8" : "#64748b"} !important`,

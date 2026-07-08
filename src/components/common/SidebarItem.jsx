@@ -47,7 +47,8 @@ export const SidebarItem = ({ title, to, icon, selected }) => {
                 sx={{
                     fontFamily: "'Inter', 'Nunito Sans', sans-serif",
                     fontSize: "13.5px",
-                    fontWeight: isActive ? 600 : 500
+                    fontWeight: isActive ? 600 : 500,
+                    color: "inherit"
                 }}
             >
                 {title}

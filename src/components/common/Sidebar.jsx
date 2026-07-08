@@ -99,10 +99,23 @@ const Sidebar = ({ role }) => {
           padding: `8px 20px 8px 16px !important`,
           borderRadius: "8px !important",
           margin: "2px 8px !important",
-          transition: "all 0.2s ease !important"
+          transition: "all 0.2s ease !important",
+          color: `${isDark ? colors.grey[200] : colors.grey[600]} !important`
+        },
+        "& .pro-inner-item > .pro-icon-wrapper": {
+          color: `${isDark ? colors.grey[200] : colors.grey[600]} !important`
+        },
+        "& .pro-inner-item > .pro-item-content": {
+          color: `${isDark ? colors.grey[200] : colors.grey[600]} !important`
         },
         "& .pro-inner-item:hover": {
           backgroundColor: `rgba(92, 107, 192, 0.08) !important`,
+          color: `#5c6bc0 !important`
+        },
+        "& .pro-inner-item:hover > .pro-icon-wrapper": {
+          color: `#5c6bc0 !important`
+        },
+        "& .pro-inner-item:hover > .pro-item-content": {
           color: `#5c6bc0 !important`
         },
         "& .pro-menu-item.active .pro-inner-item": {
@@ -110,6 +123,12 @@ const Sidebar = ({ role }) => {
           color: `#5c6bc0 !important`,
           borderLeft: "3px solid #5c6bc0 !important",
           fontWeight: "600 !important"
+        },
+        "& .pro-menu-item.active .pro-inner-item > .pro-icon-wrapper": {
+          color: `#5c6bc0 !important`
+        },
+        "& .pro-menu-item.active .pro-inner-item > .pro-item-content": {
+          color: `#5c6bc0 !important`
         },
         // Sticky sidebar for layout
         "& .pro-sidebar": {
