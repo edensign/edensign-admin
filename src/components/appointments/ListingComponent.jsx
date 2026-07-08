@@ -65,23 +65,25 @@ const ListingComponent = () => {
     return (
         <Box m="10px">
             <Box
-                height={isMobile ? "19vh" : "11vh"}
-                borderRadius="4px"
-                padding={isMobile ? "1vh" : "2vh"}
-                backgroundColor={colors.blueAccent[700]}
+                borderRadius="12px"
+                padding="16px 24px"
+                backgroundColor={theme.palette.mode === 'dark' ? colors.primary[400] : '#ffffff'}
+                border={`1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(92,107,192,0.08)'}`}
+                boxShadow={theme.palette.mode === 'dark' ? 'none' : '0 4px 12px rgba(92,107,192,0.03)'}
             >
                 <Box
                     display="flex"
-                    height={isMobile ? "16vh" : "7vh"}
                     flexDirection={isMobile ? "column" : "row"}
-                    justifyContent={"space-between"}
-                    alignItems={isMobile ? "center" : "center"}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap={2}
                 >
                     <Typography
                         component="h2"
-                        variant="h2"
-                        color={colors.grey[100]}
-                        fontWeight="bold"
+                        variant="h3"
+                        color={theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b'}
+                        fontWeight="800"
+                        sx={{ letterSpacing: "-0.01em" }}
                     >
                         {selected || "Appointments"}
                     </Typography>
@@ -93,11 +95,15 @@ const ListingComponent = () => {
                             startIcon={<CalendarViewWeekIcon />}
                             onClick={() => navigate("/appointment/slots/kanban")}
                             sx={{
-                                color: colors.grey[100],
-                                borderColor: "rgba(255,255,255,0.4)",
+                                color: theme.palette.mode === 'dark' ? '#cbd5e1' : '#475569',
+                                borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
+                                fontWeight: "600",
+                                borderRadius: "8px",
+                                textTransform: "none",
                                 "&:hover": {
-                                    borderColor: colors.grey[100],
-                                    backgroundColor: "rgba(255,255,255,0.08)",
+                                    borderColor: "#5c6bc0",
+                                    color: "#5c6bc0",
+                                    backgroundColor: "rgba(92, 107, 192, 0.04)",
                                 },
                             }}
                         >
@@ -105,9 +111,20 @@ const ListingComponent = () => {
                         </Button>
                         <Button
                             type="button"
-                            color="secondary"
                             variant="contained"
                             onClick={() => navigate("/appointment/create")}
+                            sx={{
+                                backgroundColor: colors.blueAccent[500],
+                                color: "#ffffff",
+                                fontWeight: "600",
+                                borderRadius: "8px",
+                                padding: "8px 16px",
+                                whiteSpace: "nowrap",
+                                textTransform: "none",
+                                "&:hover": {
+                                    backgroundColor: colors.blueAccent[600]
+                                }
+                            }}
                         >
                             Create Appointment
                         </Button>
@@ -115,37 +132,52 @@ const ListingComponent = () => {
                 </Box>
             </Box>
             <Box
-                m="20px 0 0 0"
+                m="24px 0 0 0"
                 height="75vh"
                 sx={{
+                    boxShadow: theme.palette.mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(92,107,192,0.06)",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)"}`,
                     "& .MuiDataGrid-root": {
                         border: "none",
-                        fontSize: "14px",
+                        fontSize: "0.875rem",
+                        fontFamily: "'Inter', sans-serif"
                     },
                     "& .MuiDataGrid-cell": {
-                        borderBottom: "none",
-                        fontSize: "14px",
+                        borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`,
+                        color: theme.palette.mode === "dark" ? "#cbd5e1" : "#475569",
                         padding: "12px 16px",
                     },
                     "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.blueAccent[700],
-                        borderBottom: "none",
-                        fontSize: "15px",
-                        fontWeight: "bold",
+                        backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
+                        borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                        color: theme.palette.mode === "dark" ? "#cbd5e1" : "#1e293b",
+                        fontSize: "0.75rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em"
                     },
                     "& .MuiDataGrid-columnHeaderTitle": {
                         fontWeight: "bold",
                     },
                     "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.primary[400],
+                        backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
                         overflowX: "hidden",
                     },
                     "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: colors.blueAccent[700],
+                        borderTop: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                        backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
+                        color: theme.palette.mode === "dark" ? "#cbd5e1" : "#475569"
+                    },
+                    "& .MuiDataGrid-row": {
+                        backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
+                        "&:hover": {
+                            backgroundColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03) !important" : "rgba(92,107,192,0.04) !important"
+                        }
                     },
                     "& .MuiCheckbox-root": {
-                        color: `${colors.greenAccent[200]} !important`,
+                        color: `${colors.greenAccent[500]} !important`,
                     },
                     "& .MuiDataGrid-scrollbar--horizontal": {
                         display: "none",

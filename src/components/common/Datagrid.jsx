@@ -89,47 +89,70 @@ export default function ServerPaginationGrid({
 
     return (
         <Box
-            m="30px 0 0 0"
-            // width="100vw"
+            m="24px 0 0 0"
             sx={{
+                boxShadow: theme.palette.mode === "dark" ? "0 4px 20px rgba(0,0,0,0.3)" : "0 4px 20px rgba(92,107,192,0.06)",
+                borderRadius: "12px",
+                overflow: "hidden",
+                border: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)"}`,
                 "& .MuiDataGrid-root": {
                     border: "none",
-                    fontSize: "1rem"
+                    fontSize: "0.875rem",
+                    fontFamily: "'Inter', sans-serif"
                 },
                 "& .MuiDataGrid-cell": {
-                    borderBottom: "none"
+                    borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"}`,
+                    color: theme.palette.mode === "dark" ? "#cbd5e1" : "#475569"
                 },
                 "& .MuiDataGrid-cellCheckbox": {
                     borderBottom: "none"
                 },
                 "& .MuiDataGrid-cell:focus-within": {
-                    outline: `1px solid ${colors.greenAccent[600]}`
+                    outline: `1px solid rgba(92, 107, 192, 0.3)`
                 },
                 "& .MuiDataGrid-cell:hover": {
-                    color: colors.greenAccent[300]
+                    color: "#5c6bc0"
                 },
                 "& .name-column--cell": {
-                    color: colors.greenAccent[300],
+                    color: "#5c6bc0",
+                    fontWeight: 600
                 },
                 "& .MuiDataGrid-columnHeaders": {
-                    backgroundColor: colors.blueAccent[700],
-                    borderBottom: "none"
+                    backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
+                    borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                    color: theme.palette.mode === "dark" ? "#cbd5e1" : "#1e293b",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em"
                 },
                 "& .MuiDataGrid-columnHeader": {
-                    backgroundColor: colors.blueAccent[700],
+                    backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
                 },
                 "& .MuiDataGrid-virtualScroller": {
-                    minHeight: 320
+                    minHeight: 320,
+                    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff"
                 },
                 "& .MuiDataGrid-footerContainer": {
-                    borderTop: "none",
-                    backgroundColor: colors.blueAccent[700]
+                    borderTop: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                    backgroundColor: theme.palette.mode === "dark" ? "#1e293b" : "#f8fafc",
+                    color: theme.palette.mode === "dark" ? "#cbd5e1" : "#475569"
+                },
+                "& .MuiDataGrid-row": {
+                    backgroundColor: theme.palette.mode === "dark" ? "#0f172a" : "#ffffff",
+                    "&:hover": {
+                        backgroundColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.03) !important" : "rgba(92,107,192,0.04) !important"
+                    }
                 },
                 "& .MuiCheckbox-root": {
-                    color: `${colors.greenAccent[200]} !important`
+                    color: `${colors.greenAccent[500]} !important`
                 },
                 "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                    color: `${colors.grey[100]} !important`
+                    color: `${theme.palette.mode === "dark" ? "#94a3b8" : "#64748b"} !important`,
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    margin: "4px 8px"
                 },
             }}
         >

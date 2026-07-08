@@ -4,9 +4,10 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Typography, Button, Card, CardContent, Grid, useTheme, Fade, useMediaQuery } from "@mui/material";
+import { Box, Typography, Button, Card, CardContent, Grid, useTheme, Fade, useMediaQuery, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, CircularProgress } from "@mui/material";
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
+import CategoryIcon from '@mui/icons-material/Category';
 
 import API from "../../apis";
 import { tokens } from "../../theme";
@@ -21,6 +22,56 @@ const CategoryListingComponent = () => {
     const [categories, setCategories] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState("");
+    const [newCategoryDesc, setNewCategoryDesc] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [toast, setToast] = useState({ open: false, severity: "success", message: "" });
+
+    const handleCreateCategory = async () => {
+        if (!newCategoryName.trim()) return;
+
+        setSubmitting(true);
+        try {
+            const res = await API.CategoryAPI.create({
+                name: newCategoryName.trim(),
+                description: newCategoryDesc.trim()
+            });
+
+            if (res && res.status === "Success") {
+                setToast({
+                    open: true,
+                    severity: "success",
+                    message: "Category created successfully!"
+                });
+                setOpenDialog(false);
+                setNewCategoryName("");
+                setNewCategoryDesc("");
+                
+                // Refresh categories list dynamically
+                const catRes = await API.CategoryAPI.getAll();
+                if (catRes && catRes.status === "Success") {
+                    setCategories(catRes.data);
+                }
+            } else {
+                setToast({
+                    open: true,
+                    severity: "error",
+                    message: res.message || "Failed to create category."
+                });
+            }
+        } catch (err) {
+            console.error("Error creating category:", err);
+            setToast({
+                open: true,
+                severity: "error",
+                message: err.response?.data?.msg || err.message || "An error occurred."
+            });
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,34 +120,57 @@ const CategoryListingComponent = () => {
         <Box m="20px">
             {/* Header section */}
             <Box
-                mb="30px"
-                p="20px"
-                borderRadius="8px"
+                borderRadius="12px"
+                padding="16px 24px"
+                backgroundColor={theme.palette.mode === 'dark' ? colors.primary[400] : '#ffffff'}
+                border={`1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(92,107,192,0.08)'}`}
+                boxShadow={theme.palette.mode === 'dark' ? 'none' : '0 4px 12px rgba(92,107,192,0.03)'}
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
                 flexDirection={isMobile ? "column" : "row"}
                 gap="15px"
-                sx={{
-                    background: theme.palette.mode === "dark"
-                        ? `linear-gradient(100deg, ${colors.blueAccent[800]} 0%, ${colors.blueAccent[900]} 100%)`
-                        : `linear-gradient(100deg, ${colors.blueAccent[600]} 0%, ${colors.blueAccent[700]} 100%)`,
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
-                }}
+                mb="30px"
             >
                 <Box>
-                    <Typography variant="h1" fontWeight="bold" color={colors.grey[100]}>
+                    <Typography
+                        variant="h2"
+                        fontWeight="800"
+                        color={theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b'}
+                        sx={{ letterSpacing: "-0.01em" }}
+                    >
                         Product Categories
                     </Typography>
-                    <Typography variant="h5" color={theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.grey[200]} mt="5px">
+                    <Typography
+                        variant="body2"
+                        color={theme.palette.mode === "dark" ? colors.greenAccent[400] : "#64748b"}
+                        mt="5px"
+                    >
                         Explore categories, manage affiliated companies, and expand distributor chains.
                     </Typography>
                 </Box>
-                <Box display="flex" gap="10px" width={isMobile ? "100%" : "auto"}>
+                <Box display="flex" gap="10px" width={isMobile ? "100%" : "auto"} flexDirection={isMobile ? "column" : "row"}>
                     <Button
                         fullWidth={isMobile}
                         variant="contained"
-                        color="success"
+                        onClick={() => setOpenDialog(true)}
+                        startIcon={<CategoryIcon />}
+                        sx={{
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            textTransform: "none",
+                            padding: "8px 16px",
+                            background: "linear-gradient(90deg, #852df2 0%, #b23af7 100%)",
+                            color: "#ffffff",
+                            whiteSpace: "nowrap",
+                            "&:hover": { opacity: 0.9 }
+                        }}
+                    >
+                        Create Category
+                    </Button>
+                    <Button
+                        fullWidth={isMobile}
+                        variant="contained"
                         startIcon={<AddBusinessIcon />}
                         onClick={() => navigateTo("/company/create")}
                         sx={{
@@ -104,8 +178,10 @@ const CategoryListingComponent = () => {
                             fontWeight: "bold",
                             textTransform: "none",
                             padding: "8px 16px",
-                            background: "linear-gradient(90deg, #11998e 0%, #38ef7d 100%)",
-                            "&:hover": { opacity: 0.9 }
+                            backgroundColor: colors.blueAccent[500],
+                            color: "#ffffff",
+                            whiteSpace: "nowrap",
+                            "&:hover": { backgroundColor: colors.blueAccent[600] }
                         }}
                     >
                         Create Company
@@ -119,9 +195,10 @@ const CategoryListingComponent = () => {
                             textTransform: "none",
                             fontWeight: "bold",
                             padding: "8px 16px",
-                            borderColor: theme.palette.mode === "dark" ? colors.greenAccent[500] : colors.grey[200],
-                            color: colors.grey[100],
-                            "&:hover": { borderColor: theme.palette.mode === "dark" ? colors.greenAccent[400] : colors.grey[300], backgroundColor: "rgba(255, 255, 255, 0.08)" }
+                            whiteSpace: "nowrap",
+                            borderColor: theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.15)",
+                            color: theme.palette.mode === "dark" ? "#cbd5e1" : "#475569",
+                            "&:hover": { borderColor: "#5c6bc0", color: "#5c6bc0", backgroundColor: "rgba(92, 107, 192, 0.04)" }
                         }}
                     >
                         View Companies
@@ -270,6 +347,112 @@ const CategoryListingComponent = () => {
                 })}
             </Grid>
             )}
+
+            {/* Create Category Dialog */}
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                aria-labelledby="category-dialog-title"
+                fullWidth
+                maxWidth="sm"
+                sx={{
+                    "& .MuiPaper-root": {
+                        background: colors.primary[400],
+                        borderRadius: "16px",
+                        border: "1px solid rgba(255, 255, 255, 0.05)",
+                        boxShadow: "0 12px 40px rgba(0,0,0,0.25)"
+                    }
+                }}
+            >
+                <DialogTitle id="category-dialog-title" sx={{ p: "24px 24px 8px 24px" }}>
+                    <Typography variant="h2" fontWeight="bold" color={colors.grey[100]}>
+                        Create New Category
+                    </Typography>
+                </DialogTitle>
+                <DialogContent sx={{ p: "8px 24px 24px 24px" }}>
+                    <Box display="flex" flexDirection="column" gap="20px" mt="10px">
+                        <TextField
+                            label="Category Name *"
+                            variant="filled"
+                            fullWidth
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            sx={{
+                                "& .MuiFilledInput-root": {
+                                    backgroundColor: "rgba(255,255,255,0.05)",
+                                    "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" }
+                                }
+                            }}
+                        />
+                        <TextField
+                            label="Description"
+                            variant="filled"
+                            fullWidth
+                            multiline
+                            rows={3}
+                            value={newCategoryDesc}
+                            onChange={(e) => setNewCategoryDesc(e.target.value)}
+                            sx={{
+                                "& .MuiFilledInput-root": {
+                                    backgroundColor: "rgba(255,255,255,0.05)",
+                                    "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" }
+                                }
+                            }}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: "16px 24px 24px 24px" }}>
+                    <Button
+                        onClick={() => {
+                            setOpenDialog(false);
+                            setNewCategoryName("");
+                            setNewCategoryDesc("");
+                        }}
+                        variant="outlined"
+                        disabled={submitting}
+                        sx={{
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: "bold",
+                            borderColor: colors.grey[300],
+                            color: colors.grey[100]
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleCreateCategory}
+                        variant="contained"
+                        disabled={submitting || !newCategoryName.trim()}
+                        sx={{
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            textTransform: "none",
+                            background: "linear-gradient(90deg, #11998e 0%, #38ef7d 100%)",
+                            "&:hover": { opacity: 0.9 }
+                        }}
+                    >
+                        {submitting ? <CircularProgress size={20} color="inherit" /> : "Create Category"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Notification Toast */}
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                open={toast.open}
+                autoHideDuration={4000}
+                onClose={() => setToast({ ...toast, open: false })}
+            >
+                <Alert
+                    severity={toast.severity}
+                    variant="filled"
+                    onClose={() => setToast({ ...toast, open: false })}
+                    sx={{ width: "100%" }}
+                >
+                    {toast.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };

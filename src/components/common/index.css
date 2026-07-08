@@ -6,6 +6,9 @@
  * restrictions set forth in your license agreement with Eden Sign.
  */
 
+/* =======================================
+   Loader Ring (unchanged logic)
+======================================= */
 .lds-ring {
   display: inline-block;
   position: fixed;
@@ -26,7 +29,7 @@
   border: 8px solid #cef;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #cef transparent transparent transparent;
+  border-color: #5c6bc0 transparent transparent transparent;
 }
 
 .lds-ring div:nth-child(1) {
@@ -51,7 +54,9 @@
   }
 }
 
-/* Design for Sign In Loader */
+/* =======================================
+   Sign-In Loader (unchanged logic)
+======================================= */
 .lds-ellipsis {
   display: inline-block;
   position: relative;
@@ -65,7 +70,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #cef;
+  background: #ffffff;
   animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
 
@@ -111,4 +116,67 @@
   100% {
     transform: translate(24px, 0);
   }
+}
+
+/* =======================================
+   Phoenix-style Pro-Sidebar Overrides
+======================================= */
+
+/* Light mode — white sidebar */
+.pro-sidebar {
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0 !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.07) !important;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04) !important;
+  transition: width 0.3s ease, background 0.3s ease !important;
+}
+
+.pro-sidebar > .pro-sidebar-inner {
+  background: #ffffff !important;
+}
+
+.pro-sidebar.collapsed > .pro-sidebar-inner {
+  background: #ffffff !important;
+}
+
+/* Menu items */
+.pro-sidebar .pro-menu .pro-menu-item > .pro-inner-item {
+  padding: 8px 20px 8px 16px !important;
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+  transition: all 0.2s ease !important;
+  color: #475569 !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+}
+
+.pro-sidebar .pro-menu .pro-menu-item > .pro-inner-item:hover {
+  background-color: rgba(92, 107, 192, 0.08) !important;
+  color: #5c6bc0 !important;
+}
+
+.pro-sidebar .pro-menu .pro-menu-item.active > .pro-inner-item {
+  background-color: rgba(92, 107, 192, 0.1) !important;
+  color: #5c6bc0 !important;
+  border-left: 3px solid #5c6bc0 !important;
+  font-weight: 600 !important;
+}
+
+/* Icon wrapper */
+.pro-sidebar .pro-icon-wrapper {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* Collapsed icon tooltip bg */
+.pro-sidebar .pro-menu .pro-menu-item .pro-item-content {
+  font-family: 'Inter', 'Nunito Sans', sans-serif !important;
+}
+
+/* scrollbar inside sidebar */
+.pro-sidebar .pro-sidebar-inner .pro-sidebar-layout {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 107, 192, 0.3) transparent;
 }
