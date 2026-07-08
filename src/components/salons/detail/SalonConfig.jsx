@@ -31,9 +31,14 @@ export const datagridColumns = () => {
     };
 
     const handleActionView = (salon_code) => {
-        const websiteUrl = import.meta.env.VITE_WEBSITE_URL || 'http://localhost:5173';
+        let websiteUrl = import.meta.env.VITE_WEBSITE_URL || 'http://localhost:5173';
+        console.log("Raw websiteUrl from env:", websiteUrl);
+        websiteUrl = websiteUrl.replace(/^['"]|['"]$/g, '');
+        console.log("Clean websiteUrl (quotes stripped):", websiteUrl);
         const cleanWebsiteUrl = websiteUrl.endsWith('/') ? websiteUrl.slice(0, -1) : websiteUrl;
-        window.open(`${cleanWebsiteUrl}/salon/detail/${salon_code}`, "_blank", "noopener,noreferrer");
+        const targetUrl = `${cleanWebsiteUrl}/salon/detail/${salon_code}`;
+        console.log("Opening URL:", targetUrl);
+        window.open(targetUrl, "_blank", "noopener,noreferrer");
     };
 
     const columns = [
