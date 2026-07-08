@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 
 import { tokens } from "../../../theme";
 import { Utility } from "../../utility";
@@ -27,6 +28,12 @@ export const datagridColumns = () => {
 
     const handleActionEdit = (id) => {
         navigateTo(`/salon/detail/update/${id}`, { state: { id: id } });
+    };
+
+    const handleActionView = (salon_code) => {
+        const websiteUrl = import.meta.env.VITE_WEBSITE_URL || 'http://localhost:5173';
+        const cleanWebsiteUrl = websiteUrl.endsWith('/') ? websiteUrl.slice(0, -1) : websiteUrl;
+        window.open(`${cleanWebsiteUrl}/salon/detail/${salon_code}`, "_blank", "noopener,noreferrer");
     };
 
     const columns = [
@@ -143,23 +150,34 @@ export const datagridColumns = () => {
             headerAlign: "center",
             align: "center",
             flex: 1,
-            minWidth: 75,
+            minWidth: 130,
             renderCell: ({ row }) => {
                 // Sales Executive can only edit salons where they are the referrer
                 const canEdit = role === 'admin' || (role === 'sales_executive' && row.referral_by === userId);
                 
                 return (
-                    <Box width="30%"
+                    <Box
                         m="0 auto"
                         p="5px"
                         display="flex"
-                        justifyContent="center">
+                        justifyContent="center"
+                        gap="8px"
+                        width="100%"
+                    >
                         {canEdit && (
                             <Button color="info" variant="contained"
                                 onClick={() => handleActionEdit(row.id)}
-                                sx={{ minWidth: "50px" }}
+                                sx={{ minWidth: "40px" }}
                             >
                                 <DriveFileRenameOutlineOutlinedIcon />
+                            </Button>
+                        )}
+                        {row.salon_code && (
+                            <Button color="secondary" variant="contained"
+                                onClick={() => handleActionView(row.salon_code)}
+                                sx={{ minWidth: "40px" }}
+                            >
+                                <VisibilityOutlinedIcon />
                             </Button>
                         )}
                     </Box>

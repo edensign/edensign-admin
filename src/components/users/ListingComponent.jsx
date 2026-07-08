@@ -79,52 +79,73 @@ const ListingComponent = () => {
     return (
         <Box m="10px" position="relative">
             <Box
-                height={isMobile ? "19vh" : isTab ? "8vh" : "11vh"}
-                borderRadius="4px"
-                padding={isMobile ? "1vh" : "2vh"}
-                backgroundColor={colors.blueAccent[700]}
+                borderRadius="12px"
+                padding="16px 24px"
+                backgroundColor={theme.palette.mode === 'dark' ? colors.primary[400] : '#ffffff'}
+                border={`1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(92,107,192,0.08)'}`}
+                boxShadow={theme.palette.mode === 'dark' ? 'none' : '0 4px 12px rgba(92,107,192,0.03)'}
             >
                 <Box
                     display="flex"
-                    height={isMobile ? "16vh" : "7vh"}
                     flexDirection={isMobile ? "column" : "row"}
-                    justifyContent={"space-between"}
-                    alignItems={isMobile ? "center" : "normal"}
-
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap={2}
                 >
-                    <Typography
-                        component="h2"
-                        variant="h2"
-                        color={colors.grey[100]}
-                        fontWeight="bold"
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                        <Typography
+                            component="h2"
+                            variant="h3"
+                            color={theme.palette.mode === 'dark' ? '#f1f5f9' : '#1e293b'}
+                            fontWeight="800"
+                            sx={{ letterSpacing: "-0.01em" }}
+                        >
+                            {selected}
+                        </Typography>
+                    </Box>
+                    <Box
+                        display="flex"
+                        flexDirection={isMobile ? "column" : "row"}
+                        alignItems="center"
+                        gap={2}
+                        width={isMobile ? "100%" : "auto"}
                     >
-                        {selected}
-                    </Typography>
-                    <Search
-                        action={setUsers}
-                        api={API.UserAPI}
-                        condition={condition}
-                        getSearchData={getPaginatedData}
-                        oldPagination={oldPagination}
-                        reloadBtn={reloadBtn}
-                        setSearchFlag={setSearchFlag}
-                    />
-                    <Button
-                        type="submit"
-                        color="success"
-                        variant="contained"
-                        onClick={() => {
-                            // Sales Executive creates salon owners via /salon/create
-                            if (role === 'sales_executive' && getQueryParam() === 'salon') {
-                                navigateTo('/salon/create');
-                            } else {
-                                navigateTo(`/${selected}/create`);
-                            }
-                        }}
-                        sx={{ height: isTab ? "4vh" : "auto" }}
-                    >
-                        Create New {selected}
-                    </Button>
+                        <Search
+                            action={setUsers}
+                            api={API.UserAPI}
+                            condition={condition}
+                            getSearchData={getPaginatedData}
+                            oldPagination={oldPagination}
+                            reloadBtn={reloadBtn}
+                            setSearchFlag={setSearchFlag}
+                        />
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            onClick={() => {
+                                // Sales Executive creates salon owners via /salon/create
+                                if (role === 'sales_executive' && getQueryParam() === 'salon') {
+                                    navigateTo('/salon/create');
+                                } else {
+                                    navigateTo(`/${selected}/create`);
+                                }
+                            }}
+                            sx={{
+                                backgroundColor: colors.blueAccent[500],
+                                color: "#ffffff",
+                                fontWeight: "600",
+                                borderRadius: "8px",
+                                padding: "8px 16px",
+                                whiteSpace: "nowrap",
+                                textTransform: "none",
+                                "&:hover": {
+                                    backgroundColor: colors.blueAccent[600]
+                                }
+                            }}
+                        >
+                            Create New {selected}
+                        </Button>
+                    </Box>
                 </Box>
             </Box>
             <Button sx={{

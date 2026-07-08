@@ -69,6 +69,7 @@ const OfferCardListingComponent = lazy(() => import("./components/offerCards/Lis
 const OfferCardFormComponent = lazy(() => import("./components/offerCards/FormComponent"));
 
 const CategoryListingComponent = lazy(() => import("./components/category/CategoryListingComponent"));
+const CategoryManageComponent = lazy(() => import("./components/category/CategoryManageComponent"));
 const CompanyListingComponent = lazy(() => import("./components/company/CompanyListingComponent"));
 const CompanyFormComponent = lazy(() => import("./components/company/CompanyFormComponent"));
 const CompanyProfileComponent = lazy(() => import("./components/company/CompanyProfileComponent"));
@@ -221,6 +222,7 @@ function App() {
                        <Route exact path="/offer-cards/update/:id" element={<OfferCardFormComponent />} />
 
                        <Route exact path="/category/listing" element={<CategoryListingComponent />} />
+                       <Route exact path="/category/manage" element={<CategoryManageComponent />} />
                        <Route exact path="/company/listing" element={<CompanyListingComponent />} />
                        <Route exact path="/company/create" element={<CompanyFormComponent />} />
                        <Route exact path="/company/update/:id" element={<CompanyFormComponent />} />

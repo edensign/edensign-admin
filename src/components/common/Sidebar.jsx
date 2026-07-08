@@ -14,23 +14,57 @@ import "react-pro-sidebar/dist/css/styles.css";
 import { Box, IconButton, Typography, useTheme, useMediaQuery } from "@mui/material";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
+import StoreOutlinedIcon from "@mui/icons-material/StoreOutlined";
+import ContentCutOutlinedIcon from "@mui/icons-material/ContentCutOutlined";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
+import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import ContactMailOutlinedIcon from "@mui/icons-material/ContactMailOutlined";
+import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import LocationCityOutlinedIcon from "@mui/icons-material/LocationCityOutlined";
+import SpaOutlinedIcon from "@mui/icons-material/SpaOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import ApiIcon from '@mui/icons-material/Api';
-import AssistantIcon from '@mui/icons-material/Assistant';
-import LoyaltyIcon from '@mui/icons-material/Loyalty';
-import { Api, TuneOutlined } from '@mui/icons-material';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
+import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
+import MiscellaneousServicesOutlinedIcon from "@mui/icons-material/MiscellaneousServicesOutlined";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 
 import { tokens } from "../../theme";
 import { SidebarItem } from "./SidebarItem";
 import { Utility } from "../utility";
 
 import edensignImg from "../assets/eden.jpg";
+
+// Section label component — Phoenix style
+const SectionLabel = ({ label, colors }) => (
+  <Typography
+    variant="caption"
+    sx={{
+      display: "block",
+      color: colors.grey[500],
+      fontWeight: 700,
+      fontSize: "10px",
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      m: "18px 0 6px 18px",
+      opacity: 0.7
+    }}
+  >
+    {label}
+  </Typography>
+);
 
 const Sidebar = ({ role }) => {
   const theme = useTheme();
@@ -42,6 +76,11 @@ const Sidebar = ({ role }) => {
 
   const id = getLocalStorage("salon")?.id;
 
+  const isDark = theme.palette.mode === "dark";
+  const sidebarBg = isDark ? colors.primary[400] : "#ffffff";
+  const borderColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)";
+  const logoTextColor = isDark ? "#f1f5f9" : "#0f172a";
+
   useEffect(() => {
     setIsCollapsed(isMobile);
   }, [isMobile]);
@@ -50,19 +89,33 @@ const Sidebar = ({ role }) => {
     <Box
       sx={{
         "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`
+          background: `${sidebarBg} !important`,
+          borderRight: `1px solid ${borderColor} !important`
         },
         "& .pro-icon-wrapper": {
           backgroundColor: `transparent !important`
         },
         "& .pro-inner-item": {
-          padding: `4px 35px 4px 15px !important`
+          padding: `8px 20px 8px 16px !important`,
+          borderRadius: "8px !important",
+          margin: "2px 8px !important",
+          transition: "all 0.2s ease !important"
         },
         "& .pro-inner-item:hover": {
-          color: `#868dfb !important`
+          backgroundColor: `rgba(92, 107, 192, 0.08) !important`,
+          color: `#5c6bc0 !important`
         },
-        "& .pro-menu-item.active": {
-          color: `#6870fa !important`
+        "& .pro-menu-item.active .pro-inner-item": {
+          backgroundColor: `rgba(92, 107, 192, 0.1) !important`,
+          color: `#5c6bc0 !important`,
+          borderLeft: "3px solid #5c6bc0 !important",
+          fontWeight: "600 !important"
+        },
+        // Sticky sidebar for layout
+        "& .pro-sidebar": {
+          height: "100vh !important",
+          position: "sticky !important",
+          top: "0 !important"
         }
       }}
     >
@@ -71,10 +124,10 @@ const Sidebar = ({ role }) => {
           {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+            icon={isCollapsed ? <MenuOutlinedIcon sx={{ color: "#5c6bc0" }} /> : undefined}
             style={{
-              color: colors.grey[100],
-              margin: isMobile ? `10px 0px 10px 0` : `10px 0px 10px 20px !important`
+              color: logoTextColor,
+              margin: isMobile ? `10px 0px 10px 0` : `10px 0px 10px 0px`
             }}
           >
             {!isCollapsed && (
@@ -82,33 +135,72 @@ const Sidebar = ({ role }) => {
                 display="flex"
                 justifyContent="space-between"
                 alignItems="center"
-                ml="5px"
+                px={1}
+                py={0.5}
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  {import.meta.env.VITE_COMPANY_NAME}
-                </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
+                {/* Brand logo area */}
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #5c6bc0, #7c3aed)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0
+                    }}
+                  >
+                    <Typography sx={{ color: "#fff", fontWeight: 800, fontSize: "14px" }}>
+                      E
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "15px",
+                      color: logoTextColor,
+                      letterSpacing: "-0.02em"
+                    }}
+                  >
+                    {import.meta.env.VITE_COMPANY_NAME}
+                  </Typography>
+                </Box>
+                <IconButton
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  size="small"
+                  sx={{ color: colors.grey[500] }}
+                >
+                  <MenuOutlinedIcon fontSize="small" />
                 </IconButton>
               </Box>
             )}
           </MenuItem>
 
-          {/* USER */}
+          {/* USER AVATAR */}
           {!isCollapsed && (
-            <Box mb="15px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  src={edensignImg}
-                  style={{ cursor: "pointer", borderRadius: "10%", width: "60%" }}
-                />
-              </Box>
+            <Box
+              sx={{
+                mx: 2,
+                mb: 1,
+                mt: 0.5,
+                borderRadius: "12px",
+                overflow: "hidden",
+                border: `1px solid ${borderColor}`
+              }}
+            >
+              <img
+                alt="profile-user"
+                src={edensignImg}
+                style={{ cursor: "pointer", width: "100%", display: "block", objectFit: "cover", maxHeight: "120px" }}
+              />
             </Box>
           )}
+
           {role === 'admin' && <>
             {/* MENU ITEMS */}
-            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            <Box paddingLeft={isCollapsed ? undefined : "4px"}>
               <SidebarItem
                 title="Dashboard"
                 to="/"
@@ -116,159 +208,129 @@ const Sidebar = ({ role }) => {
                 selected={selected}
               />
 
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Users
-              </Typography>
+              <SectionLabel label="Users" colors={colors} />
               <SidebarItem
                 title="Employee"
                 to="/employee/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<BadgeOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon"
                 to="/salon/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<StoreOutlinedIcon />}
                 selected={selected}
-
               />
               <SidebarItem
                 title="Freelancer"
                 to="/freelancer/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<ContentCutOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Sales Executive"
                 to="/Sales Executive/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<SupportAgentOutlinedIcon />}
                 selected={selected}
               />
 
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Salons
-              </Typography>
+              <SectionLabel label="Salons" colors={colors} />
               <SidebarItem
                 title="Salon Detail"
                 to="/salon/detail/listing"
-                icon={<FormatListBulletedIcon />}
+                icon={<ListAltOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Appointments"
                 to="/appointment/listing"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<CalendarMonthOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon Inventory"
                 to="/salon-inventory/salons"
-                icon={<ReceiptLongIcon />}
+                icon={<Inventory2OutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon Cashflow"
                 to="/salon/cashflow"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<AccountBalanceWalletOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Offer Cards"
                 to="/offer-cards/listing"
-                icon={<LoyaltyIcon />}
+                icon={<LocalOfferOutlinedIcon />}
                 selected={selected}
               />
 
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Products
-              </Typography>
+              <SectionLabel label="Products" colors={colors} />
               <SidebarItem
                 title="Product Detail"
                 to="/product/detail/listing"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<ShoppingBagOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Product Inventory"
                 to="/inventory/listing"
-                icon={<ContactsOutlinedIcon />}
+                icon={<Inventory2Icon />}
                 selected={selected}
               />
-               <SidebarItem
+              <SidebarItem
                 title="Product Ads"
                 to="/product-ads/listing"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<CampaignOutlinedIcon />}
                 selected={selected}
               />
 
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Companies
-              </Typography>
+              <SectionLabel label="Companies" colors={colors} />
               <SidebarItem
                 title="Category & Company"
                 to="/category/listing"
-                icon={<FormatListBulletedIcon />}
+                icon={<CategoryOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
+                title="Manage Categories"
+                to="/category/manage"
+                icon={<CategoryOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Distributors"
                 to="/distributor/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<LocalShippingOutlinedIcon />}
                 selected={selected}
               />
 
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Enquiries
-              </Typography>
+              <SectionLabel label="Enquiries" colors={colors} />
               <SidebarItem
                 title="Contact Enquiries"
                 to="/contact/listing"
-                icon={<ContactsOutlinedIcon />}
+                icon={<ContactMailOutlinedIcon />}
                 selected={selected}
               />
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Pages
-              </Typography>
+
+              <SectionLabel label="Pages" colors={colors} />
               <SidebarItem
                 title="State"
                 to="/state/listing"
-                icon={<ApiIcon />}
+                icon={<MapOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="City"
                 to="/city/listing"
-                icon={<ApiIcon />}
+                icon={<LocationCityOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Amenity"
                 to="/amenity/listing"
-                icon={<ApiIcon />}
+                icon={<SpaOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
@@ -280,19 +342,19 @@ const Sidebar = ({ role }) => {
               <SidebarItem
                 title="Job Seeker"
                 to="/job/seeker/listing"
-                icon={<HelpOutlineOutlinedIcon />}
+                icon={<WorkOutlineOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Skill"
                 to="/skill/listing"
-                icon={<HelpOutlineOutlinedIcon />}
+                icon={<PsychologyOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Service"
                 to="/service/listing"
-                icon={<LoyaltyIcon />}
+                icon={<MiscellaneousServicesOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
@@ -304,141 +366,109 @@ const Sidebar = ({ role }) => {
 
             </Box>
           </>}
+
           {role === 'salon' &&
             <>
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Salons
-              </Typography>
+              <SectionLabel label="Salons" colors={colors} />
               <SidebarItem
                 title="Salon Detail"
                 to={id ? `/salon/detail/update/${id}` : "/salon/detail/create"}
-                icon={<FormatListBulletedIcon />}
+                icon={<ListAltOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon Inventory"
                 to="/salon-inventory/listing"
-                icon={<ReceiptLongIcon />}
+                icon={<Inventory2OutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Appointments"
                 to="/appointment/listing"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<CalendarMonthOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Salon Cashflow"
                 to="/salon/cashflow"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<AccountBalanceWalletOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Offer Cards"
                 to="/offer-cards/listing"
-                icon={<LoyaltyIcon />}
+                icon={<LocalOfferOutlinedIcon />}
                 selected={selected}
               />
             </>}
+
           {role === 'sales_executive' &&
             <>
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Sales Dashboard
-              </Typography>
+              <SectionLabel label="Sales Dashboard" colors={colors} />
               <SidebarItem
                 title="Dashboard"
                 to="/"
                 icon={<HomeOutlinedIcon />}
                 selected={selected}
               />
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Salon Owners
-              </Typography>
+              <SectionLabel label="Salon Owners" colors={colors} />
               <SidebarItem
                 title="Salon"
                 to="/salon/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<StoreOutlinedIcon />}
                 selected={selected}
               />
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                My Salons
-              </Typography>
+              <SectionLabel label="My Salons" colors={colors} />
               <SidebarItem
                 title="My Salons"
                 to="/salon/detail/listing"
-                icon={<FormatListBulletedIcon />}
+                icon={<ListAltOutlinedIcon />}
                 selected={selected}
               />
             </>}
+
           {role === 'company' &&
             <>
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                My Company
-              </Typography>
+              <SectionLabel label="My Company" colors={colors} />
               <SidebarItem
                 title="My Profile"
                 to="/company/profile/view"
-                icon={<HomeOutlinedIcon />}
+                icon={<AccountCircleOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Distributor Chain"
                 to="/company/distributors/listing"
-                icon={<PeopleOutlinedIcon />}
+                icon={<LocalShippingOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Create Distributor"
                 to="/company/distributors/create"
-                icon={<PeopleOutlinedIcon />}
+                icon={<GroupAddOutlinedIcon />}
                 selected={selected}
               />
             </>}
+
           {role === 'distributor' &&
             <>
-              <Typography
-                variant="h6"
-                color={colors.grey[300]}
-                sx={{ m: "15px 0 5px 10px" }}
-              >
-                Distributor Panel
-              </Typography>
+              <SectionLabel label="Distributor Panel" colors={colors} />
               <SidebarItem
                 title="My Products"
                 to="/product/detail/listing"
-                icon={<ReceiptOutlinedIcon />}
+                icon={<ShoppingBagOutlinedIcon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Product Inventory"
                 to="/inventory/listing"
-                icon={<ContactsOutlinedIcon />}
+                icon={<Inventory2Icon />}
                 selected={selected}
               />
               <SidebarItem
                 title="Product Offers"
                 to="/product-ads/listing"
-                icon={<LoyaltyIcon />}
+                icon={<LocalOfferOutlinedIcon />}
                 selected={selected}
               />
             </>}

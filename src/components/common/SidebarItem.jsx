@@ -23,24 +23,39 @@ export const SidebarItem = ({ title, to, icon, selected }) => {
     const colors = tokens(theme.palette.mode);
     const { setLocalStorage } = Utility();
 
+    const isDark = theme.palette.mode === "dark";
+    const isActive = title === selected;
+
     return (
         <MenuItem
-            active={title === selected}
+            active={isActive}
             style={{
-                color: colors.grey[100],
+                color: isActive
+                    ? "#5c6bc0"
+                    : isDark ? colors.grey[200] : colors.grey[400],
+                fontSize: "13.5px",
+                fontWeight: isActive ? 600 : 500,
+                fontFamily: "'Inter', 'Nunito Sans', sans-serif",
             }}
             onClick={() => {
                 dispatch(setMenuItem(title));
                 setLocalStorage("menu", { selected: title });
-            }
-            }
+            }}
             icon={icon}
         >
-            <Typography>{title}</Typography>
+            <Typography
+                sx={{
+                    fontFamily: "'Inter', 'Nunito Sans', sans-serif",
+                    fontSize: "13.5px",
+                    fontWeight: isActive ? 600 : 500
+                }}
+            >
+                {title}
+            </Typography>
             <Link to={to} />
         </MenuItem>
     );
 };
-        //to be continued in link to
+//to be continued in link to
 // {(getRole() === 'salon' && getLocalStorage("menu")?.selected === 'Salon Detail') ?
-// setStorageAndDispatch(navigateTo, API) 
+// setStorageAndDispatch(navigateTo, API)
