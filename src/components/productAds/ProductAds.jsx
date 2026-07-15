@@ -60,6 +60,7 @@ const ProductAds = () => {
                 await API.ProductAdAPI.update(payload);
                 toastAndNavigate(dispatch, true, "success", "Ad updated", () => {}, null);
             } else {
+                delete payload.id;
                 await API.ProductAdAPI.create(payload);
                 toastAndNavigate(dispatch, true, "success", "Ad created", () => {}, null);
             }
