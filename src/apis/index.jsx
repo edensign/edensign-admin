@@ -33,6 +33,7 @@ import { DashboardAPI } from "./DashboardAPI";
 import { CategoryAPI } from "./CategoryAPI";
 import { CompanyAPI } from "./CompanyAPI";
 import { DistributorAPI } from "./DistributorAPI";
+import { SystemConfigAPI } from "./SystemConfigAPI";
 
 export default {
     AddressAPI,
@@ -61,5 +62,6 @@ export default {
     DashboardAPI,
     CategoryAPI,
     CompanyAPI,
-    DistributorAPI
+    DistributorAPI,
+    SystemConfigAPI
 };

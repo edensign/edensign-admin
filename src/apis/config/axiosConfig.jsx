@@ -8,11 +8,9 @@
 
 import axios from "axios";
 
-const ENV = import.meta.env;
-
 export const api = axios.create({
   withCredentials: true,
-  baseURL: ENV.VITE_BASE_URL?.replace(/"/g, ""),
+  baseURL: (import.meta.env.VITE_BASE_URL || "http://localhost:8080/api/v1").replace(/"/g, ""),
   validateStatus: (status) => (status >= 200 && status < 300) || status == 404
 });
 

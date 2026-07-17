@@ -382,6 +382,12 @@ const Sidebar = ({ role }) => {
                 icon={<SchoolOutlinedIcon />}
                 selected={selected}
               />
+              <SidebarItem
+                title="AI Agent Config"
+                to="/system/config"
+                icon={<PsychologyOutlinedIcon />}
+                selected={selected}
+              />
 
             </Box>
           </>}
