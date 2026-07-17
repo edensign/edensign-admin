@@ -76,6 +76,7 @@ const CompanyProfileComponent = lazy(() => import("./components/company/CompanyP
 const DistributorChainComponent = lazy(() => import("./components/company/DistributorChainComponent"));
 const DistributorListingComponent = lazy(() => import("./components/distributor/DistributorListingComponent"));
 const DistributorFormComponent = lazy(() => import("./components/distributor/DistributorFormComponent"));
+const SystemConfig = lazy(() => import("./components/systemConfig/SystemConfig"));
 
 import API from "./apis";
 import { Utility } from "./components/utility";
@@ -230,6 +231,7 @@ function App() {
                        <Route exact path="/distributor/listing" element={<DistributorListingComponent />} />
                        <Route exact path="/distributor/create" element={<DistributorFormComponent />} />
                        <Route exact path="/distributor/update/:id" element={<DistributorFormComponent />} />
+                       <Route exact path="/system/config" element={<SystemConfig />} />
 
                        {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
