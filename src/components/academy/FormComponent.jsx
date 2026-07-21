@@ -17,6 +17,7 @@ import API from "../../apis";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
 import { tokens } from "../../theme";
 import { Utility } from "../utility";
+import Toast from "../common/Toast";
 
 const categories = ["Salon Growth", "Technical Skills", "Product Guides", "Marketing"];
 
@@ -47,7 +48,8 @@ const FormComponent = () => {
     const dispatch = useDispatch();
     const [initialFormValues, setInitialFormValues] = useState(initialValues);
     const selected = useSelector(state => state.menuItems.selected);
-    const { getLocalStorage } = Utility();
+    const toastInfo = useSelector(state => state.toastInfo);
+    const { getLocalStorage, toastAndNavigate } = Utility();
 
     useEffect(() => {
         const selectedMenu = getLocalStorage("menu");
@@ -60,12 +62,16 @@ const FormComponent = () => {
 
     const fetchCourse = async () => {
         try {
-            const response = await API.CommonAPI.getByPk("academy", id);
-            if (response.status === 200) {
+            const response = await API.CommonAPI.getByPk(id, "academy");
+            // Response payload uses { status: "Success", data: {...} }
+            if (response && (response.status === "Success" || response.status === 200) && response.data) {
                 setInitialFormValues(response.data);
+            } else {
+                toastAndNavigate(dispatch, true, "error", "Failed to load course details");
             }
         } catch (error) {
             console.error("Error fetching course:", error);
+            toastAndNavigate(dispatch, true, "error", "Failed to load course details");
         }
     };
 
@@ -78,13 +84,20 @@ const FormComponent = () => {
                 response = await API.AcademyAPI.create(values);
             }
 
-            if (response.status === 200) {
-                alert(id ? "Updated Successfully" : "Created Successfully");
-                navigateTo("/academy/listing");
+            // Axios returns the HTTP response — check response.data for payload
+            const payload = response?.data || response;
+            if (response?.status === 200 || payload?.status === "Success") {
+                toastAndNavigate(
+                    dispatch, true, "success",
+                    id ? "Course updated successfully!" : "Course created successfully!",
+                    navigateTo, "/academy/listing"
+                );
+            } else {
+                toastAndNavigate(dispatch, true, "error", payload?.msg || "Failed to save course");
             }
         } catch (error) {
             console.error("Error submitting form:", error);
-            alert("Error saving course");
+            toastAndNavigate(dispatch, true, "error", error?.response?.data?.msg || "Error saving course");
         }
     };
 
@@ -217,6 +230,12 @@ const FormComponent = () => {
                     </form>
                 )}
             </Formik>
+
+            <Toast
+                alerting={toastInfo.toastAlert}
+                severity={toastInfo.toastSeverity}
+                message={toastInfo.toastMessage}
+            />
         </Box>
     );
 };

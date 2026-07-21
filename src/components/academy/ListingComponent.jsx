@@ -10,12 +10,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Box, Typography, Button, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box, Typography, Button, useMediaQuery, useTheme,
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+} from "@mui/material";
 import ReplayIcon from '@mui/icons-material/Replay';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
 import API from "../../apis";
 import Search from "../common/Search";
 import ServerPaginationGrid from '../common/Datagrid';
+import Toast from "../common/Toast";
 
 import { datagridColumns } from "./AcademyConfig";
 import { setMenuItem } from "../../redux/actions/NavigationAction";
@@ -33,13 +39,19 @@ const ListingComponent = () => {
     const isTab = useMediaQuery("(max-width:920px)");
 
     const selected = useSelector(state => state.menuItems.selected);
+    const toastInfo = useSelector(state => state.toastInfo);
     const [listData, setListData] = useState({ count: 0, rows: [] });
+    const [loading, setLoading] = useState(true);
 
     const [searchFlag, setSearchFlag] = useState({ search: false, searching: false });
     const [oldPagination, setOldPagination] = useState();
 
+    // Confirmation dialog state
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pendingDeleteId, setPendingDeleteId] = useState(null);
+
     const { getPaginatedData } = useCommon();
-    const { getLocalStorage } = Utility();
+    const { getLocalStorage, toastAndNavigate } = Utility();
 
     const colors = tokens(theme.palette.mode);
     const reloadBtn = document.getElementById("reload-btn");
@@ -51,8 +63,9 @@ const ListingComponent = () => {
 
     const fetchAcademyData = async (page = 0, size = 5, search = false) => {
         try {
+            setLoading(true);
             const response = await API.AcademyAPI.getAll(page, size, search);
-            if (response.status === 200) {
+            if (response && (response.status === 200 || response.status === 'Success') && response.data) {
                 setListData(response.data);
             } else {
                 setListData({ count: 0, rows: [] });
@@ -60,21 +73,40 @@ const ListingComponent = () => {
         } catch (error) {
             console.error("Error fetching academy data:", error);
             setListData({ count: 0, rows: [] });
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this course?")) {
-            try {
-                const response = await API.AcademyAPI.delete(id);
-                if (response.status === 200) {
-                    alert("Deleted Successfully");
-                    fetchAcademyData();
-                }
-            } catch (error) {
-                alert("Error deleting course");
+    // Opens the confirmation dialog — no delete yet
+    const handleDeleteClick = (id) => {
+        setPendingDeleteId(id);
+        setConfirmOpen(true);
+    };
+
+    // Confirmed — execute the delete
+    const handleDeleteConfirm = async () => {
+        setConfirmOpen(false);
+        try {
+            const response = await API.AcademyAPI.delete(pendingDeleteId);
+            const payload = response?.data || response;
+            if (response?.status === 200 || payload?.status === "Success") {
+                toastAndNavigate(dispatch, true, "success", "Course deleted successfully!");
+                fetchAcademyData();
+            } else {
+                toastAndNavigate(dispatch, true, "error", payload?.msg || "Failed to delete course");
             }
+        } catch (error) {
+            console.error("Error deleting course:", error);
+            toastAndNavigate(dispatch, true, "error", error?.response?.data?.msg || "Error deleting course");
+        } finally {
+            setPendingDeleteId(null);
         }
+    };
+
+    const handleDeleteCancel = () => {
+        setConfirmOpen(false);
+        setPendingDeleteId(null);
     };
 
     const handleReload = () => {
@@ -121,7 +153,6 @@ const ListingComponent = () => {
                         width={isMobile ? "100%" : "auto"}
                     >
                         <Search
-                            // We use local state instead of redux for Academy listing for now
                             customFetch={fetchAcademyData}
                             api={API.AcademyAPI}
                             getSearchData={fetchAcademyData}
@@ -151,6 +182,7 @@ const ListingComponent = () => {
                     </Box>
                 </Box>
             </Box>
+
             <Button sx={{
                 display: "none",
                 position: "absolute",
@@ -169,17 +201,79 @@ const ListingComponent = () => {
                 </span>
                 Back
             </Button>
+
             <ServerPaginationGrid
                 customFetch={fetchAcademyData}
                 api={API.AcademyAPI}
                 getQuery={fetchAcademyData}
-                columns={datagridColumns(handleDelete)}
+                columns={datagridColumns(handleDeleteClick)}
                 rows={listData.rows}
                 count={listData.count}
                 pageSizeOptions={pageSizeOptions}
                 setOldPagination={setOldPagination}
                 searchFlag={searchFlag}
                 setSearchFlag={setSearchFlag}
+                loading={loading}
+            />
+
+            {/* ── Delete Confirmation Dialog ── */}
+            <Dialog
+                open={confirmOpen}
+                onClose={handleDeleteCancel}
+                PaperProps={{
+                    sx: {
+                        borderRadius: "16px",
+                        padding: "8px",
+                        minWidth: "360px",
+                        boxShadow: "0 24px 48px rgba(0,0,0,0.18)"
+                    }
+                }}
+            >
+                <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+                    <WarningAmberRoundedIcon sx={{ color: "#f59e0b", fontSize: 28 }} />
+                    <Typography fontWeight="700" fontSize="18px">Delete Course</Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{ color: "text.secondary", fontSize: "14px" }}>
+                        Are you sure you want to delete this course? This action&nbsp;
+                        <strong>cannot be undone</strong>.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+                    <Button
+                        onClick={handleDeleteCancel}
+                        variant="outlined"
+                        sx={{
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            borderColor: "rgba(0,0,0,0.15)"
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleDeleteConfirm}
+                        variant="contained"
+                        startIcon={<DeleteOutlineIcon />}
+                        sx={{
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            backgroundColor: "#ef4444",
+                            "&:hover": { backgroundColor: "#dc2626" }
+                        }}
+                    >
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* ── Toast Notification ── */}
+            <Toast
+                alerting={toastInfo.toastAlert}
+                severity={toastInfo.toastSeverity}
+                message={toastInfo.toastMessage}
             />
         </Box>
     );
