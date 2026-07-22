@@ -135,9 +135,6 @@ const Login = () => {
   return (
     <Box
       sx={{
-        backgroundImage: isDark
-          ? `linear-gradient(135deg, rgba(15,23,42,0.97) 0%, rgba(30,41,59,0.97) 100%)`
-          : `linear-gradient(135deg, rgba(245,247,250,0.96) 0%, rgba(226,232,240,0.96) 100%)`,
         backgroundImage: `url(${bgImg})`,
         backgroundSize: "cover",
         backgroundPosition: "center",

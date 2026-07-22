@@ -56,6 +56,7 @@ const ServiceListingComponent = lazy(() => import("./components/services/Listing
 
 const SkillListingComponent = lazy(() => import("./components/skill/ListingComponent"));
 const ContactListingComponent = lazy(() => import("./components/contactUs/ListingComponent"));
+const LeadsListingComponent = lazy(() => import("./components/leads/LeadsListingComponent"));
 
 const UserFormComponent = lazy(() => import("./components/users/FormComponent"));
 const UserListingComponent = lazy(() => import("./components/users/ListingComponent"));
@@ -77,6 +78,7 @@ const DistributorChainComponent = lazy(() => import("./components/company/Distri
 const DistributorListingComponent = lazy(() => import("./components/distributor/DistributorListingComponent"));
 const DistributorFormComponent = lazy(() => import("./components/distributor/DistributorFormComponent"));
 const SystemConfig = lazy(() => import("./components/systemConfig/SystemConfig"));
+const OrdersListingComponent = lazy(() => import("./components/orders/OrdersListingComponent"));
 
 import API from "./apis";
 import { Utility } from "./components/utility";
@@ -85,14 +87,12 @@ import { setAgreementSigned } from "./redux/actions/UserActions";
 // import Calendar from "./calendar/calendar";
 
 function App() {
-  const [role, setRole] = useState(null);
+  const { pathname, search } = useLocation();
+  const { getLocalStorage, getRole, setStorageAndDispatch, verifyToken } = Utility();
+  const [role, setRole] = useState(() => getRole());
   const [theme, colorMode] = useMode();
   const navigateTo = useNavigate();
   const dispatch = useDispatch();
-
-  const { pathname, search } = useLocation();
-  const { getLocalStorage, getRole, setStorageAndDispatch, verifyToken } = Utility();
-
 
   useEffect(() => {
     const roleType = getRole();
@@ -190,6 +190,7 @@ function App() {
 
                       <Route exact path="/service/listing" element={<ServiceListingComponent />} />
                       <Route exact path="/contact/listing" element={<ContactListingComponent />} />
+                      <Route exact path="/leads/listing" element={<LeadsListingComponent />} />
 
                       <Route exact path="/skill/listing" element={<SkillListingComponent />} />
 
@@ -232,6 +233,7 @@ function App() {
                        <Route exact path="/distributor/create" element={<DistributorFormComponent />} />
                        <Route exact path="/distributor/update/:id" element={<DistributorFormComponent />} />
                        <Route exact path="/system/config" element={<SystemConfig />} />
+                       <Route exact path="/orders/listing" element={<OrdersListingComponent />} />
 
                        {/* <Route exact path="/calendar" element={<Calendar />} /> */}
                     </>}
