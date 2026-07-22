@@ -287,6 +287,12 @@ const Sidebar = ({ role }) => {
 
               <SectionLabel label="Products" colors={colors} />
               <SidebarItem
+                title="Orders"
+                to="/orders/listing"
+                icon={<LocalShippingOutlinedIcon />}
+                selected={selected}
+              />
+              <SidebarItem
                 title="Product Detail"
                 to="/product/detail/listing"
                 icon={<ShoppingBagOutlinedIcon />}
@@ -325,13 +331,19 @@ const Sidebar = ({ role }) => {
                 selected={selected}
               />
 
-              <SectionLabel label="Enquiries" colors={colors} />
+              <SectionLabel label="Leads & Enquiries" colors={colors} />
               <SidebarItem
+                title="Partner Requests / Leads"
+                to="/leads/listing"
+                icon={<ContactMailOutlinedIcon />}
+                selected={selected}
+              />
+              {/* <SidebarItem
                 title="Contact Enquiries"
                 to="/contact/listing"
                 icon={<ContactMailOutlinedIcon />}
                 selected={selected}
-              />
+              /> */}
 
               <SectionLabel label="Pages" colors={colors} />
               <SidebarItem
